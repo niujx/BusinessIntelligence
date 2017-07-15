@@ -23,7 +23,7 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo())
                 .pathMapping("/")
                 .select()
-                .paths(PathSelectors.regex("/data.*"))
+                .paths(PathSelectors.regex("/bi.*"))
                 .build();
     }
 

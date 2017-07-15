@@ -31,6 +31,7 @@
         <logback.version>1.2.1</logback.version>
         <commons.version>3.5</commons.version>
         <swagger.version>2.6.1</swagger.version>
+        <http-client.version>4.5.3</http-client.version>
     </properties>
 
     <dependencies>
@@ -130,6 +131,13 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.0.26</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${http-client.version}</version>
         </dependency>
 
     </dependencies>
