@@ -1,0 +1,26 @@
+server:
+   port: 9578
+
+logging:
+    path: logs
+    file: bi.log
+
+
+spring:
+   application:
+          name: bi
+   datasource:
+       driver-class-name: com.mysql.jdbc.Driver
+       url: jdbc:mysql://10.143.90.39:3306/test?autoReconnect=true
+       username: root
+       password: root
+
+
+mybatis:
+    type-aliases-package: com.business.intelligence.model
+    mapper-locations:
+       - mapper/*
+
+
+
+
