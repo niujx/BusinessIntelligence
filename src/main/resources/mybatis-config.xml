@@ -21,5 +21,6 @@
     </typeAliases>
     <mappers>
         <mapper resource="mapper/TUser.xml"/>
+        <mapper resource="mapper/ElemeOrderCrawler.xml"/>
     </mappers>
 </configuration>

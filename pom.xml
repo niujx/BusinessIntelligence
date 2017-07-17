@@ -139,6 +139,32 @@
             <artifactId>httpclient</artifactId>
             <version>${http-client.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>me.ele.openapi</groupId>
+            <artifactId>eleme-openapi-sdk</artifactId>
+            <version>1.3.11</version>
+        </dependency>
 
     </dependencies>
 
