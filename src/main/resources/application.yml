@@ -21,6 +21,8 @@ mybatis:
     mapper-locations:
        - mapper/*
 
+imgPath: /Users/wangfukun/other/img/
+
 
 
 
