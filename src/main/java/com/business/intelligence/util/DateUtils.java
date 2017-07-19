@@ -8,6 +8,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
+     /**将时间按照yyyy-MM-dd的格式转换为String
+     */
+    public static String date2String(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
 
     /**
      * @author wfk
