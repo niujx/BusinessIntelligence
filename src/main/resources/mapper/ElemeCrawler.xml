@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.intelligence">
+    <insert id="insertEvaluate" keyProperty="id" parameterType="ElemeEvaluate">
+        insert into eleme_evaluate(shopId,date,evaValue,star,goods,num,type) values (#{shopId},#{date},#{evaValue},#{star},#{goods},#{num},#{type})
+    </insert>
+
+    <insert id="insertOrder" keyProperty="id" parameterType="OOrder">
+        <!--todo-->
+    </insert>
+</mapper>
