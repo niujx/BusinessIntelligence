@@ -1,0 +1,83 @@
+/*全局基本样式不用管*/
+*{
+	margin:0;
+	padding:0;
+	list-style: none;
+	text-decoration: none;
+}
+/*百度外卖*/
+/*装表格的大框子的样式*/
+.tableDetail{
+	width: 90%;/*表格宽 可调整*/
+	margin: 5% auto;/*使表格居中 20%代表距离上边的高度*/
+}
+/*表格本身样式*/
+.tableDetail table{
+	width: 100%;
+	text-align: center;
+}
+/*单元格的背景色*/
+.tableDetail table td{
+	padding: 14px;/*调节表格单元格之间的内间距*/
+	/*background: #def3ca;*/
+	background:#feeff1;
+	border:2px solid white;
+	border-radius: 6px;
+	color: #5a5050;
+	font-size: 12px;
+	
+}
+/*表格里的按钮*/
+.tableDetail table td button{
+	border:1px solid white;
+	padding: 2px 8px;
+	/*background:-webkit-linear-gradient(top, #acce3c, #9cc401);*/
+	background:-webkit-linear-gradient(top, #fb8192, #fd556d);
+	border:none;
+	border-radius: 4px;
+	color: white;
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	outline: none;
+}
+.tableDetail table td button:first-child{
+	margin-right: 8px;
+}
+/*设置所有的抓取时间样式*/
+.tableDetail table td input{
+	outline: none;
+	border:none;
+	padding: 2px 8px;
+}
+/*标题单元格的背景色*/
+.tableDetail table th{
+	text-align: center;
+	padding: 10px;/*调节表头单元格之间的内间距*/
+	/*background:-webkit-linear-gradient(top, #91e304, #6ba93d);*//* Chrome */
+	background:-webkit-linear-gradient(top, #fb96a3, #fd2e4a);/* Chrome */
+	border:2px solid white;
+	border-radius: 6px;
+	color: white;
+}
+
+/*美团外卖*/
+.tableDetail.meituan table th{
+	background:-webkit-linear-gradient(top, #fcd985, #fdb810);/* Chrome */
+}
+.tableDetail.meituan table td{
+	background:#fdf5e0;
+}
+.tableDetail.meituan table td button{
+	background:-webkit-linear-gradient(top, #fdcd59, #efae11);
+}
+
+/*饿了么*/
+.tableDetail.eleme table th{
+	background:-webkit-linear-gradient(top, #7fc2ea, #0391e6);/* Chrome */
+}
+.tableDetail.eleme table td{
+	background:#e8f4fb;
+}
+.tableDetail.eleme table td button{
+	background:-webkit-linear-gradient(top, #98c9e6, #36a3e3);
+}
