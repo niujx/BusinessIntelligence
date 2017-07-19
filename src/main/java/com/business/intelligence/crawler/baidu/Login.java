@@ -1,10 +1,12 @@
 package com.business.intelligence.crawler.baidu;
 
 import com.alibaba.fastjson.JSONObject;
+import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.Extracter;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.HttpUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +24,7 @@ import sun.misc.BASE64Encoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -80,7 +83,7 @@ public class Login {
             rget = HttpClientUtil.get(shouye);
             content = HttpClientUtil.executeGetWithResult(client, rget);
             if (content.contains("百度商户")) {
-                loadBills();
+                loadBills("","");
             }
             log.info("登录后返回内容2：" + content);
         } catch (IOException e) {
@@ -91,7 +94,11 @@ public class Login {
     /**
      * 统一下载
      */
-    private static void loadBills() {
+    private static void loadBills(String startTime,String endTime) {
+        if(StringUtils.isEmpty(startTime)&&StringUtils.isEmpty(endTime)){
+            startTime = DateUtils.formatDate(new Date(),"yyyyMMdd");
+            endTime =  DateUtils.formatDate(DateUtils.someDayAgo(1),"yyyyMMdd");
+        }
         dowShopdata();
         dowShophotsaledish();
     }
