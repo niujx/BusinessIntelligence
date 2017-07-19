@@ -1,6 +1,6 @@
-package com.business.intelligence.crawler.ElemeCrawler;
+package com.business.intelligence.crawler.eleme;
 
-import com.business.intelligence.utils.WebUtils;
+import com.business.intelligence.util.WebUtils;
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.ElemeModel.ElemeEvaluate;

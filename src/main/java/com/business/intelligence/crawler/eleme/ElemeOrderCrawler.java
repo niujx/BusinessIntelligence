@@ -1,9 +1,8 @@
-package com.business.intelligence.crawler.ElemeCrawler;
+package com.business.intelligence.crawler.eleme;
 
-import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
-import com.business.intelligence.utils.DateUtils;
+import com.business.intelligence.util.DateUtils;
 import eleme.openapi.sdk.api.entity.order.OOrder;
 import eleme.openapi.sdk.api.entity.order.OrderList;
 import eleme.openapi.sdk.api.exception.ServiceException;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Tcww on 2017/7/18.
@@ -45,7 +43,7 @@ public class ElemeOrderCrawler extends ElemeCrawler{
             OrderList allOrders = getAllOrders(date);
             System.out.println(allOrders.getTotal());
             for(OOrder order:allOrders.getList()){
-                elemeDao.insertOrder(order);
+//                elemeDao.insertOrder(order);
             }
         } catch (ServiceException e) {
             e.printStackTrace();

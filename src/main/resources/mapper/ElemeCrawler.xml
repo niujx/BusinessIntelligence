@@ -8,7 +8,7 @@
         insert into eleme_evaluate(shopId,date,evaValue,star,goods,num,type) values (#{shopId},#{date},#{evaValue},#{star},#{goods},#{num},#{type})
     </insert>
 
-    <insert id="insertOrder" keyProperty="id" parameterType="OOrder">
+    <!--<insert id="insertOrder" keyProperty="id" parameterType="OOrder">-->
         <!--todo-->
-    </insert>
+    <!--</insert>-->
 </mapper>
