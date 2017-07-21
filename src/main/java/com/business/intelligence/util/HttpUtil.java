@@ -431,7 +431,7 @@ public class HttpUtil {
             jsonEntity = new StringEntity(json, "UTF-8");
             httppost.setEntity(jsonEntity);
             httppost.setHeader(HttpMethodParams.SO_TIMEOUT,"600000");
-            httppost.setHeader("Content-type", "application/json;charset=utf-8");
+            httppost.setHeader("Content-type", "application/x-www-form-urlencoded");
             logger.info("request: " + httppost.getURI());
             CloseableHttpResponse httpResponse = httpRequest.execute(httppost);
             try {
