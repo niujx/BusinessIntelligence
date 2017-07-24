@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Tcqq on 2017/7/17.
  */
 @Component
-public class ElemeEvaluateCrawler extends BaseCrawler {
+public class ElemeEvaluateCrawler extends ElemeCrawler {
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
     //用户信息
@@ -52,7 +52,7 @@ public class ElemeEvaluateCrawler extends BaseCrawler {
      * 获取评价个数
      */
     public int getCount(String url){
-        String json = WebUtils.getWeb(url,httpClient);
+        String json = WebUtils.getWebByGet(url,httpClient);
         json = "{\"result\":{\"list\":"+json+"}}";
         Integer count = (Integer) WebUtils.getOneByJsonPath(json,"$.result.list[0].amount");
         return count;
@@ -65,7 +65,7 @@ public class ElemeEvaluateCrawler extends BaseCrawler {
      */
     public List<ElemeEvaluate> getOnePageEvaluateByCustomer(long shopId, String url){
         List<ElemeEvaluate> list = new ArrayList<ElemeEvaluate>();
-        String json = WebUtils.getWeb(url,httpClient);
+        String json = WebUtils.getWebByGet(url,httpClient);
         json = "{\"result\":{\"list\":"+json+"}}";
         List<LinkedHashMap<String, Object>> maps = WebUtils.getMapsByJsonPath(json, "$.result.list[*]");
         //取得所有订单评论
