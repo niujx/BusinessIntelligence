@@ -1,5 +1,7 @@
 (function($){
 	
+	var address = "http://localhost:9578/bi/";
+	
 	/**************************百度外卖*******************************/
 	//点击开抓按钮时
 	$(".baidu .begin").on('click',function(){
@@ -31,7 +33,7 @@
 	$(".baidu .download").on("click",function(){
 		//发送请求
 		$.ajax({
-			url:"./new_file.json",//请求路径
+			url:address+"getTime",//请求路径
 			type:"get",//请求方式 get和post
 			dataType:"json",//返回数据的格式
 			success:function(e){
