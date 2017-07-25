@@ -29,6 +29,7 @@ import java.util.*;
 
 /**
  * Created by Tcqq on 2017/7/19.
+ * 营业统计 POST请求
  */
 @Component
 public class ElemeSaleCrawler extends ElemeCrawler {
@@ -77,8 +78,12 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             e.printStackTrace();
         }finally {
             try {
-                execute.close();
-                client.close();
+                if (execute != null){
+                    execute.close();
+                }
+                if(client != null){
+                    client.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

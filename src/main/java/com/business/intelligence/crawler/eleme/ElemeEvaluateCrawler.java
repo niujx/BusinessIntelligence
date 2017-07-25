@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/17.
+ * 顾客评价
  */
 @Component
 public class ElemeEvaluateCrawler extends ElemeCrawler {

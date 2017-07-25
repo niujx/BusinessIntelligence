@@ -14,6 +14,13 @@ public class DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
+     /**将毫秒值按照yyyy-MM-dd的格式转换为时间字符串
+     */
+    public static String long2Date(Long l){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(l);
+        return sdf.format(date);
+    }
 
     /**
      * @author wfk

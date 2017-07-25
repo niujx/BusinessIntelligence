@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/24.
+ * 商品分析 POST请求
  */
 @Component
 public class ElemeCommodityCrawler extends ElemeCrawler{

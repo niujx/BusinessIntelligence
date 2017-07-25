@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/24.
+ * 排名流量 POST请求
  */
 @Component
 public class ElemeFlowCrawler extends ElemeCrawler{
@@ -72,8 +73,12 @@ public class ElemeFlowCrawler extends ElemeCrawler{
             e.printStackTrace();
         }finally {
             try {
-                execute.close();
-                client.close();
+                if (execute != null){
+                    execute.close();
+                }
+                if(client != null){
+                    client.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

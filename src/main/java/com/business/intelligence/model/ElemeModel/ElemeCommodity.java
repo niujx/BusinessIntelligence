@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by Tcqq on 2017/7/24.
+ * 商品分析
  */
 @Data
 @Component

@@ -83,7 +83,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         String content=null;
         HttpPost httppost = new HttpPost(LOGINURL);
         StringEntity jsonEntity = null;
-        String json = "{\"id\":\"22f73c49-f96f-42b7-8716-ec4177a4d25a\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":15201633321_eleme,\"password\":"+PASSWORD+",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"22f73c49-f96f-42b7-8716-ec4177a4d25a\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":"+USERNAME+",\"password\":"+PASSWORD+",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         httppost.setEntity(jsonEntity);
         httppost.setHeader("Content-type", "application/json;charset=utf-8");
@@ -124,7 +124,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
     }
 
     /**
-     * 设置饿了么网页跳掉的header
+     * 设置饿了么网页的header
      */
     protected void setElemeHeader(HttpPost post){
         post.setHeader("Content-type", "application/json;charset=utf-8");
