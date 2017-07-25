@@ -49,24 +49,14 @@ public class ElemeFlowCrawler extends ElemeCrawler{
      */
     public List<LinkedHashMap<String, Object>> getFlowText(CloseableHttpClient client){
         CloseableHttpResponse execute = null;
-        String content=null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":150148671,\"beginDate\":\"2017-06-26\",\"endDate\":\"2017-06-26\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":150148671,\"beginDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
-        post.setHeader("Content-type", "application/json;charset=utf-8");
-        post.setHeader("Host", "app-api.shop.ele.me");
-        post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0");
-        post.setHeader("Accept", "*/*");
-        post.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-        post.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        post.setHeader("X-Shard", "shopid=150148671");
+        setElemeHeader(post);
         post.setHeader("X-Eleme-RequestID", "bce6735e-27dd-441b-982c-19b6422327b3");
-        post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
-        post.setHeader("origin", "https://melody-stats.faas.ele.me");
-        post.setHeader("Connection", "keep-alive");
         try {
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();

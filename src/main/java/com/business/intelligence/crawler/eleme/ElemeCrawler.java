@@ -122,4 +122,20 @@ public abstract class ElemeCrawler extends BaseCrawler{
         return client;
 
     }
+
+    /**
+     * 设置饿了么网页跳掉的header
+     */
+    protected void setElemeHeader(HttpPost post){
+        post.setHeader("Content-type", "application/json;charset=utf-8");
+        post.setHeader("Host", "app-api.shop.ele.me");
+        post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0");
+        post.setHeader("Accept", "*/*");
+        post.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+        post.setHeader("Accept-Encodinge", "gzip, deflate, br");
+        post.setHeader("X-Shard", "shopid=150148671");
+        post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
+        post.setHeader("origin", "https://melody-stats.faas.ele.me");
+        post.setHeader("Connection", "keep-alive");
+    }
 }

@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeEvaluate {
-    private long shopId;
+    private Long shopId;
     private String date;
     private String evaValue;
-    private int star;
+    private Integer star;
     private String goods;
-    private int num;
+    private Integer num;
     private String type;
 
 

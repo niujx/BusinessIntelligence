@@ -11,18 +11,18 @@ import org.springframework.stereotype.Component;
 public class ElemeSale {
     private String date;
     private String shop;
-    private double totalOrderAmount;
-    private double foodAmount;
-    private double boxAmount;
-    private double deliverAmount;
-    private double onlinePaymentAmount;
-    private double offlinePaymentAmount;
-    private double restaurantDiscount;
-    private double elemeDiscount;
-    private double validOrderCount;
-    private double averagePrice;
-    private double invalidOrderCount;
-    private double lossSaleAmount;
+    private Double totalOrderAmount;
+    private Double foodAmount;
+    private Double boxAmount;
+    private Double deliverAmount;
+    private Double onlinePaymentAmount;
+    private Double offlinePaymentAmount;
+    private Double restaurantDiscount;
+    private Double elemeDiscount;
+    private Double validOrderCount;
+    private Double averagePrice;
+    private Double invalidOrderCount;
+    private Double lossSaleAmount;
 
     @Override
     public String toString() {

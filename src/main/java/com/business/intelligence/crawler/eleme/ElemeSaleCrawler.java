@@ -54,24 +54,14 @@ public class ElemeSaleCrawler extends ElemeCrawler {
      */
     public List<LinkedHashMap<String, Object>> getSaleText(CloseableHttpClient client){
         CloseableHttpResponse execute = null;
-        String content=null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
         String json = "{\"id\":\"055c6d0f-dc56-4188-89c1-10c67963df8a\",\"method\":\"getHistoryBusinessStatisticsV3\",\"service\":\"saleStatsNew\",\"params\":{\"shopId\":150148671,\"startDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
-        post.setHeader("Content-type", "application/json;charset=utf-8");
-        post.setHeader("Host", "app-api.shop.ele.me");
-        post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0");
-        post.setHeader("Accept", "*/*");
-        post.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-        post.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        post.setHeader("X-Shard", "shopid=150148671");
+        setElemeHeader(post);
         post.setHeader("X-Eleme-RequestID", "055c6d0f-dc56-4188-89c1-10c67963df8a");
-        post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
-        post.setHeader("origin", "https://melody-stats.faas.ele.me");
-        post.setHeader("Connection", "keep-alive");
         try {
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
