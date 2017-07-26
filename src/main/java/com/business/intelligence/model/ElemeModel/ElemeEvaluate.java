@@ -13,10 +13,8 @@ public class ElemeEvaluate {
     private Long shopId;
     private String date;
     private String evaValue;
-    private Integer star;
+    private String quality;
     private String goods;
-    private Integer num;
-    private String type;
 
 
     @Override
@@ -25,10 +23,8 @@ public class ElemeEvaluate {
                 "shopId=" + shopId +
                 ", date='" + date + '\'' +
                 ", evaValue='" + evaValue + '\'' +
-                ", star=" + star +
+                ", quality=" + quality +
                 ", goods='" + goods + '\'' +
-                ", index=" + num +
-                ", type='" + type + '\'' +
                 '}';
     }
 }
