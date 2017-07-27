@@ -29,6 +29,7 @@ mybatis:
        - mapper/*
 
 imgPath: /Users/wangfukun/other/img/
+csvPath: /Users/wangfukun/other/img/
 
 
 
