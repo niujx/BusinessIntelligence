@@ -27,13 +27,12 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 @Configuration
 @EnableAsync
-public class Login {
+public class WaimaiCrawler {
 
-    private static final Logger log = LoggerFactory.getLogger(Login.class);
+    private static final Logger log = LoggerFactory.getLogger(WaimaiCrawler.class);
 
     private static String token;
 
@@ -41,7 +40,7 @@ public class Login {
 
     private static CookieStore cookieStore = new BasicCookieStore();
 
-    public Login() {
+    public WaimaiCrawler() {
         if (client == null) {
             client = HttpClientUtil.getHttpClient(cookieStore);
         }
@@ -55,7 +54,7 @@ public class Login {
      * @param passWord 密码
      * @param captcha  图片验证码（解析后的）
      */
-    public static void logins(String userName, String passWord, String captcha) {
+    public void logins(String userName, String passWord, String captcha) {
         String loginUrl = "https://wmpass.baidu.com/api/login";
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "1");
@@ -70,22 +69,22 @@ public class Login {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            log.info("登录时返回内容：" + content);
+//            log.info("登录时返回内容：" + content);
             JSONObject json = JSONObject.parseObject(content);
             JSONObject data = json.getJSONObject("data");
             String return_url = data.getString("return_url");
             HttpGet rget = HttpClientUtil.get(return_url);
             content = HttpClientUtil.executeGetWithResult(client, rget);
-            log.info("登录后返回内容1：" + content);
+//            log.info("登录后返回内容1：" + content);
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/");
 
             String shouye = "https://wmcrm.baidu.com/crm?qt=neworderlist";
             rget = HttpClientUtil.get(shouye);
             content = HttpClientUtil.executeGetWithResult(client, rget);
             if (content.contains("百度商户")) {
-                loadBills("","");
+                loadBills("", "");
             }
-            log.info("登录后返回内容2：" + content);
+//            log.info("登录后返回内容2：" + content);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,13 +93,15 @@ public class Login {
     /**
      * 统一下载
      */
-    private static void loadBills(String startTime,String endTime) {
-        if(StringUtils.isEmpty(startTime)&&StringUtils.isEmpty(endTime)){
-            startTime = DateUtils.formatDate(new Date(),"yyyyMMdd");
-            endTime =  DateUtils.formatDate(DateUtils.someDayAgo(1),"yyyyMMdd");
+    private void loadBills(String startTime, String endTime) {
+        if (StringUtils.isEmpty(startTime) && StringUtils.isEmpty(endTime)) {
+            startTime = DateUtils.formatDate(new Date(), "yyyyMMdd");
+            endTime = DateUtils.formatDate(DateUtils.someMonthAgo(1), "yyyyMMdd");
         }
-        dowShopdata();
-        dowShophotsaledish();
+        dowShopdata(startTime, endTime);
+        dowShophotsaledish(startTime, endTime);
+        dowAllcashtradelist(startTime, endTime);
+        dowAllcashtradelist(startTime, endTime);
     }
 
     /**
@@ -109,10 +110,10 @@ public class Login {
      * @return
      */
     @Async
-    private static void dowShopdata() {
+    private void dowShopdata(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shopdata");
-            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=20170707&endTime=20170713&act=export");
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime="+startTime+"&endTime="+endTime+"&act=export");
             dwd.addHeader("referer", "https://wmcrm.baidu.com/crm?qt=shopdata");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
@@ -120,7 +121,7 @@ public class Login {
             CloseableHttpResponse response = client.execute(dwd);
             InputStream in = response.getEntity().getContent();
             File file = new File("/Users/wangfukun/other/img/");
-            File target = new File(file.getParentFile(), file.getName() + System.currentTimeMillis() + ".csv");
+            File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
         } catch (IOException e) {
             log.error("下载曝光数据失败：" + e);
@@ -133,16 +134,62 @@ public class Login {
      * @return
      */
     @Async
-    private static void dowShophotsaledish() {
+    private void dowShophotsaledish(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shophotsaledish");
-            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm?qt=exportshophotsaledishtask&from=pc&start_time=2017-06-18&end_time=2017-07-17&orderby=xl&display=json&");
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm?qt=exportshophotsaledishtask&from=pc&start_time="+startTime+"&end_time="+endTime+"&orderby=xl&display=json&");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
             CloseableHttpResponse response = client.execute(dwd);
             InputStream in = response.getEntity().getContent();
             File file = new File("/Users/wangfukun/other/img/");
-            File target = new File(file.getParentFile(), file.getName() + System.currentTimeMillis() + ".csv");
+            File target = new File(file.getParentFile(), "热销菜品表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
+            FileUtils.copyInputStreamToFile(in, target);
+        } catch (IOException e) {
+
+        }
+    }
+
+    /**
+     * 下载商户已入账
+     *
+     * @param startTime
+     * @param endTime
+     */
+    @Async
+    private void dowAllcashtradelist(String startTime, String endTime) {
+        try {
+            HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=getstaterecordlist");
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/settlement/exportallcashtradelist?begin_time=" + startTime + "&end_time=" + endTime + "&display=json");
+            dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            dwd.addHeader("accept-encoding", "gzip, deflate, br");
+            CloseableHttpResponse response = client.execute(dwd);
+            InputStream in = response.getEntity().getContent();
+            File file = new File("/Users/wangfukun/other/img/");
+            File target = new File(file.getParentFile(), "商户入账表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
+            FileUtils.copyInputStreamToFile(in, target);
+        } catch (IOException e) {
+
+        }
+    }
+
+    /**
+     * 下载商户提现
+     *
+     * @param startTime
+     * @param endTime
+     */
+    @Async
+    private void dowWthdrawlist(String startTime, String endTime) {
+        try {
+            HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=getstaterecordlist");
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/settlement/exportwithdrawlist?trade_begin_time=" + startTime + "&trade_end_time=" + endTime + "&display=json");
+            dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            dwd.addHeader("accept-encoding", "gzip, deflate, br");
+            CloseableHttpResponse response = client.execute(dwd);
+            InputStream in = response.getEntity().getContent();
+            File file = new File("/Users/wangfukun/other/img/");
+            File target = new File(file.getParentFile(), "商户提现表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
         } catch (IOException e) {
 
@@ -154,7 +201,7 @@ public class Login {
      *
      * @return
      */
-    public static void getToken() {
+    public void getToken() {
         try {
             String url = "https://wmpass.baidu.com/wmpass/openservice/captchapair?protocal=https&callback=jQuery111003751282313330697_1500275164771&_=" + System.currentTimeMillis();
             HttpGet get = HttpClientUtil.get(url);
@@ -170,6 +217,7 @@ public class Login {
             log.error("获取图片验证token出错：" + e);
         }
     }
+
 
     /**
      * 获取加密密码
@@ -194,7 +242,8 @@ public class Login {
     }
 
     public static void main(String[] args) {
-        getToken();
+        WaimaiCrawler l = new WaimaiCrawler();
+        l.getToken();
         CloseableHttpClient httpRequest = HttpClients.createDefault();
         String url = "https://wmpass.baidu.com/wmpass/openservice/imgcaptcha?token=" + token + "&t=" + System.currentTimeMillis() + "&color=3c78d8";
         HttpGet httpget = new HttpGet(url);
@@ -203,11 +252,11 @@ public class Login {
         String pwd = getPassWord("wang170106");
         log.info("密码：" + pwd);
         ;
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("请输入验证码：");
-        String img = scanner.nextLine();
-        log.info("图片验证码" + img);
-        logins("twfhscywjd", pwd, img);
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.print("请输入验证码：");
+//        String img = scanner.nextLine();
+        log.info("图片验证码" + imgCode);
+        l.logins("twfhscywjd", pwd, imgCode);
     }
 
 }

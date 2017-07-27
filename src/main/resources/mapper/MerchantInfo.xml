@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.intelligence.model.MerchantInfo">
+    <select id="selectById" parameterType="String" resultType="MerchantInfo">
+        SELECT
+           MERCHANT_ID_ AS id,
+           MERCHANT_NAME_  AS name,
+           ADDRESS_  AS address,
+           PHONE_  AS phone,
+           MT_USER_  AS mtUser,
+           MT_PWD_  AS mtPassword,
+           ELM_USER_  AS eleUser,
+           ELM_PWD_  AS elmPassword,
+           BD_USER_  AS bdUser,
+           BD_PWD_   AS bdPassword,
+           CREATE_TIME_ AS createTime,
+           CREATE_EMP_  AS createEmp,
+           UPDATE_TIME_ AS  updateTime,
+           UPDATE_EMP_   AS updateEmp
+        FROM
+            tb_all_merchantinfo
+        WHERE
+            MERCHANT_ID_ = #{id}
+    </select>
+</mapper>
