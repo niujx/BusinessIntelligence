@@ -1,4 +1,4 @@
-package com.business.intelligence.utils;
+package com.business.intelligence.util;
 
 import com.jayway.jsonpath.JsonPath;
 import org.apache.http.HttpEntity;

@@ -1,6 +1,5 @@
 package com.business.intelligence.util;
 
-import com.sun.deploy.net.URLEncoder;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
@@ -27,6 +26,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;

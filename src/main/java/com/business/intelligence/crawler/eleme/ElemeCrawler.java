@@ -1,4 +1,4 @@
-package com.business.intelligence.crawler.ElemeCrawler;
+package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.crawler.BaseCrawler;
 import eleme.openapi.sdk.config.Config;

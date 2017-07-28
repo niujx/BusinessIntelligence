@@ -1,7 +1,7 @@
 package com.business.intelligence.dao;
 
 import com.business.intelligence.BaseTest;
-import com.business.intelligence.model.TUser;
+import com.business.intelligence.model.MerchantInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,9 +19,9 @@ public class TestJDBC extends BaseTest {
 
     @Test
     public void testJDBC() {
-        TUser user = sqlSessionTemplate.selectOne("com.business.intelligence.model.TUser.selectUserById", 1);
-        Assert.assertNotNull(user);
-        Assert.assertEquals(user.getUserName(), "yanshi");
+        MerchantInfo merchantInfo = sqlSessionTemplate.selectOne("com.business.intelligence.model.MerchantInfo.selectById", "95133ec4-c04a-474c-8d94-750cb3c2c039");
+        Assert.assertNotNull(merchantInfo);
+        Assert.assertEquals(merchantInfo.getName(),"兄鸡店面");
     }
 
 
