@@ -17,9 +17,12 @@ public class DateUtils {
      /**将毫秒值按照yyyy-MM-dd的格式转换为时间字符串
      */
     public static String long2Date(Long l){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(l);
-        return sdf.format(date);
+        if(l != null){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date(l);
+            return sdf.format(date);
+        }
+        return "毫秒数为null";
     }
 
     /**

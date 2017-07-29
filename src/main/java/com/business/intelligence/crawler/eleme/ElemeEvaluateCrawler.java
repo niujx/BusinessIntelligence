@@ -44,10 +44,12 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         String evaluateText = getEvaluateText(login());
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
         List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
-        getElemeEvaluateBeans(orderList,foodList);
+        List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
+        for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
+            elemeDao.insertEvaluate(elemeEvaluate);
+        }
 
     }
-
 
     /**
      * 通过爬虫获得所有的对应日期的顾客评论
@@ -126,20 +128,22 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         List<ElemeEvaluate> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : orderList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
+            elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Integer)map.getOrDefault("ratingId",null)*1l);
             elemeEvaluate.setShopId(204666l);
-            elemeEvaluate.setDate(DateUtils.date2String(crawlerDate));
-            elemeEvaluate.setEvaValue((String)map.get("ratingContent"));
-            elemeEvaluate.setQuality(String.valueOf(map.get("ratingStar")));
+            elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
+            elemeEvaluate.setEvaValue((String)map.getOrDefault("ratingContent","无评论"));
+            elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
             elemeEvaluate.setGoods("本条为订单评论");
             list.add(elemeEvaluate);
         }
         for(LinkedHashMap<String,Object> map : foodList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
+            elemeEvaluate.setId((Long)map.getOrDefault("ratingId",null));
             elemeEvaluate.setShopId(204666l);
-            elemeEvaluate.setDate(DateUtils.date2String(crawlerDate));
-            elemeEvaluate.setEvaValue((String)map.get("foodRatingContent"));
-            elemeEvaluate.setQuality((String)map.get("quality"));
-            elemeEvaluate.setGoods((String)map.get("foodName"));
+            elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
+            elemeEvaluate.setEvaValue((String)map.getOrDefault("foodRatingContent","无评论"));
+            elemeEvaluate.setQuality((String)map.getOrDefault("quality","无"));
+            elemeEvaluate.setGoods((String)map.getOrDefault("foodName","无"));
             list.add(elemeEvaluate);
         }
         return list;

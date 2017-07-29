@@ -33,29 +33,22 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     private HttpClient httpClient = super.httpClient;
 
     private static final String URL ="https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
-    private static final Map<Boolean, String> SHARE = Maps.newHashMap();
+    private static final Map<Boolean, String> ISSHARE = Maps.newHashMap();
 
     static {
-        SHARE.put(true,"与折扣、特价活动共享");
-        SHARE.put(false,"不与折扣、特价活动共享");
-        SHARE.put(null,"未知");
+        ISSHARE.put(true,"与折扣、特价活动共享");
+        ISSHARE.put(false,"不与折扣、特价活动共享");
+        ISSHARE.put(null,"未知");
     }
 
     @Override
     public void doRun() {
-
-    }
-
-
-    public static void main(String[] args) {
-        ElemeActivityCrawler elemeActivityCrawler = new ElemeActivityCrawler();
-        List<LinkedHashMap<String, Object>> activityText = elemeActivityCrawler.getActivityText(elemeActivityCrawler.login());
-        List<ElemeActivity> elemeActivityBeans = elemeActivityCrawler.getElemeActivityBeans(activityText);
-        for(ElemeActivity e : elemeActivityBeans){
-            System.out.println(e);
+        List<LinkedHashMap<String, Object>> activityText = getActivityText(login());
+        List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
+        for(ElemeActivity elemeActivity : elemeActivityBeans){
+            elemeDao.insertActivity(elemeActivity);
         }
     }
-
 
     /**
      * 通过爬虫获得所有活动详情
@@ -106,17 +99,18 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : activityList){
             LinkedHashMap<String, Object> contentMap = (LinkedHashMap)map.get("content");
             ElemeActivity  elemeActivity= new ElemeActivity();
+            elemeActivity.setId((Integer) map.get("id"));
             elemeActivity.setShopId(150148671l);
-            elemeActivity.setBeginDate((String)map.get("beginDate"));
-            elemeActivity.setEndDate((String)map.get("endDate"));
-            elemeActivity.setName((String)map.get("name"));
-            elemeActivity.setStatus((String)map.get("status"));
-            elemeActivity.setCreateTime((String)map.get("createdAt"));
-            elemeActivity.setDescription((String)map.get("description"));
-            elemeActivity.setShare(SHARE.get((Boolean)contentMap.get("shareWithOtherActivities")));
+            elemeActivity.setBeginDate((String)map.getOrDefault("beginDate",""));
+            elemeActivity.setEndDate((String)map.getOrDefault("endDate",""));
+            elemeActivity.setName((String)map.getOrDefault("name",""));
+            elemeActivity.setStatus((String)map.getOrDefault("status","未知"));
+            elemeActivity.setCreateTime((String)map.getOrDefault("createdAt",""));
+            elemeActivity.setDescription((String)map.getOrDefault("description","无"));
+            elemeActivity.setIsShare(ISSHARE.get((Boolean)contentMap.getOrDefault("shareWithOtherActivities",null)));
             //活动内容
             String content = "";
-            switch ((String) map.get("iconText")){
+            switch ((String) map.getOrDefault("iconText","")){
                 case "折":
                    content = getZhe((Integer)contentMap.get("minCategory"),(Integer)contentMap.get("maxCategory"),(Double)contentMap.get("originalLeastPrice"),(Double)contentMap.get("originalMostPrice"),(Double)contentMap.get("discount"));
                    break;

@@ -10,20 +10,27 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeEvaluate {
+    //主键，网页名称：ratingId
+    private Long id;
+    //商户ID
     private Long shopId;
-    private String date;
+    //爬取时间
+    private String crawlerDate;
+    //评价内容
     private String evaValue;
+    //星级或者是评价
     private String quality;
+    //商品名称
     private String goods;
-
 
     @Override
     public String toString() {
         return "ElemeEvaluate{" +
-                "shopId=" + shopId +
-                ", date='" + date + '\'' +
+                "id=" + id +
+                ", shopId=" + shopId +
+                ", crawlerDate='" + crawlerDate + '\'' +
                 ", evaValue='" + evaValue + '\'' +
-                ", quality=" + quality +
+                ", quality='" + quality + '\'' +
                 ", goods='" + goods + '\'' +
                 '}';
     }

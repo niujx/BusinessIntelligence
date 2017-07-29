@@ -42,6 +42,9 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
     public void doRun() {
         List<LinkedHashMap<String, Object>> commodityText = getCommodityText(login());
         List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
+        for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
+            elemeDao.insertCommodity(elemeCommodity);
+        }
     }
 
 
@@ -104,21 +107,24 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         int totalSalesAmount = 0;
         //销量
         int totalSalesVolume = 0;
+        //排名
+        int index = 0;
         //计算销售额和销量的总量
         for(LinkedHashMap<String,Object> map : commodityList){
-            totalSalesAmount = totalSalesAmount +=(Double)map.get("salesAmount");
-            totalSalesVolume = totalSalesVolume +=(Integer)map.get("salesVolume");
+            totalSalesAmount = totalSalesAmount +=(Double)map.getOrDefault("salesAmount",0);
+            totalSalesVolume = totalSalesVolume +=(Integer)map.getOrDefault("salesVolume",0);
         }
         for(LinkedHashMap<String,Object> map : commodityList){
+            index++;
             ElemeCommodity elemeCommodity = new ElemeCommodity();
-            elemeCommodity.setDate(DateUtils.date2String(beginCrawlerDate)+" ~~ " + DateUtils.date2String(crawlerDate));
+            elemeCommodity.setMessageDate(DateUtils.date2String(beginCrawlerDate)+" ~~ " + DateUtils.date2String(crawlerDate)+" ("+index+")");
             elemeCommodity.setShopId(150148671l);
-            elemeCommodity.setFoodName((String)map.get("foodName"));
-            elemeCommodity.setSalesAmount((Double)map.get("salesAmount"));
-            String amountRate = String .valueOf((Double)map.get("salesAmount")/totalSalesAmount*100);
+            elemeCommodity.setFoodName((String)map.getOrDefault("foodName",""));
+            elemeCommodity.setSalesAmount((Double)map.getOrDefault("salesAmount",0));
+            String amountRate = String .valueOf((Double)map.getOrDefault("salesAmount",0)/totalSalesAmount*100);
             elemeCommodity.setSalesAmountRate(amountRate.substring(0,amountRate.indexOf(".")+3)+"%");
-            elemeCommodity.setSalesVolume((Integer)map.get("salesVolume"));
-            String volumeRate = String.valueOf((Integer)map.get("salesVolume")*1.0/totalSalesVolume*100);
+            elemeCommodity.setSalesVolume((Integer)map.getOrDefault("salesVolume",0));
+            String volumeRate = String.valueOf((Integer)map.getOrDefault("salesVolume",0)*1.0/totalSalesVolume*100);
             elemeCommodity.setSalesVolumeRate(volumeRate.substring(0,volumeRate.indexOf(".")+3)+"%");
             list.add(elemeCommodity);
         }

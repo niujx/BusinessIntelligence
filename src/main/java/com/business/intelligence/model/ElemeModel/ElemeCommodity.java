@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeCommodity {
-    //日期
-    private String date;
+    //日期,主键
+    private String messageDate;
     //商铺ID
     private Long shopId;
     //商品名称
@@ -28,7 +28,7 @@ public class ElemeCommodity {
     @Override
     public String toString() {
         return "ElemeCommodity{" +
-                "date='" + date + '\'' +
+                "messageDate='" + messageDate + '\'' +
                 ", shopId=" + shopId +
                 ", foodName='" + foodName + '\'' +
                 ", salesAmount=" + salesAmount +
