@@ -40,7 +40,10 @@ public class ElemeFlowCrawler extends ElemeCrawler{
     @Override
     public void doRun() {
         List<LinkedHashMap<String, Object>> flowList = getFlowText(login());
-        getElemeFlowBeans(flowList);
+        List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
+        for(ElemeFlow elemeFlow : elemeFlowBeans){
+            elemeDao.insertFlow(elemeFlow);
+        }
     }
 
     /**
@@ -63,11 +66,6 @@ public class ElemeFlowCrawler extends ElemeCrawler{
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.restaurantTrafficStatsList");
-            for (LinkedHashMap<String,Object> map:mapsByJsonPath){
-                for(String key : map.keySet()){
-                    System.out.println("key="+key+"-------value="+map.get(key));
-                }
-            }
             return mapsByJsonPath;
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,11 +95,12 @@ public class ElemeFlowCrawler extends ElemeCrawler{
         List<ElemeFlow> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : flowList){
             ElemeFlow elemeFlow = new ElemeFlow();
-            elemeFlow.setDate((String)map.get("statsDate"));
-            elemeFlow.setShopName((String)map.get("shopName"));
-            elemeFlow.setExposureTotalCount((Integer)map.get("exposureTotalCount"));
-            elemeFlow.setVisitorNum((Integer)map.get("visitorNum"));
-            elemeFlow.setBuyerNum((Integer)map.get("buyerNum"));
+            elemeFlow.setFlowId((String)map.getOrDefault("shopName","")+"~"+(String)map.getOrDefault("statsDate",""));
+            elemeFlow.setCrawlerDate((String)map.getOrDefault("statsDate",""));
+            elemeFlow.setShopName((String)map.getOrDefault("shopName",""));
+            elemeFlow.setExposureTotalCount((Integer)map.getOrDefault("exposureTotalCount",0));
+            elemeFlow.setVisitorNum((Integer)map.getOrDefault("visitorNum",0));
+            elemeFlow.setBuyerNum((Integer)map.getOrDefault("buyerNum",0));
             list.add(elemeFlow);
         }
         return list;

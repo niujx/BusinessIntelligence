@@ -10,25 +10,42 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeSale {
-    private String date;
-    private String shop;
+    //主键，门店~日期
+    private String saleId;
+    //统计日期
+    private String orderDate;
+    //门店
+    private Integer shop;
+    //营业额
     private Double totalOrderAmount;
+    //菜品销售
     private Double foodAmount;
+    //餐盒收入
     private Double boxAmount;
+    //配送收入
     private Double deliverAmount;
+    //在线支付
     private Double onlinePaymentAmount;
+    //货到付款
     private Double offlinePaymentAmount;
+    //商户补贴
     private Double restaurantDiscount;
+    //饿了么补贴
     private Double elemeDiscount;
-    private Double validOrderCount;
+    //有效单数
+    private Integer validOrderCount;
+    //平均客单价
     private Double averagePrice;
-    private Double invalidOrderCount;
+    //无效订单数
+    private Integer invalidOrderCount;
+    //预计损失
     private Double lossSaleAmount;
+
 
     @Override
     public String toString() {
         return "ElemeSale{" +
-                "date='" + date + '\'' +
+                "orderDate='" + orderDate + '\'' +
                 ", shop='" + shop + '\'' +
                 ", totalOrderAmount=" + totalOrderAmount +
                 ", foodAmount=" + foodAmount +

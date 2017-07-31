@@ -26,6 +26,10 @@ public class ElemeController {
     private ElemeBillCrawler elemeBillCrawler;
     @Autowired
     private ElemeCommodityCrawler elemeCommodityCrawler;
+    @Autowired
+    private ElemeFlowCrawler elemeFlowCrawler;
+    @Autowired
+    private ElemeSaleCrawler elemeSaleCrawler;
 
 
     @RequestMapping(value = "crawlerEvaluate", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
@@ -53,6 +57,18 @@ public class ElemeController {
     public String crawlerCommodity() {
         elemeCommodityCrawler.doRun();
         return "CrawlerCommodity is ok";
+    }
+    @RequestMapping(value = "crawlerFlow", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @ApiOperation(value = "爬取流量统计", httpMethod = "GET")
+    public String crawlerFlow() {
+        elemeFlowCrawler.doRun();
+        return "CrawlerFlow is ok";
+    }
+    @RequestMapping(value = "crawlerSale", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @ApiOperation(value = "爬取营业统计", httpMethod = "GET")
+    public String crawlerSale() {
+        elemeSaleCrawler.doRun();
+        return "CrawlerSale is ok";
     }
 
 

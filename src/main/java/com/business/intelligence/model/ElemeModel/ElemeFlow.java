@@ -10,20 +10,29 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeFlow {
-    private String date;
+    //主键：门店名称~日期
+    private String flowId;
+    //日期
+    private String crawlerDate;
+    //门店名称
     private String shopName;
+    //曝光率
     private Integer exposureTotalCount;
+    //到点数
     private Integer visitorNum;
+    //下单数
     private Integer buyerNum;
 
     @Override
     public String toString() {
         return "ElemeFlow{" +
-                "date='" + date + '\'' +
-                ", shop='" + shopName + '\'' +
+                "flowId='" + flowId + '\'' +
+                ", crawlerDate='" + crawlerDate + '\'' +
+                ", shopName='" + shopName + '\'' +
                 ", exposureTotalCount=" + exposureTotalCount +
                 ", visitorNum=" + visitorNum +
                 ", buyerNum=" + buyerNum +
                 '}';
     }
+
 }

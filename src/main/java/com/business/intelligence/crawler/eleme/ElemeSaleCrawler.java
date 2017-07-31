@@ -45,7 +45,10 @@ public class ElemeSaleCrawler extends ElemeCrawler {
     @Override
     public void doRun() {
         List<LinkedHashMap<String, Object>> saleList= getSaleText(login());
-        getElemeSaleBeans(saleList);
+        List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
+        for(ElemeSale elemeSale : elemeSaleBeans){
+            elemeDao.insertSale(elemeSale);
+        }
     }
 
     /**
@@ -68,11 +71,6 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.restaurantSaleDetailV3List");
-            for (LinkedHashMap<String,Object> map:mapsByJsonPath){
-                for(String key : map.keySet()){
-                    System.out.println("key="+key+"-------value="+map.get(key));
-                }
-            }
             return mapsByJsonPath;
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,20 +99,21 @@ public class ElemeSaleCrawler extends ElemeCrawler {
         List<ElemeSale> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : saleList){
             ElemeSale elemeSale = new ElemeSale();
-            elemeSale.setDate((String)map.get("date"));
-            elemeSale.setShop((String)map.get("shop"));
-            elemeSale.setTotalOrderAmount((Double) map.get("totalOrderAmount)"));
-            elemeSale.setFoodAmount((Double) map.get("foodAmount"));
-            elemeSale.setBoxAmount((Double)map.get("boxAmount"));
-            elemeSale.setDeliverAmount((Double)map.get("deliverAmount"));
-            elemeSale.setOnlinePaymentAmount((Double)map.get("onlinePaymentAmount"));
-            elemeSale.setOfflinePaymentAmount((Double)map.get("offlinePaymentAmount"));
-            elemeSale.setRestaurantDiscount((Double)map.get("restaurantDiscount"));
-            elemeSale.setElemeDiscount((Double)map.get("elemeDiscount"));
-            elemeSale.setValidOrderCount((Double)map.get("validOrderCount"));
-            elemeSale.setAveragePrice((Double)map.get("averagePrice"));
-            elemeSale.setInvalidOrderCount((Double)map.get("invalidOrderCount"));
-            elemeSale.setLossSaleAmount((Double)map.get("lossSaleAmount"));
+            elemeSale.setSaleId(map.getOrDefault("restaurantId","")+"~"+map.getOrDefault("orderDate",""));
+            elemeSale.setOrderDate((String)map.getOrDefault("orderDate",""));
+            elemeSale.setShop((Integer)map.getOrDefault("restaurantId",0));
+            elemeSale.setTotalOrderAmount((Double) map.getOrDefault("totalOrderAmount", 0));
+            elemeSale.setFoodAmount((Double) map.getOrDefault("foodAmount",0));
+            elemeSale.setBoxAmount((Double)map.getOrDefault("boxAmount",0));
+            elemeSale.setDeliverAmount((Double)map.getOrDefault("deliverAmount",0));
+            elemeSale.setOnlinePaymentAmount((Double)map.getOrDefault("onlinePaymentAmount",0));
+            elemeSale.setOfflinePaymentAmount((Double)map.getOrDefault("offlinePaymentAmount",0));
+            elemeSale.setRestaurantDiscount((Double)map.getOrDefault("restaurantDiscount",0));
+            elemeSale.setElemeDiscount((Double)map.getOrDefault("elemeDiscount",0));
+            elemeSale.setValidOrderCount((Integer)map.getOrDefault("validOrderCount",0));
+            elemeSale.setAveragePrice((Double)map.getOrDefault("averagePrice",0));
+            elemeSale.setInvalidOrderCount((Integer)map.getOrDefault("invalidOrderCount",0));
+            elemeSale.setLossSaleAmount((Double)map.getOrDefault("lossSaleAmount",0));
             list.add(elemeSale);
         }
         return list;

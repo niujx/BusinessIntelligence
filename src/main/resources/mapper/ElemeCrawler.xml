@@ -32,6 +32,18 @@
         VALUES
             (#{messageDate},#{shopId},#{foodName},#{salesAmount},#{salesAmountRate},#{salesVolume},#{salesVolumeRate})
     </insert>
+    <insert id="insertFlow" keyProperty="FLOW_ID" parameterType="ElemeFlow">
+        INSERT INTO "HYF"."BIL_ELEME_FLOW"
+            (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM)
+        VALUES
+            (#{flowId},#{crawlerDate},#{shopName},#{exposureTotalCount},#{visitorNum},#{buyerNum})
+    </insert>
+    <insert id="insertSale" keyProperty="SALE_ID" parameterType="ElemeSale">
+        INSERT INTO "HYF"."BIL_ELEME_SALE"
+            (SALE_ID, ORDER_DATE, SHOP, TOTAL_ORDER_AMOUNT, FOOD_AMOUNT, BOX_AMOUNT, DELIVER_AMOUNT, ONLINE_PAYMENT_AMOUNT, OFFLINE_PAYMENT_AMOUNT, RESTAURANT_DISCOUNT, ELEME_DISCOUNT, VALID_ORDER_COUNT, AVERAGE_PRICE, INVALID_ORDER_COUNT, LOSS_SALE_AMOUNT)
+        VALUES
+          (#{saleId},#{orderDate},#{shop},#{totalOrderAmount},#{foodAmount},#{boxAmount},#{deliverAmount},#{onlinePaymentAmount},#{offlinePaymentAmount},#{restaurantDiscount},#{elemeDiscount},#{validOrderCount},#{averagePrice},#{invalidOrderCount},#{lossSaleAmount})
+    </insert>
 
     <!--<insert id="insertOrder" keyProperty="id" parameterType="OOrder">-->
         <!--todo-->
