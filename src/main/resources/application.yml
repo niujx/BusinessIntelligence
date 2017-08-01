@@ -10,17 +10,10 @@ spring:
    application:
           name: bi
    datasource:
-#<<<<<<< Updated upstream
-#       driver-class-name: com.mysql.jdbc.Driver
-#       url: jdbc:mysql://10.152.9.32:3306/test2?autoReconnect=true
-#       username: root
-#       password: qa@test
-#=======
        driver-class-name: oracle.jdbc.driver.OracleDriver
        url: jdbc:oracle:thin:@//101.201.239.70:1521/orcl
        username: hyf
        password: hyf123
-#>>>>>>> Stashed changes
 
 
 mybatis:
@@ -28,7 +21,8 @@ mybatis:
     mapper-locations:
        - mapper/*
 
-imgPath: /Users/wangfukun/other/img/
+imgPath: /Users/yanshi/image
+csvPath: /Users/yanshi/image
 
 
 
