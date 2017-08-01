@@ -5,7 +5,44 @@
 
 <mapper namespace="com.business.intelligence">
     <insert id="insertEvaluate" keyProperty="id" parameterType="ElemeEvaluate">
-        insert into eleme_evaluate(shopId,date,evaValue,star,goods,num,type) values (#{shopId},#{date},#{evaValue},#{star},#{goods},#{num},#{type})
+        INSERT INTO "HYF"."BIL_ELEME_EVALUATE"
+            (ID, SHOP_ID, CRAWLER_DATE, EVA_VALUE, QUALITY, GOODS)
+        VALUES
+            (#{id},#{shopId},#{crawlerDate},#{evaValue},#{quality},#{goods})
+
+    </insert>
+
+    <insert id="insertActivity" keyProperty="id" parameterType="ElemeActivity">
+        INSERT INTO "HYF"."BIL_ELEME_ACTIVITY"
+            (ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE)
+        VALUES
+            (#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare})
+    </insert>
+
+    <insert id="insertBill" keyProperty="closingDate" parameterType="ElemeBill">
+        INSERT INTO "HYF"."BIL_ELEME_BILL"
+            (CLOSUBG_DATE, INCOME, EXPENSE, DEDUCT_AMOUNT, DUE_AMOUNT, PAY_AMOUNT, PAYMENT_DATE, SHOP_ID)
+        VALUES
+            (#{closingDate},#{income},#{expense},#{deductAmount},#{dueAmount},#{payAmount},#{paymentDate},#{shopId})
+    </insert>
+
+    <insert id="insertCommodity" keyProperty="messageDate" parameterType="ElemeCommodity">
+        INSERT INTO "HYF"."BIL_ELEME_COMMODITY"
+            (MESSAGE_DATE, SHOP_ID, FOOD_NAME, SALES_AMOUNT, SALES_AMOUNT_RATE, SALES_VOLUME, SALES_VOLUME_RATE)
+        VALUES
+            (#{messageDate},#{shopId},#{foodName},#{salesAmount},#{salesAmountRate},#{salesVolume},#{salesVolumeRate})
+    </insert>
+    <insert id="insertFlow" keyProperty="FLOW_ID" parameterType="ElemeFlow">
+        INSERT INTO "HYF"."BIL_ELEME_FLOW"
+            (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM)
+        VALUES
+            (#{flowId},#{crawlerDate},#{shopName},#{exposureTotalCount},#{visitorNum},#{buyerNum})
+    </insert>
+    <insert id="insertSale" keyProperty="SALE_ID" parameterType="ElemeSale">
+        INSERT INTO "HYF"."BIL_ELEME_SALE"
+            (SALE_ID, ORDER_DATE, SHOP, TOTAL_ORDER_AMOUNT, FOOD_AMOUNT, BOX_AMOUNT, DELIVER_AMOUNT, ONLINE_PAYMENT_AMOUNT, OFFLINE_PAYMENT_AMOUNT, RESTAURANT_DISCOUNT, ELEME_DISCOUNT, VALID_ORDER_COUNT, AVERAGE_PRICE, INVALID_ORDER_COUNT, LOSS_SALE_AMOUNT)
+        VALUES
+          (#{saleId},#{orderDate},#{shop},#{totalOrderAmount},#{foodAmount},#{boxAmount},#{deliverAmount},#{onlinePaymentAmount},#{offlinePaymentAmount},#{restaurantDiscount},#{elemeDiscount},#{validOrderCount},#{averagePrice},#{invalidOrderCount},#{lossSaleAmount})
     </insert>
 
     <!--<insert id="insertOrder" keyProperty="id" parameterType="OOrder">-->

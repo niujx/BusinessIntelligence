@@ -5,29 +5,33 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by Tcqq on 2017/7/17.
+ * 顾客评价
  */
 @Data
 @Component
 public class ElemeEvaluate {
-    private long shopId;
-    private String date;
+    //主键，网页名称：ratingId
+    private Long id;
+    //商户ID
+    private Long shopId;
+    //爬取时间
+    private String crawlerDate;
+    //评价内容
     private String evaValue;
-    private int star;
+    //星级或者是评价
+    private String quality;
+    //商品名称
     private String goods;
-    private int num;
-    private String type;
-
 
     @Override
     public String toString() {
         return "ElemeEvaluate{" +
-                "shopId=" + shopId +
-                ", date='" + date + '\'' +
+                "id=" + id +
+                ", shopId=" + shopId +
+                ", crawlerDate='" + crawlerDate + '\'' +
                 ", evaValue='" + evaValue + '\'' +
-                ", star=" + star +
+                ", quality='" + quality + '\'' +
                 ", goods='" + goods + '\'' +
-                ", index=" + num +
-                ", type='" + type + '\'' +
                 '}';
     }
 }

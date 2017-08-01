@@ -112,12 +112,19 @@ public class HttpClientUtil {
             return "";
         }
         StringBuilder sb = new StringBuilder();
+        int index = 0;
         try {
             for (Map.Entry<String, ? extends Object> entry : params.entrySet()) {
                 Object value = entry.getValue();
                 value = value == null ? "" : value.toString();
-                sb.append("&").append(URLEncoder.encode(entry.getKey(), encoding)).append("=")
-                        .append(URLEncoder.encode((String) value, encoding));
+                if(index == 0){
+                    sb.append("?").append(URLEncoder.encode(entry.getKey(), encoding)).append("=")
+                            .append(URLEncoder.encode((String) value, encoding));
+                }else{
+                    sb.append("&").append(URLEncoder.encode(entry.getKey(), encoding)).append("=")
+                            .append(URLEncoder.encode((String) value, encoding));
+                }
+                index++;
             }
         } catch (Exception e) {
             e.printStackTrace();

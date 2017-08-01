@@ -1,6 +1,6 @@
 package com.business.intelligence.dao;
 
-import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
+import com.business.intelligence.model.ElemeModel.*;
 import eleme.openapi.sdk.api.entity.order.OOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -20,10 +20,29 @@ public class ElemeDao {
     public void insertEvaluate(ElemeEvaluate elemeEvaluate){
         sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
     }
+    public void insertActivity(ElemeActivity elemeActivity){
+        sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
+    }
+    public void insertBill(ElemeBill elemeBill){
+        sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
+    }
+    public void insertCommodity(ElemeCommodity elemeCommodity){
+        sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
+    }
+    public void insertFlow(ElemeFlow elemeFlow){
+        sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
+    }
+    public void insertSale(ElemeSale elemeSale){
+        sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
+    }
+
+
 
     public void insertOrder(OOrder order){
         sqlSessionTemplate.insert("com.business.intelligence.insertOrder",order);
     }
+
+
 
 
 
