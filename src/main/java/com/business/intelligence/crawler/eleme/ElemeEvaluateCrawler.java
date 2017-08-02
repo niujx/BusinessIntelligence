@@ -1,14 +1,22 @@
 package com.business.intelligence.crawler.eleme;
 
-import com.business.intelligence.util.WebUtils;
-import com.business.intelligence.crawler.BaseCrawler;
-import com.business.intelligence.model.Authenticate;
-import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
 import com.business.intelligence.dao.ElemeDao;
+import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.ElemeModel.ElemeBill;
+import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
+import com.business.intelligence.util.DateUtils;
+import com.business.intelligence.util.WebUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -16,109 +24,131 @@ import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/17.
+ * 顾客评价 POST请求
  */
 @Component
-public class ElemeEvaluateCrawler extends BaseCrawler {
+public class ElemeEvaluateCrawler extends ElemeCrawler {
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
+    private Date endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,1);
     //用户信息
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
 
     private HttpClient httpClient = super.httpClient;
-    private static final String HEADELEMEJSON = "https://www.ele.me/restapi/ugc/v1/restaurant/204666/ratings?limit=40&offset=";
-    private static final String ENDELEMEJSON = "&record_type=1";
-    private static final String COUNTJSON = "https://www.ele.me/restapi/ugc/v1/restaurant/204666/rating_categories";
-
-    //测试用
-    private static int index = 0;
+    private static final String URL = "https://app-api.shop.ele.me/ugc/invoke?method=shopRating.querySingleShopRating";
 
     @Override
     public void doRun() {
-        int count = getCount(COUNTJSON);
-        System.out.println(count);
-        List<ElemeEvaluate> allPageEvaluateByCustomer = getAllPageEvaluateByCustomer(count, 20466, HEADELEMEJSON, ENDELEMEJSON);
-        //测试
-        for(ElemeEvaluate elemeEvaluate : allPageEvaluateByCustomer){
-            System.out.println(elemeEvaluate);
-        }
-        for (ElemeEvaluate elemeEvaluate : allPageEvaluateByCustomer){
+        String evaluateText = getEvaluateText(login());
+        List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
+        List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
+        List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
+        for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
             elemeDao.insertEvaluate(elemeEvaluate);
         }
+
     }
 
     /**
-     * 获取评价个数
+     * 通过爬虫获得所有的对应日期的顾客评论
+     * @param client
+     * @return
      */
-    public int getCount(String url){
-        String json = WebUtils.getWeb(url,httpClient);
-        json = "{\"result\":{\"list\":"+json+"}}";
-        Integer count = (Integer) WebUtils.getOneByJsonPath(json,"$.result.list[0].amount");
-        return count;
+    public String getEvaluateText(CloseableHttpClient client){
+        CloseableHttpResponse execute = null;
+        HttpPost post = new HttpPost(URL);
+        StringEntity jsonEntity = null;
+        String beginDate = DateUtils.date2String(crawlerDate);
+        String endDate = DateUtils.date2String(endCrawlerDate);
+        String json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":204666,\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":20,\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+        jsonEntity = new StringEntity(json, "UTF-8");
+        post.setEntity(jsonEntity);
+        setElemeHeader(post);
+        post.setHeader("X-Eleme-RequestID", "4b6e096e-0d39-49a6-adb7-c6fe3b6583b4");
+        try {
+            execute = client.execute(post);
+            HttpEntity entity = execute.getEntity();
+            String result = EntityUtils.toString(entity, "UTF-8");
+
+            Object count = WebUtils.getOneByJsonPath(result, "$.result.total");
+            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":204666,\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+            jsonEntity = new StringEntity(json, "UTF-8");
+            post.setEntity(jsonEntity);
+            execute = client.execute(post);
+            entity = execute.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if (execute != null){
+                    execute.close();
+                }
+                if(client != null){
+                    client.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
     }
 
     /**
-     * 获得单页（最多40个）的所有商品的顾客评价
-     * @param shopId 商铺的ID
-     * @param url 评论的地址
+     * 通过爬取的json获得订单的评论详情
+     * @param json
+     * @return
      */
-    public List<ElemeEvaluate> getOnePageEvaluateByCustomer(long shopId, String url){
-        List<ElemeEvaluate> list = new ArrayList<ElemeEvaluate>();
-        String json = WebUtils.getWeb(url,httpClient);
-        json = "{\"result\":{\"list\":"+json+"}}";
-        List<LinkedHashMap<String, Object>> maps = WebUtils.getMapsByJsonPath(json, "$.result.list[*]");
-        //取得所有订单评论
-        for(LinkedHashMap map:maps){
-            index++;
-            ElemeEvaluate orderElemeEvaluate = new ElemeEvaluate();
-            orderElemeEvaluate.setNum(index);
-            orderElemeEvaluate.setType("订单评论");
-            orderElemeEvaluate.setShopId(shopId);
-            orderElemeEvaluate.setEvaValue(map.get("rating_text").toString());
-            orderElemeEvaluate.setStar(Integer.valueOf(map.get("rating_star").toString()));
-            orderElemeEvaluate.setDate(map.get("rated_at").toString());
-            StringBuilder sb =new StringBuilder();
-            List<LinkedHashMap<String, Object>> itemMaps = (List<LinkedHashMap<String, Object>>)map.get("item_rating_list");
-            if(itemMaps.isEmpty()){
-                orderElemeEvaluate.setGoods("顾客没有对任何具体的菜品进行评价");
-            }
-            for(LinkedHashMap<String, Object>  itemMap:itemMaps){
-                sb.append(itemMap.get("rate_name").toString()+" ");
-                orderElemeEvaluate.setGoods(sb.toString().trim());
-                ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
-                elemeEvaluate.setNum(index);
-                elemeEvaluate.setType("商品评价");
-                elemeEvaluate.setShopId(shopId);
-                elemeEvaluate.setDate(map.get("rated_at").toString());
-                elemeEvaluate.setGoods(itemMap.get("rate_name").toString());
-                elemeEvaluate.setStar(Integer.valueOf(itemMap.get("rating_star").toString()));
-                elemeEvaluate.setEvaValue(itemMap.get("rating_text").toString());
-                list.add(elemeEvaluate);
-            }
-            list.add(orderElemeEvaluate);
+    public List<LinkedHashMap<String, Object>> getOrderList(String json){
+        List<LinkedHashMap<String, Object>> foodList = WebUtils.getMapsByJsonPath(json, "$.result.orderRatingList[*].orderCommentList[*]");
+        return foodList;
+    }
+
+    /**
+     * 通过爬取的json获得具体商品的评论详情
+     * @param json
+     * @return
+     */
+    public List<LinkedHashMap<String, Object>> getFoodList(String json){
+        List<LinkedHashMap<String, Object>> foodList = WebUtils.getMapsByJsonPath(json, "$.result.orderRatingList[*].foodCommentList[*]");
+        return foodList;
+    }
+
+    /**
+     * 获取ElemeEvaluate实体类
+     * @param orderList
+     * @param foodList
+     * @return
+     */
+    public List<ElemeEvaluate> getElemeEvaluateBeans(List<LinkedHashMap<String, Object>> orderList , List<LinkedHashMap<String, Object>> foodList){
+        List<ElemeEvaluate> list = new ArrayList<>();
+        for(LinkedHashMap<String,Object> map : orderList){
+            ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
+            elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Integer)map.getOrDefault("ratingId",null)*1l);
+            elemeEvaluate.setShopId(204666l);
+            elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
+            elemeEvaluate.setEvaValue((String)map.getOrDefault("ratingContent","无评论"));
+            elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
+            elemeEvaluate.setGoods("本条为订单评论");
+            list.add(elemeEvaluate);
+        }
+        for(LinkedHashMap<String,Object> map : foodList){
+            ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
+            elemeEvaluate.setId((Long)map.getOrDefault("ratingId",null));
+            elemeEvaluate.setShopId(204666l);
+            elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
+            elemeEvaluate.setEvaValue((String)map.getOrDefault("foodRatingContent","无评论"));
+            elemeEvaluate.setQuality((String)map.getOrDefault("quality","无"));
+            elemeEvaluate.setGoods((String)map.getOrDefault("foodName","无"));
+            list.add(elemeEvaluate);
         }
         return list;
     }
 
-    /**
-     * 获得所有页的所有商品的顾客评价
-     * @param evaluateCount 总评论个数
-     * @param shopId 商铺的ID
-     * @param headOfUrl 评论地址的前半部分
-     * @param endOfUrl 评论地址的后半部分
-     */
-    public List<ElemeEvaluate> getAllPageEvaluateByCustomer(int evaluateCount, long shopId, String headOfUrl, String endOfUrl){
-        int count = evaluateCount%40;
-        List<ElemeEvaluate> allList = new ArrayList<ElemeEvaluate>();
-        String url = "";
-        for(int i = 0 ; i< count+1;i++){
-            //  https://www.ele.me/restapi/ugc/v1/restaurant/204666/ratings?limit=40&offset=   ?    &record_type=1
-            url = headOfUrl+i*40+endOfUrl;
-            List<ElemeEvaluate> list = getOnePageEvaluateByCustomer(shopId, url);
-            allList.addAll(list);
-        }
-        return allList;
-    }
+
 
 }
