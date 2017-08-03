@@ -39,7 +39,6 @@ public class ElemeSaleCrawler extends ElemeCrawler {
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=saleStatsNew.getHistoryBusinessStatisticsV3";
     @Override
@@ -61,7 +60,7 @@ public class ElemeSaleCrawler extends ElemeCrawler {
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json = "{\"id\":\"055c6d0f-dc56-4188-89c1-10c67963df8a\",\"method\":\"getHistoryBusinessStatisticsV3\",\"service\":\"saleStatsNew\",\"params\":{\"shopId\":150148671,\"startDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"055c6d0f-dc56-4188-89c1-10c67963df8a\",\"method\":\"getHistoryBusinessStatisticsV3\",\"service\":\"saleStatsNew\",\"params\":{\"shopId\":"+SHOPID+",\"startDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);

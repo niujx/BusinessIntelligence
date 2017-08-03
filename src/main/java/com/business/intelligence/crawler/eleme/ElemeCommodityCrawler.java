@@ -34,7 +34,6 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL ="https://app-api.shop.ele.me/stats/invoke/?method=foodSalesStats.getFoodSalesStatsV2";
 
@@ -59,7 +58,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         StringEntity jsonEntity = null;
         String endDate = DateUtils.date2String(crawlerDate);
         String beginDate = DateUtils.date2String(beginCrawlerDate);
-        String json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":150148671,\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":20,\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":"+SHOPID+",\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":20,\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -69,7 +68,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
             Object count = WebUtils.getOneByJsonPath(result, "$.result.totalRecord");
-            json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":150148671,\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":"+(Integer)count+",\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+            json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":"+SHOPID+",\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":"+(Integer)count+",\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             execute = client.execute(post);

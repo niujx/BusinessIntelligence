@@ -29,50 +29,16 @@ import java.util.*;
  * Created by Tcqq on 2017/7/18.
  */
 public abstract class ElemeCrawler extends BaseCrawler{
-    @Setter
-    protected Token token = getToken();
-    @Setter
-    protected Config config = getConfig();
-
-    //获得Token
-    private static final String ACCESSTOKEN = "d6962561958e53cd6dbb724d38e8ec12";
-    private static final String TOKENTYPE = "Bearer";
-    private static final long EXPIRES = 86400;
-    private static final String REFRESHTOKEN = "695aea84c6b186a10d1f32dfe9a0d858";
-
-    //配置Config
-    private static final boolean ISSANDBOX= true;
-    private static final String APPKEY = "l6kCfCKiDI";
-    private static final String APPSECRET = "dc24f210a1ca72364b726b230c5672115d87f6bf";
 
     //登录
     private static final String USERNAME = "hwfzhongke";
     private static final String PASSWORD = "abc123456";
     private static final String LOGINURL = "https://app-api.shop.ele.me/arena/invoke/?method=LoginService.loginByUsername";
+    protected static final String SHOPID = "204666";
 
     //登出
     private static final String LOGOUTURL = "https://melody.shop.ele.me/app/shop/150148671/stats/business";
 
-    /**
-     * 获得Token
-     * @return
-     */
-    private Token getToken(){
-        Token token = new Token();
-        token.setAccessToken(ACCESSTOKEN);
-        token.setTokenType(TOKENTYPE);
-        token.setExpires(EXPIRES);
-        token.setRefreshToken(REFRESHTOKEN);
-        return token;
-    }
-
-    /**
-     * 配置Config
-     * @return
-     */
-    private Config getConfig(){
-        return new Config(ISSANDBOX,APPKEY,APPSECRET);
-    }
 
     /**
      * 登录
@@ -84,7 +50,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         String content=null;
         HttpPost httppost = new HttpPost(LOGINURL);
         StringEntity jsonEntity = null;
-        String json = "{\"id\":\"1aa7820f-49cf-48bd-9e8a-e41e478528b8\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":"+USERNAME+",\"password\":"+PASSWORD+",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"2bbb7b48-c428-4158-b30d-78dc93a8e6f1\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":\""+USERNAME+"\",\"password\":\""+PASSWORD+"\",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         httppost.setEntity(jsonEntity);
         httppost.setHeader("Content-type", "application/json;charset=utf-8");
@@ -93,7 +59,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         httppost.setHeader("Accept", "*/*");
         httppost.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
         httppost.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        httppost.setHeader("X-Shard", "shopid=204666");
+        httppost.setHeader("X-Shard", "shopid="+SHOPID+"");
         httppost.setHeader("X-Eleme-RequestID", "1aa7820f-49cf-48bd-9e8a-e41e478528b8");
         httppost.setHeader("Referer", "https://melody.shop.ele.me/login");
         httppost.setHeader("origin", "https://melody.shop.ele.me");
@@ -124,15 +90,15 @@ public abstract class ElemeCrawler extends BaseCrawler{
 
     }
 
-//    public static void main(String[] args) {
-//        ElemeCrawler elemeCrawler = new ElemeCrawler() {
-//            @Override
-//            public void doRun() {
-//
-//            }
-//        };
-//       elemeCrawler.login();
-//    }
+    public static void main(String[] args) {
+        ElemeCrawler elemeCrawler = new ElemeCrawler() {
+            @Override
+            public void doRun() {
+
+            }
+        };
+       elemeCrawler.logOut(elemeCrawler.login());
+    }
 
     /**
      *登出
@@ -172,7 +138,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         post.setHeader("Accept", "*/*");
         post.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
         post.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        post.setHeader("X-Shard", "shopid=150148671");
+        post.setHeader("X-Shard", "shopid="+SHOPID+"");
         post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
         post.setHeader("origin", "https://melody-stats.faas.ele.me");
         post.setHeader("Connection", "keep-alive");

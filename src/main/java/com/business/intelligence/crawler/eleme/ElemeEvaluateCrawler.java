@@ -36,7 +36,6 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
     @Autowired
     private ElemeDao elemeDao;
 
-    private HttpClient httpClient = super.httpClient;
     private static final String URL = "https://app-api.shop.ele.me/ugc/invoke?method=shopRating.querySingleShopRating";
 
     @Override
@@ -62,7 +61,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         StringEntity jsonEntity = null;
         String beginDate = DateUtils.date2String(crawlerDate);
         String endDate = DateUtils.date2String(endCrawlerDate);
-        String json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":204666,\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":20,\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+SHOPID+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":20,\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -73,7 +72,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             String result = EntityUtils.toString(entity, "UTF-8");
 
             Object count = WebUtils.getOneByJsonPath(result, "$.result.total");
-            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":204666,\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+SHOPID+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             execute = client.execute(post);

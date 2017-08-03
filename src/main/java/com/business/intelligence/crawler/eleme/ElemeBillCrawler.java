@@ -30,7 +30,6 @@ public class ElemeBillCrawler extends ElemeCrawler{
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
@@ -54,9 +53,9 @@ public class ElemeBillCrawler extends ElemeCrawler{
         params.put("beginDate",String.valueOf(crawlerDate.getTime()));
         params.put("endDate",String.valueOf(crawlerDate.getTime()));
         params.put("limit","10");
-        params.put("loginRestaurantId","150148671");
+        params.put("loginRestaurantId",SHOPID);
         params.put("offset","0");
-        params.put("restaurantId","150148671");
+        params.put("restaurantId",SHOPID);
         params.put("status","3");
         params.put("token","30a23e32be094eebfa1e93ddc59eed83");
         String url2 = URL+HttpClientUtil.buildParamString(params);

@@ -30,7 +30,6 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL ="https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
     private static final Map<Boolean, String> ISSHARE = Maps.newHashMap();
@@ -59,7 +58,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         CloseableHttpResponse execute = null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
-        String json = "{\"id\":\"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498\",\"method\":\"getApplyActivity\",\"service\":\"applyActivityManage\",\"params\":{\"shopId\":150148671},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"Mzg3OTI4ZDMtODMzNy00MDUyLWE2ZjN2FhYT\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498\",\"method\":\"getApplyActivity\",\"service\":\"applyActivityManage\",\"params\":{\"shopId\":"+SHOPID+"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"Mzg3OTI4ZDMtODMzNy00MDUyLWE2ZjN2FhYT\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
