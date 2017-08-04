@@ -1,44 +1,38 @@
 package com.business.intelligence.crawler.eleme;
 
-import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.crawler.BaseCrawler;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
-import com.business.intelligence.util.HttpUtil;
-import com.business.intelligence.util.WebUtils;
-import eleme.openapi.sdk.config.Config;
-import eleme.openapi.sdk.oauth.response.Token;
-import lombok.Setter;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.http.Header;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by Tcqq on 2017/7/18.
  */
+@Slf4j
 public abstract class ElemeCrawler extends BaseCrawler{
     private CookieStore cookieStore = new BasicCookieStore();
     private CloseableHttpClient client;
 
     //登录
-    private static final String USERNAME = "hwfzhongke";
-    private static final String PASSWORD = "abc123456";
+    protected String username;
+    protected String password;
+    protected String shopId;
     private static final String LOGINURL = "https://app-api.shop.ele.me/arena/invoke/?method=LoginService.loginByUsername";
-    protected static final String SHOPID = "204666";
 
+    //爬取数据需要的
+    protected String ksId;
     //登出
     private static final String LOGOUTURL = "https://melody.shop.ele.me/app/shop/150148671/stats/business";
 
@@ -52,7 +46,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         String content = null;
         HttpPost httppost = new HttpPost(LOGINURL);
         StringEntity jsonEntity = null;
-        String json = "{\"id\":\"2bbb7b48-c428-4158-b30d-78dc93a8e6f1\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":\""+USERNAME+"\",\"password\":\""+PASSWORD+"\",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"2bbb7b48-c428-4158-b30d-78dc93a8e6f1\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":\""+username+"\",\"password\":\""+password+"\",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         httppost.setEntity(jsonEntity);
         httppost.setHeader("Content-type", "application/json;charset=utf-8");
@@ -61,7 +55,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         httppost.setHeader("Accept", "*/*");
         httppost.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
         httppost.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        httppost.setHeader("X-Shard", "shopid="+SHOPID+"");
+        httppost.setHeader("X-Shard", "shopid="+shopId+"");
         httppost.setHeader("X-Eleme-RequestID", "1aa7820f-49cf-48bd-9e8a-e41e478528b8");
         httppost.setHeader("Referer", "https://melody.shop.ele.me/login");
         httppost.setHeader("origin", "https://melody.shop.ele.me");
@@ -73,7 +67,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
             if (entity != null) {
                 System.out.println(content);
             }
-            CookieStoreUtils.storeCookie(cookieStore,getCookieName(USERNAME,PASSWORD));
+            CookieStoreUtils.storeCookie(cookieStore,getCookieName(username,password));
         }catch (IOException e){
             e.printStackTrace();
             try {
@@ -106,15 +100,21 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 .append(userName)
                 .append("_")
                 .append(password);
+        log.info("cookie name is {}",sb.toString());
         return sb.toString();
     }
 
     /**
      * 提取Cookie，没有则登录
      */
-    public CloseableHttpClient getClient(){
-        cookieStore = CookieStoreUtils.readStore(getCookieName(USERNAME,PASSWORD));
+    public CloseableHttpClient getClient(ElemeBean elemeBean){
+        this.username = elemeBean.getUsername();
+        this.password = elemeBean.getPassword();
+        this.shopId = elemeBean.getShopId();
+        this.ksId = elemeBean.getKsId();
+        cookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
         if (cookieStore == null) {
+            log.info("no cookie , so login");
             login();
         }
         client = HttpClientUtil.getHttpClient(cookieStore);
@@ -170,7 +170,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         post.setHeader("Accept", "*/*");
         post.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
         post.setHeader("Accept-Encodinge", "gzip, deflate, br");
-        post.setHeader("X-Shard", "shopid="+SHOPID+"");
+        post.setHeader("X-Shard", "shopid="+shopId+"");
         post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
         post.setHeader("origin", "https://melody-stats.faas.ele.me");
         post.setHeader("Connection", "keep-alive");

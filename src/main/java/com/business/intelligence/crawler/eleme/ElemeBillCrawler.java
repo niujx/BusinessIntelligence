@@ -2,10 +2,12 @@ package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeBill;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,6 +24,7 @@ import java.util.*;
  * Created by Tcqq on 2017/7/25.
  * 账单记录 GET请求
  */
+@Slf4j
 @Component
 public class ElemeBillCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
@@ -33,13 +36,14 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
-    @Override
-    public void doRun() {
-        List<LinkedHashMap<String, Object>> billText = getBillText(getClient());
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
         List<ElemeBill> billList = getElemeBillBeans(billText);
         for(ElemeBill elemeBill : billList){
             elemeDao.insertBill(elemeBill);
         }
+        log.info("用户名为 {} 的账单记录已入库",username);
     }
 
     /**
@@ -53,9 +57,9 @@ public class ElemeBillCrawler extends ElemeCrawler{
         params.put("beginDate",String.valueOf(crawlerDate.getTime()));
         params.put("endDate",String.valueOf(crawlerDate.getTime()));
         params.put("limit","10");
-        params.put("loginRestaurantId",SHOPID);
+        params.put("loginRestaurantId",shopId);
         params.put("offset","0");
-        params.put("restaurantId",SHOPID);
+        params.put("restaurantId",shopId);
         params.put("status","3");
         params.put("token","30a23e32be094eebfa1e93ddc59eed83");
         String url2 = URL+HttpClientUtil.buildParamString(params);
@@ -99,12 +103,15 @@ public class ElemeBillCrawler extends ElemeCrawler{
             elemeBill.setDueAmount(notNull((String)map.getOrDefault("dueAmount","无")));
             elemeBill.setPayAmount(notNull((String)map.getOrDefault("payAmount","无")));
             elemeBill.setPaymentDate(DateUtils.long2Date((Long)map.getOrDefault("paymentDate",null)));
-            elemeBill.setShopId(Long.valueOf(SHOPID));
+            elemeBill.setShopId(Long.valueOf(shopId));
             list.add(elemeBill);
         }
         return list;
     }
 
 
+    @Override
+    public void doRun() {
 
+    }
 }

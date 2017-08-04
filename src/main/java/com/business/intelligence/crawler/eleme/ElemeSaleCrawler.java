@@ -1,53 +1,47 @@
 package com.business.intelligence.crawler.eleme;
 
-import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.dao.ElemeDao;
-import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeSale;
 import com.business.intelligence.util.DateUtils;
-import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.WebUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.http.Header;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.RequestLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/19.
  * 营业统计 POST请求
  */
+@Slf4j
 @Component
 public class ElemeSaleCrawler extends ElemeCrawler {
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
-    //用户信息
-    private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
 
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=saleStatsNew.getHistoryBusinessStatisticsV3";
-    @Override
-    public void doRun() {
-        List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient());
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么经营统计，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient(elemeBean));
         List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
         for(ElemeSale elemeSale : elemeSaleBeans){
             elemeDao.insertSale(elemeSale);
         }
+        log.info("用户名为 {} 的经营统计已入库",username);
     }
 
     /**
@@ -56,11 +50,13 @@ public class ElemeSaleCrawler extends ElemeCrawler {
      * @return
      */
     public List<LinkedHashMap<String, Object>> getSaleText(CloseableHttpClient client){
+        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json = "{\"id\":\"055c6d0f-dc56-4188-89c1-10c67963df8a\",\"method\":\"getHistoryBusinessStatisticsV3\",\"service\":\"saleStatsNew\",\"params\":{\"shopId\":"+SHOPID+",\"startDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"055c6d0f-dc56-4188-89c1-10c67963df8a\",\"method\":\"getHistoryBusinessStatisticsV3\",\"service\":\"saleStatsNew\",\"params\":{\"shopId\":"+shopId+",\"startDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        log.info("request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -116,5 +112,10 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             list.add(elemeSale);
         }
         return list;
+    }
+
+    @Override
+    public void doRun() {
+
     }
 }

@@ -1,34 +1,20 @@
 package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.dao.ElemeDao;
-import com.business.intelligence.model.Authenticate;
-import com.business.intelligence.model.ElemeModel.ElemeFlow;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeMessage;
 import com.business.intelligence.model.ElemeModel.ElemeOrder;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.WebUtils;
 import com.google.common.collect.Maps;
-import eleme.openapi.sdk.api.entity.order.OOrder;
-import eleme.openapi.sdk.api.entity.order.OrderList;
-import eleme.openapi.sdk.api.exception.ServiceException;
-import eleme.openapi.sdk.api.service.OrderService;
-import eleme.openapi.sdk.config.Config;
-import eleme.openapi.sdk.oauth.response.Token;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,12 +26,11 @@ import java.util.*;
  * Created by Tcww on 2017/7/18.
  * 查询全部订单  POST提交
  */
+@Slf4j
 @Component
 public class ElemeOrderCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
-    //用户信息
-    private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
 
@@ -80,13 +65,14 @@ public class ElemeOrderCrawler extends ElemeCrawler{
 
     }
 
-    @Override
-    public void doRun() {
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么订单，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
         ElemeMessage orderText = getOrderText(HttpClientUtil.getHttpClient(new BasicCookieStore()));
         List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
         for(ElemeOrder elemeOrder : elemeOrderBeans){
            elemeDao.insertOrder(elemeOrder);
         }
+        log.info("用户名为 {} 的订单已入库",username);
     }
 
 
@@ -96,11 +82,13 @@ public class ElemeOrderCrawler extends ElemeCrawler{
      * @return
      */
     public ElemeMessage getOrderText(CloseableHttpClient client){
+        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
         HttpPost countpost = new HttpPost(COUNTURL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"NTNlMmI4OTItODhjMC00ZGYzLTg3YTNWI5MW\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+SHOPID+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
+        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
+        log.info("request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         countpost.setEntity(jsonEntity);
         setElemeHeader(countpost);
@@ -112,7 +100,7 @@ public class ElemeOrderCrawler extends ElemeCrawler{
 
             Object count = WebUtils.getOneByJsonPath(result,"$.result");
             HttpPost post = new HttpPost(URL);
-            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"NTNlMmI4OTItODhjMC00ZGYzLTg3YTNWI5MW\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+SHOPID+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
+            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             setElemeHeader(post);
@@ -241,4 +229,8 @@ public class ElemeOrderCrawler extends ElemeCrawler{
         return  sb.toString().trim();
     }
 
+    @Override
+    public void doRun() {
+
+    }
 }

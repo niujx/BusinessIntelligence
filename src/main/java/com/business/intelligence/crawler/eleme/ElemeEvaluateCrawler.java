@@ -2,10 +2,12 @@ package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeBill;
 import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -26,27 +28,27 @@ import java.util.List;
  * Created by Tcqq on 2017/7/17.
  * 顾客评价 POST请求
  */
+@Slf4j
 @Component
 public class ElemeEvaluateCrawler extends ElemeCrawler {
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
     private Date endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,1);
-    //用户信息
-    private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
 
     private static final String URL = "https://app-api.shop.ele.me/ugc/invoke?method=shopRating.querySingleShopRating";
 
-    @Override
-    public void doRun() {
-        String evaluateText = getEvaluateText(getClient());
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么顾客评价，日期： {} ，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),URL,username);
+        String evaluateText = getEvaluateText(getClient(elemeBean));
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
         List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
         List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
         for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
             elemeDao.insertEvaluate(elemeEvaluate);
         }
+        log.info("用户名为 {} 的顾客评价已入库",username);
 
     }
 
@@ -56,12 +58,15 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
      * @return
      */
     public String getEvaluateText(CloseableHttpClient client){
+        log.info("ksid id {}",ksId);
+        //获得爬取个数
         CloseableHttpResponse execute = null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String beginDate = DateUtils.date2String(crawlerDate);
         String endDate = DateUtils.date2String(endCrawlerDate);
-        String json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+SHOPID+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":20,\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+shopId+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":20,\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        log.info("count request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -70,9 +75,11 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
-
             Object count = WebUtils.getOneByJsonPath(result, "$.result.total");
-            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+SHOPID+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+            log.info("爬取的个数为 {}",count);
+            //开始爬取内容
+            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+shopId+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
+            log.info("request json is {}",json);
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             execute = client.execute(post);
@@ -128,7 +135,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : orderList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
             elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Integer)map.getOrDefault("ratingId",null)*1l);
-            elemeEvaluate.setShopId(Long.valueOf(SHOPID));
+            elemeEvaluate.setShopId(Long.valueOf(shopId));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
             elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
@@ -138,7 +145,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : foodList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
             elemeEvaluate.setId((Long)map.getOrDefault("ratingId",null));
-            elemeEvaluate.setShopId(Long.valueOf(SHOPID));
+            elemeEvaluate.setShopId(Long.valueOf(shopId));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("foodRatingContent","无评论")));
             elemeEvaluate.setQuality(notNull((String)map.getOrDefault("quality","无")));
@@ -149,5 +156,8 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
     }
 
 
+    @Override
+    public void doRun() {
 
+    }
 }
