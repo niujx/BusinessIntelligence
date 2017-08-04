@@ -27,10 +27,7 @@ public class CookieStoreUtils {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(storePath, fileName)))) {
             CookieStore cookieStore = (CookieStore) inputStream.readObject();
             return cookieStore;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
         }
 
         return null;
