@@ -35,7 +35,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     @Override
     public void doRun() {
-        List<LinkedHashMap<String, Object>> billText = getBillText(login());
+        List<LinkedHashMap<String, Object>> billText = getBillText(getClient());
         List<ElemeBill> billList = getElemeBillBeans(billText);
         for(ElemeBill elemeBill : billList){
             elemeDao.insertBill(elemeBill);
@@ -93,13 +93,13 @@ public class ElemeBillCrawler extends ElemeCrawler{
         for(LinkedHashMap<String,Object> map : billList){
             ElemeBill elemeBill = new ElemeBill();
             elemeBill.setClosingDate(String.valueOf(DateUtils.long2Date((Long)map.get("closingDate"))));
-            elemeBill.setIncome((String)map.getOrDefault("income","无"));
-            elemeBill.setExpense((String)map.getOrDefault("expense","无"));
-            elemeBill.setDeductAmount((String)map.getOrDefault("deductAmount","无"));
-            elemeBill.setDueAmount((String)map.getOrDefault("dueAmount","无"));
-            elemeBill.setPayAmount((String)map.getOrDefault("payAmount","无"));
+            elemeBill.setIncome(notNull((String)map.getOrDefault("income","无")));
+            elemeBill.setExpense(notNull((String)map.getOrDefault("expense","无")));
+            elemeBill.setDeductAmount(notNull((String)map.getOrDefault("deductAmount","无")));
+            elemeBill.setDueAmount(notNull((String)map.getOrDefault("dueAmount","无")));
+            elemeBill.setPayAmount(notNull((String)map.getOrDefault("payAmount","无")));
             elemeBill.setPaymentDate(DateUtils.long2Date((Long)map.getOrDefault("paymentDate",null)));
-            elemeBill.setShopId(150148671l);
+            elemeBill.setShopId(Long.valueOf(SHOPID));
             list.add(elemeBill);
         }
         return list;

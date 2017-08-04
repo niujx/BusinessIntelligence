@@ -71,8 +71,6 @@ public class ElemeController {
         return "CrawlerSale is ok";
     }
 
-
-
     @RequestMapping(value = "crawlerOrder", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取所以订单", httpMethod = "GET")
     public String crawlerOrder() {

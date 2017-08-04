@@ -17,4 +17,11 @@ public class ElemeMessage {
     //获取的原始json串
     private String json;
 
+    @Override
+    public String toString() {
+        return "ElemeMessage{" +
+                "list=" + list +
+                ", json='" + json + '\'' +
+                '}';
+    }
 }

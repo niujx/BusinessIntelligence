@@ -32,9 +32,9 @@ public class ElemeOrder {
     //发票抬头
     private String invoice;
     //是否预订单
-    private Boolean book;
+    private String book;
     //是否在线支付
-    private Boolean onlinePaid;
+    private String onlinePaid;
     //顾客联系电话 List<String>
     private String phoneList;
     //店铺绑定的外部ID
@@ -60,7 +60,7 @@ public class ElemeOrder {
     //送餐地址
     private String deliveryPoiAddress;
     //顾客是否需要发票
-    private Boolean invoiced;
+    private String invoiced;
     //店铺实收
     private Double income;
     //饿了么服务费率
@@ -78,7 +78,7 @@ public class ElemeOrder {
     //饿了么承担活动费用
     private Double elemePart;
     //降级标识
-    private Boolean downgraded;
+    private String downgraded;
     //保护小号失效时间
     private String secretPhoneExpireTime;
     //订单参加活动信息  List<OActivity>

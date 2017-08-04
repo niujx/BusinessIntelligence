@@ -2,6 +2,7 @@ package com.business.intelligence.crawler.eleme;
 
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.crawler.BaseCrawler;
+import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.HttpUtil;
 import com.business.intelligence.util.WebUtils;
@@ -29,6 +30,8 @@ import java.util.*;
  * Created by Tcqq on 2017/7/18.
  */
 public abstract class ElemeCrawler extends BaseCrawler{
+    private CookieStore cookieStore = new BasicCookieStore();
+    private CloseableHttpClient client;
 
     //登录
     private static final String USERNAME = "hwfzhongke";
@@ -45,9 +48,8 @@ public abstract class ElemeCrawler extends BaseCrawler{
      */
     protected CloseableHttpClient login() {
         CloseableHttpResponse httpResponse = null;
-        CookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient client = HttpClientUtil.getHttpClient(cookieStore);
-        String content=null;
+        client = HttpClientUtil.getHttpClient(cookieStore);
+        String content = null;
         HttpPost httppost = new HttpPost(LOGINURL);
         StringEntity jsonEntity = null;
         String json = "{\"id\":\"2bbb7b48-c428-4158-b30d-78dc93a8e6f1\",\"method\":\"loginByUsername\",\"service\":\"LoginService\",\"params\":{\"username\":\""+USERNAME+"\",\"password\":\""+PASSWORD+"\",\"captchaCode\":\"\",\"loginedSessionIds\":[]},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\"},\"ncp\":\"2.0.0\"}";
@@ -71,6 +73,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
             if (entity != null) {
                 System.out.println(content);
             }
+            CookieStoreUtils.storeCookie(cookieStore,getCookieName(USERNAME,PASSWORD));
         }catch (IOException e){
             e.printStackTrace();
             try {
@@ -89,6 +92,35 @@ public abstract class ElemeCrawler extends BaseCrawler{
         return client;
 
     }
+
+    /**
+     * 拼接保存cookie的名字
+     * @param userName
+     * @param password
+     * @return
+     */
+    public String getCookieName(String userName,String password){
+        StringBuilder sb = new StringBuilder();
+        sb.append("eleme")
+                .append("_")
+                .append(userName)
+                .append("_")
+                .append(password);
+        return sb.toString();
+    }
+
+    /**
+     * 提取Cookie，没有则登录
+     */
+    public CloseableHttpClient getClient(){
+        cookieStore = CookieStoreUtils.readStore(getCookieName(USERNAME,PASSWORD));
+        if (cookieStore == null) {
+            login();
+        }
+        client = HttpClientUtil.getHttpClient(cookieStore);
+        return client;
+    }
+
 
     public static void main(String[] args) {
         ElemeCrawler elemeCrawler = new ElemeCrawler() {
@@ -142,5 +174,12 @@ public abstract class ElemeCrawler extends BaseCrawler{
         post.setHeader("Referer", "https://melody-stats.faas.ele.me/");
         post.setHeader("origin", "https://melody-stats.faas.ele.me");
         post.setHeader("Connection", "keep-alive");
+    }
+
+    /**
+     * 对字符串为null进行处理
+     */
+    public String notNull(String str){
+        return str == null ? "":str;
     }
 }

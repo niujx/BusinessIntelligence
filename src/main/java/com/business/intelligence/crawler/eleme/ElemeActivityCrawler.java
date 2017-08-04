@@ -42,7 +42,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
 
     @Override
     public void doRun() {
-        List<LinkedHashMap<String, Object>> activityText = getActivityText(login());
+        List<LinkedHashMap<String, Object>> activityText = getActivityText(getClient());
         List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
         for(ElemeActivity elemeActivity : elemeActivityBeans){
             elemeDao.insertActivity(elemeActivity);
@@ -100,12 +100,12 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             ElemeActivity  elemeActivity= new ElemeActivity();
             elemeActivity.setId((Integer) map.get("id"));
             elemeActivity.setShopId(150148671l);
-            elemeActivity.setBeginDate((String)map.getOrDefault("beginDate",""));
-            elemeActivity.setEndDate((String)map.getOrDefault("endDate",""));
-            elemeActivity.setName((String)map.getOrDefault("name",""));
-            elemeActivity.setStatus((String)map.getOrDefault("status","未知"));
-            elemeActivity.setCreateTime((String)map.getOrDefault("createdAt",""));
-            elemeActivity.setDescription((String)map.getOrDefault("description","无"));
+            elemeActivity.setBeginDate(notNull((String)map.getOrDefault("beginDate","")));
+            elemeActivity.setEndDate(notNull((String)map.getOrDefault("endDate","")));
+            elemeActivity.setName(notNull((String)map.getOrDefault("name","")));
+            elemeActivity.setStatus(notNull((String)map.getOrDefault("status","未知")));
+            elemeActivity.setCreateTime(notNull((String)map.getOrDefault("createdAt","")));
+            elemeActivity.setDescription(notNull((String)map.getOrDefault("description","无")));
             elemeActivity.setIsShare(ISSHARE.get((Boolean)contentMap.getOrDefault("shareWithOtherActivities",null)));
             //活动内容
             String content = "";

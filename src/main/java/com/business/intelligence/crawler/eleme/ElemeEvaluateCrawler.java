@@ -40,7 +40,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
 
     @Override
     public void doRun() {
-        String evaluateText = getEvaluateText(login());
+        String evaluateText = getEvaluateText(getClient());
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
         List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
         List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
@@ -128,9 +128,9 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : orderList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
             elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Integer)map.getOrDefault("ratingId",null)*1l);
-            elemeEvaluate.setShopId(204666l);
+            elemeEvaluate.setShopId(Long.valueOf(SHOPID));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
-            elemeEvaluate.setEvaValue((String)map.getOrDefault("ratingContent","无评论"));
+            elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
             elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
             elemeEvaluate.setGoods("本条为订单评论");
             list.add(elemeEvaluate);
@@ -138,11 +138,11 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : foodList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
             elemeEvaluate.setId((Long)map.getOrDefault("ratingId",null));
-            elemeEvaluate.setShopId(204666l);
+            elemeEvaluate.setShopId(Long.valueOf(SHOPID));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
-            elemeEvaluate.setEvaValue((String)map.getOrDefault("foodRatingContent","无评论"));
-            elemeEvaluate.setQuality((String)map.getOrDefault("quality","无"));
-            elemeEvaluate.setGoods((String)map.getOrDefault("foodName","无"));
+            elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("foodRatingContent","无评论")));
+            elemeEvaluate.setQuality(notNull((String)map.getOrDefault("quality","无")));
+            elemeEvaluate.setGoods(notNull((String)map.getOrDefault("foodName","无")));
             list.add(elemeEvaluate);
         }
         return list;

@@ -43,7 +43,7 @@ public class ElemeSaleCrawler extends ElemeCrawler {
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=saleStatsNew.getHistoryBusinessStatisticsV3";
     @Override
     public void doRun() {
-        List<LinkedHashMap<String, Object>> saleList= getSaleText(login());
+        List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient());
         List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
         for(ElemeSale elemeSale : elemeSaleBeans){
             elemeDao.insertSale(elemeSale);

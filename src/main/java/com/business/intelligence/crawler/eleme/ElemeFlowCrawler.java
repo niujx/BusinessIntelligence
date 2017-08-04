@@ -38,7 +38,7 @@ public class ElemeFlowCrawler extends ElemeCrawler{
 
     @Override
     public void doRun() {
-        List<LinkedHashMap<String, Object>> flowList = getFlowText(login());
+        List<LinkedHashMap<String, Object>> flowList = getFlowText(getClient());
         List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
         for(ElemeFlow elemeFlow : elemeFlowBeans){
             elemeDao.insertFlow(elemeFlow);
@@ -95,8 +95,8 @@ public class ElemeFlowCrawler extends ElemeCrawler{
         for(LinkedHashMap<String,Object> map : flowList){
             ElemeFlow elemeFlow = new ElemeFlow();
             elemeFlow.setFlowId((String)map.getOrDefault("shopName","")+"~"+(String)map.getOrDefault("statsDate",""));
-            elemeFlow.setCrawlerDate((String)map.getOrDefault("statsDate",""));
-            elemeFlow.setShopName((String)map.getOrDefault("shopName",""));
+            elemeFlow.setCrawlerDate(notNull((String)map.getOrDefault("statsDate","")));
+            elemeFlow.setShopName(notNull((String)map.getOrDefault("shopName","")));
             elemeFlow.setExposureTotalCount((Integer)map.getOrDefault("exposureTotalCount",0));
             elemeFlow.setVisitorNum((Integer)map.getOrDefault("visitorNum",0));
             elemeFlow.setBuyerNum((Integer)map.getOrDefault("buyerNum",0));

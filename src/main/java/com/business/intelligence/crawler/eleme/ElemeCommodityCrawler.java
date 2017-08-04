@@ -39,7 +39,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
 
     @Override
     public void doRun() {
-        List<LinkedHashMap<String, Object>> commodityText = getCommodityText(login());
+        List<LinkedHashMap<String, Object>> commodityText = getCommodityText(getClient());
         List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
         for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
             elemeDao.insertCommodity(elemeCommodity);
@@ -117,8 +117,8 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             index++;
             ElemeCommodity elemeCommodity = new ElemeCommodity();
             elemeCommodity.setMessageDate(DateUtils.date2String(beginCrawlerDate)+" ~~ " + DateUtils.date2String(crawlerDate)+" ("+index+")");
-            elemeCommodity.setShopId(150148671l);
-            elemeCommodity.setFoodName((String)map.getOrDefault("foodName",""));
+            elemeCommodity.setShopId(Long.valueOf(SHOPID));
+            elemeCommodity.setFoodName(notNull((String)map.getOrDefault("foodName","")));
             elemeCommodity.setSalesAmount((Double)map.getOrDefault("salesAmount",0));
             String amountRate = String .valueOf((Double)map.getOrDefault("salesAmount",0)/totalSalesAmount*100);
             elemeCommodity.setSalesAmountRate(amountRate.substring(0,amountRate.indexOf(".")+3)+"%");
