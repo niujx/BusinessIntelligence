@@ -2,9 +2,11 @@ package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeFlow;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,6 +27,7 @@ import java.util.List;
  * Created by Tcqq on 2017/7/24.
  * 排名流量 POST请求
  */
+@Slf4j
 @Component
 public class ElemeFlowCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
@@ -33,17 +36,17 @@ public class ElemeFlowCrawler extends ElemeCrawler{
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=trafficStats.getTrafficStatsV2";
 
-    @Override
-    public void doRun() {
-        List<LinkedHashMap<String, Object>> flowList = getFlowText(login());
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么流量排名，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        List<LinkedHashMap<String, Object>> flowList = getFlowText(getClient(elemeBean));
         List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
         for(ElemeFlow elemeFlow : elemeFlowBeans){
             elemeDao.insertFlow(elemeFlow);
         }
+        log.info("用户名为 {} 的流量排名已入库",username);
     }
 
     /**
@@ -52,11 +55,13 @@ public class ElemeFlowCrawler extends ElemeCrawler{
      * @return
      */
     public List<LinkedHashMap<String, Object>> getFlowText(CloseableHttpClient client){
+        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":150148671,\"beginDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":"+shopId+",\"beginDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        log.info("request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -96,13 +101,18 @@ public class ElemeFlowCrawler extends ElemeCrawler{
         for(LinkedHashMap<String,Object> map : flowList){
             ElemeFlow elemeFlow = new ElemeFlow();
             elemeFlow.setFlowId((String)map.getOrDefault("shopName","")+"~"+(String)map.getOrDefault("statsDate",""));
-            elemeFlow.setCrawlerDate((String)map.getOrDefault("statsDate",""));
-            elemeFlow.setShopName((String)map.getOrDefault("shopName",""));
+            elemeFlow.setCrawlerDate(notNull((String)map.getOrDefault("statsDate","")));
+            elemeFlow.setShopName(notNull((String)map.getOrDefault("shopName","")));
             elemeFlow.setExposureTotalCount((Integer)map.getOrDefault("exposureTotalCount",0));
             elemeFlow.setVisitorNum((Integer)map.getOrDefault("visitorNum",0));
             elemeFlow.setBuyerNum((Integer)map.getOrDefault("buyerNum",0));
             list.add(elemeFlow);
         }
         return list;
+    }
+
+    @Override
+    public void doRun() {
+
     }
 }

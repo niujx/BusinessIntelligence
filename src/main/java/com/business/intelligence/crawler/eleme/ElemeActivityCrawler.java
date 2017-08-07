@@ -3,8 +3,11 @@ package com.business.intelligence.crawler.eleme;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.ElemeModel.ElemeActivity;
+import com.business.intelligence.model.ElemeModel.ElemeBean;
+import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.WebUtils;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,15 +25,13 @@ import java.util.*;
  * Created by Tcqq on 2017/7/26.
  * 商店活动 POST请求
  */
+@Slf4j
 @Component
 public class ElemeActivityCrawler extends ElemeCrawler {
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
-    //用户信息
-    private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
-    private HttpClient httpClient = super.httpClient;
 
     private static final String URL ="https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
     private static final Map<Boolean, String> ISSHARE = Maps.newHashMap();
@@ -41,13 +42,14 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         ISSHARE.put(null,"未知");
     }
 
-    @Override
-    public void doRun() {
-        List<LinkedHashMap<String, Object>> activityText = getActivityText(login());
+    public void doRun(ElemeBean elemeBean) {
+        log.info("开始爬取饿了么商店活动，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        List<LinkedHashMap<String, Object>> activityText = getActivityText(getClient(elemeBean));
         List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
         for(ElemeActivity elemeActivity : elemeActivityBeans){
             elemeDao.insertActivity(elemeActivity);
         }
+        log.info("用户名为 {} 的商店活动已入库",username);
     }
 
     /**
@@ -56,10 +58,12 @@ public class ElemeActivityCrawler extends ElemeCrawler {
      * @return
      */
     public List<LinkedHashMap<String, Object>> getActivityText(CloseableHttpClient client){
+        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
-        String json = "{\"id\":\"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498\",\"method\":\"getApplyActivity\",\"service\":\"applyActivityManage\",\"params\":{\"shopId\":150148671},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"Mzg3OTI4ZDMtODMzNy00MDUyLWE2ZjN2FhYT\"},\"ncp\":\"2.0.0\"}";
+        String json = "{\"id\":\"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498\",\"method\":\"getApplyActivity\",\"service\":\"applyActivityManage\",\"params\":{\"shopId\":"+shopId+"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        log.info("request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -101,12 +105,12 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             ElemeActivity  elemeActivity= new ElemeActivity();
             elemeActivity.setId((Integer) map.get("id"));
             elemeActivity.setShopId(150148671l);
-            elemeActivity.setBeginDate((String)map.getOrDefault("beginDate",""));
-            elemeActivity.setEndDate((String)map.getOrDefault("endDate",""));
-            elemeActivity.setName((String)map.getOrDefault("name",""));
-            elemeActivity.setStatus((String)map.getOrDefault("status","未知"));
-            elemeActivity.setCreateTime((String)map.getOrDefault("createdAt",""));
-            elemeActivity.setDescription((String)map.getOrDefault("description","无"));
+            elemeActivity.setBeginDate(notNull((String)map.getOrDefault("beginDate","")));
+            elemeActivity.setEndDate(notNull((String)map.getOrDefault("endDate","")));
+            elemeActivity.setName(notNull((String)map.getOrDefault("name","")));
+            elemeActivity.setStatus(notNull((String)map.getOrDefault("status","未知")));
+            elemeActivity.setCreateTime(notNull((String)map.getOrDefault("createdAt","")));
+            elemeActivity.setDescription(notNull((String)map.getOrDefault("description","无")));
             elemeActivity.setIsShare(ISSHARE.get((Boolean)contentMap.getOrDefault("shareWithOtherActivities",null)));
             //活动内容
             String content = "";
@@ -230,4 +234,8 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     }
 
 
+    @Override
+    public void doRun() {
+
+    }
 }

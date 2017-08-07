@@ -45,7 +45,10 @@
           (#{saleId},#{orderDate},#{shop},#{totalOrderAmount},#{foodAmount},#{boxAmount},#{deliverAmount},#{onlinePaymentAmount},#{offlinePaymentAmount},#{restaurantDiscount},#{elemeDiscount},#{validOrderCount},#{averagePrice},#{invalidOrderCount},#{lossSaleAmount})
     </insert>
 
-    <!--<insert id="insertOrder" keyProperty="id" parameterType="OOrder">-->
-        <!--todo-->
-    <!--</insert>-->
+    <insert id="insertOrder" keyProperty="ORDER_ID" parameterType="ElemeOrder">
+        INSERT INTO "HYF"."BIL_ELEME_ORDER"
+            (ORDER_ID, SHOP_ID, ADDRESS, CREATE_AT, ACTIVE_AT, DELIVER_FEE, DELIVER_TIME, DESCRIPTION, GROUPS, INVOICE, BOOK, ONLINE_PAID, PHONE_LIST, OPEN_ID, SHOP_NAME, DAY_SN, STATUS, REFUND_STATUS, USER_ID, TOTAL_PRICE, ORIGINAL_PRICE, CONSIGNEE, DELIVERY_GEO, DELIVERY_POI_ADDRESS, INVOICED, INCOME, SERVICE_RATE, SERVICE_FEE, HONGBAO, PACKAGE_FEE, ACTIVITY_TOTAL, SHOP_PART, ELEME_PART, DOWNGRADED, SECRET_PHONE_EXPIRE_TIME, ORDER_ACTIVITIES, INVOICE_TYPE, TAXPAYER_ID)
+        VALUES
+            (#{orderId},#{shopId},#{address},#{createdAt},#{activeAt},#{deliverFee},#{deliverTime},#{description},#{groups},#{invoice},#{book},#{onlinePaid},#{phoneList},#{openId},#{shopName},#{daySn},#{status},#{refundStatus},#{userId},#{totalPrice},#{originalPrice},#{consignee},#{deliveryGeo},#{deliveryPoiAddress},#{invoiced},#{income},#{serviceRate},#{serviceFee},#{hongbao},#{packageFee},#{activityTotal},#{shopPart},#{elemePart},#{downgraded},#{secretPhoneExpireTime},#{orderActivities},#{invoiceType},#{taxpayerId})
+    </insert>
 </mapper>
