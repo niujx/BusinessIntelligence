@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.business.intelligence.mt">
+    <insert id="insertOrder" parameterType="MTOrder">
+        MERGE INFO BIL_MT_ORDER order USING (SELECT APP_NO FROM BIL_MT_ORDER) order_check ON (order.APP_NO = order_check.APP_NO)
+        WHEN MATCHED THEN
+        UPDATE
+        <set>
+            <if test="orderTime != null">ORDER_TIME = #{orderTime},</if>
+            <if test="hourLong != null">HOUR_LONG = #{hourLong},</if>
+            <if test="name != null">NAME = #{name},</if>
+            <if test="id != null">ID = #{id},</if>
+            <if test="city != null">CITY =#{city},</if>
+            <if test="type != null">TYPE=#{type},</if>
+            <if test="status != null">STATUS=#{status},</if>
+            <if test="disStatus != null">DIS_STATUS=#{disStatus},</if>
+            <if test="isSchedule != null">IS_SCHEDULE=#{isSchedule},</if>
+            <if test="totalPrice != null">TOTAL_PRICE=#{totalPrice},</if>
+            <if test="postDiscount != null">POST_DISCOUNT=#{postDiscount},</if>
+            <if test="mtPrice != null">MT_PRICE=#{mtPrice},</if>
+            <if test="merchantPrice != null">MERCHANT_PRICE=#{merchantPrice},</if>
+            <if test="dishInfo != null">DISH_INFO=#{dishInfo},</if>
+            <if test="deliveryfee != null">DELIVERY_FEE=#{deliveryfee},</if>
+            <if test="isDiscount != null">IS_DISCOUNT=#{isDiscount},</if>
+            <if test="preferential != null">PREFERENTIAL=#{preferential},</if>
+            <if test="isPress != null">IS_PRESS=#{isPress},</if>
+            <if test="replyStatus != null">REPLAY_STATUS=#{replyStatus},</if>
+            <if test="merchantReplay != null">MERCHANT_REPLAY=#{merchantReplay},</if>
+            <if test="complaintTime != null">COMPLAINT_TIME=#{complaintTime},</if>
+            <if test="complaintInfo != null">COMPLAINT_INFO=#{complaintInfo},</if>
+            <if test="appraiseTime != null">APPRAISE_TIME=#{appraiseTime},</if>
+            <if test="star != null">STAR=#{star},</if>
+            <if test="appraiseInfo != null">APPRAISE_INFO=#{appraiseInfo},</if>
+            <if test="foodBoxPrice != null">FOOD_BOX_PRICE=#{foodBoxPrice},</if>
+            <if test="foodBoxQuantity != null">FOOD_BOX_QUANTITY=#{foodBoxQuantity},</if>
+            <if test="orderDoneTime != null">ORDER_DONE_TIME=#{orderDoneTime},</if>
+            <if test="orderCancelInfo != null">ORDER_CANCEL_INFO=#{orderCancelInfo},</if>
+        </set>
+        WHEN NOT MATCHED THEN
+        INSERT
+        (APP_NO,ORDER_TIME,HOUR_LONG,NAME,ID,CITY,TYPE,STATUS,DIS_STATUS,IS_SCHEDULE,TOTAL_PRICE,POST_DISCOUNT,
+        MT_PRICE,MERCHANT_PRICE,DISH_INFO,DELIVERY_FEE,IS_DISCOUNT,PREFERENTIAL,IS_PRESS,REPLAY_STATUS,MERCHANT_REPLAY,
+        COMPLAINT_TIME,COMPLAINT_INFO,APPRAISE_TIME,DELIVERY_TIME,STAR,APPRAISE_INFO,FOOD_BOX_PRICE,FOOD_BOX_QUANTITY
+        ,ORDER_DONE_TIME,ORDER_CANCEL_INFO)
+        VALUES
+        (appNo,orderTime,hourLong,name,id,city,type,status,disStatus,isSchedule,totalPrice,postDiscount,
+        mtPrice,merchantPrice,dishInfo,deliveryfee,isDiscount,preferential,isPress,replyStatus,merchantReplay,
+        complaintTime,complaintInfo,appraiseTime,deliveryTime,star,appraiseInfo,foodBoxPrice,foodBoxQuantity,
+        orderDoneTime,orderCancelInfo)
+
+    </insert>
+
+</mapper>
+
+
