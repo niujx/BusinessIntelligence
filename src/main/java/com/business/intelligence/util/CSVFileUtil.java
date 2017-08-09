@@ -205,23 +205,30 @@ public class CSVFileUtil {
         return sb.toString();
     }
 
-    public static List<String> importCsv(File file){
-        List<String> dataList=new ArrayList<String>();
+    public static List<String> importCsv(File file) {
+        List<String> dataList = new ArrayList<String>();
 
-        BufferedReader br=null;
+        BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file), "gbk"));
+                    new FileInputStream(file), "utf-8"));
             String line = "";
+            int i = 0;
             while ((line = br.readLine()) != null) {
-                dataList.add(line);
+                i++;
+                if (i == 1) {
+                    continue;
+                }
+                dataList.add(line.replace("\"","").replace("\t",""));
+
             }
-        }catch (Exception e) {
-        }finally{
-            if(br!=null){
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
                 try {
                     br.close();
-                    br=null;
+                    br = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -231,10 +238,16 @@ public class CSVFileUtil {
     }
 
     public static void main(String[] args) {
-        File file = new File("/Users/wangfukun/other/img1500379584838.csv");
+        File file = new File("/Users/wangfukun/workspace/code1/BusinessIntelligence/所有现金账户流水明细导出_20170809_1502282298451.csv");
         List<String> list = importCsv(file);
-        for (int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
+        for (int i = 0; i < list.size(); i++) {
+            String content = list.get(i);
+            System.out.println(content);
+            String[] array = content.split(",");
+            if (array.length == 9) {
+                System.out.println(array[0].trim());
+            }
+
         }
     }
 }

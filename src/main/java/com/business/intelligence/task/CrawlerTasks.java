@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Slf4j
 public class CrawlerTasks {
 
-    private static  final Logger log = LoggerFactory.getLogger(CrawlerTasks.class);
 
     @Scheduled(cron = "* * 3 * *")
     public void doRun() {

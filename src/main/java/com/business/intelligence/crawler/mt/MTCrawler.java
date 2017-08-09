@@ -2,6 +2,7 @@ package com.business.intelligence.crawler.mt;
 
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
+import com.business.intelligence.dao.MTDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.mt.MTOrder;
 import com.business.intelligence.util.CookieStoreUtils;
@@ -18,6 +19,9 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.Header;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -28,12 +32,21 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.assertj.core.util.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,6 +56,8 @@ import static com.business.intelligence.util.HttpClientUtil.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
     private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
     private CloseableHttpClient client;
@@ -50,11 +65,17 @@ public class MTCrawler extends BaseCrawler {
     private LoginBean loginBean;
     private AccountInfo accountInfo;
 
+    @Autowired
+    private MTDao mtDao;
 
-    public MTCrawler(LoginBean loginBean) {
+    public MTCrawler() {
         client = HttpClientUtil.getHttpClient(cookieStore);
+    }
+
+    public void setLoginBean(LoginBean loginBean) {
         this.loginBean = loginBean;
     }
+
 
     @Override
     public void doRun() {
@@ -91,8 +112,8 @@ public class MTCrawler extends BaseCrawler {
                         uuidDev = uuid.get();
                         log.info("uuid is {}", uuidDev);
                     }
-                    log.info("de");
-                    HttpPost loginS2 = new HttpPost("https://waimaie.meituan.com/v2/epassport/logon");
+                    //  HttpPost loginS2 = new HttpPost("https://waimaie.meituan.com/v2/epassport/logon");
+                    HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
                     loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", BSID), new BasicNameValuePair("device_uuid", uuidDev))));
                     CloseableHttpResponse execute1 = client.execute(loginS2);
                     String loginMessage = EntityUtils.toString(execute1.getEntity());
@@ -107,10 +128,13 @@ public class MTCrawler extends BaseCrawler {
                         accountInfo.setAcctId(parse.read("$.data.acctId"));
                         log.info("create account info : {}", accountInfo);
 
+
                         //跨区单点登录地址 更新JSESSIONID
                         String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
                         HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
                         //保存COOKIE 到指定文件
+
+                        HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
                         CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
                         break;
                     }
@@ -155,7 +179,7 @@ public class MTCrawler extends BaseCrawler {
             int taskId = 0;
             int status;
             while (true) {
-                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/report/charts/download?wmPoiIdSel=2843062&fromDate=%s&toDate=%s&taskId=%s", fromDate, endDate, taskId == 0 ? "" : taskId));
+                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/report/charts/download?wmPoiIdSel=%s&fromDate=%s&toDate=%s&taskId=%s", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
                 taskId = parse.read("$.data.taskId");
@@ -169,18 +193,18 @@ public class MTCrawler extends BaseCrawler {
 
             url = new URI(url).toString();
             log.info("csv url is {}", url);
-            List<MTOrder> orders = Lists.newArrayList();
             try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                 if (execute.getStatusLine().getStatusCode() == 200) {
                     Reader reader = new InputStreamReader(new BOMInputStream(execute.getEntity().getContent()), "GBK");
                     CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
+                    log.info("load bizData size is {}",csvRecords.getCurrentLineNumber());
                     for (CSVRecord record : csvRecords) {
-                        log.info("length is {}",record.size());
-                        int i =0;
+                        log.info("length is {}", record.size());
+                        int i = 0;
                         MTOrder order = new MTOrder();
                         order.setAppNo(record.get(i++));
-                        order.setOrderTime(record.get(i++));
-                        order.setHourLong(record.get(i++));
+                        order.setOrderTime(toDate(record.get(i++)));
+                        order.setHourLong(toDate(record.get(i++)));
                         order.setName(record.get(i++));
                         order.setId(record.get(i++));
                         order.setCity(record.get(i++));
@@ -199,18 +223,18 @@ public class MTCrawler extends BaseCrawler {
                         order.setIsPress(record.get(i++));
                         order.setReplyStatus(record.get(i++));
                         order.setMerchantReplay(record.get(i++));
-                        order.setComplaintTime(record.get(i++));
+                        order.setComplaintTime(toDate(record.get(i++)));
                         order.setComplaintInfo(record.get(i++));
-                        order.setAppraiseTime(record.get(i++));
-                        order.setDeliveryTime(record.get(i++));
+                        order.setAppraiseTime(toDate(record.get(i++)));
+                        order.setDeliveryTime(toDate(record.get(i++)));
                         order.setStar(record.get(i++));
                         order.setAppraiseInfo(record.get(i++));
                         order.setFoodBoxPrice(record.get(i++));
                         order.setFoodBoxQuantity(record.get(i++));
-                        order.setOrderDoneTime(record.get(i++));
+                        order.setOrderDoneTime(toDate(record.get(i++)));
                         order.setOrderCancelInfo(record.get(i++));
+                        mtDao.insertOrder(order);
                         log.info("order info is {}", order);
-
                     }
                 }
             }
@@ -222,8 +246,222 @@ public class MTCrawler extends BaseCrawler {
 
     }
 
+    private Date toDate(String dateStr) {
+        if (StringUtils.isBlank(dateStr)) return null;
+        try {
+            return DateUtils.parseDate(dateStr.trim(), "yyyy-MM-dd HH:mm:ss");
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    //营业数据 营业统计
+    public void businessStatistics(String fromDate, String endDate, boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+            String reportJson, url;
+            int taskId = 0;
+            int status;
+            while (true) {
+                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", "2843062", fromDate, endDate, taskId == 0 ? "" : taskId));
+                log.info("read json is {}", reportJson);
+                ReadContext parse = JsonPath.parse(reportJson);
+                taskId = parse.read("$.data.taskId");
+                status = parse.read("$.data.status");
+                if (status != 0) {
+                    url = parse.read("$.data.url");
+                    break;
+                }
+                TimeUnit.SECONDS.sleep(10);
+            }
+            url = new URI(url).toString();
+            log.info("csv url is {}", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            businessStatistics(fromDate, endDate, true);
+        }
+    }
+//https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=30&wmPoiId=2843062&sortType=&sortValue=
+
+    //营业统计流量分析
+    public void flowanalysis(String days, boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+            String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, "2843062"));
+            log.info("read json is {}", json);
+            ReadContext parse = JsonPath.parse(json);
+            int exposureNum = parse.read("$.data.flowGeneralInfoVo.exposureNum");
+            int visitNum = parse.read("$.data.flowGeneralInfoVo.visitNum");
+            int orderNum = parse.read("$.data.flowGeneralInfoVo.orderNum");
+            log.info("exposureNum is {} ,visitNum is {} orderNum is {} ", exposureNum, visitNum, orderNum);
+        } catch (Exception e) {
+            e.printStackTrace();
+            flowanalysis(days, true);
+        }
+    }
+
+    //https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=2017-07-31&endDate=2017-08-06&type=count
+    //营业分析热门商品
+    public void hotSales(String fromDate, String endDate, boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+            try (CloseableHttpResponse execute = client.execute(new HttpGet(String.format("https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=%s&endDate=%s&type=count", fromDate, endDate)))) {
+                XSSFWorkbook hssfWorkbook = new XSSFWorkbook(execute.getEntity().getContent());
+                XSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+                for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                    XSSFRow hssfRow = sheet.getRow(rowNum);
+                    if (hssfRow != null) {
+                        log.info("cell is {}", hssfRow.getCell(0));
+                    }
+
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            hotSales(fromDate, endDate, true);
+        }
+    }
+
+
+    //评价管理
+    //http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=2843062&acctId=27578629&token=0a2TJcERKArTCsg5YO2qsWVv3JoRgTnEUynbbnU4_olc*&rate=-1&reply=-1&context=-1&startDate=2017-07-07&endDate=2017-08-06&pageNum=1
+    public void comment(String fromDate, String endDate, boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+            String url = String.format("http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=1", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate);
+            String json = HttpClientUtil.executeGetWithResult(client, url);
+            log.info("read json is {}", json);
+            ReadContext parse = JsonPath.parse(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            comment(fromDate, endDate, true);
+        }
+    }
+
+    //https://waimaieapp.meituan.com/finance/pc/api/poiSettleBill/historySettleBillList?settleBillStartDate=2017-02-07&settleBillEndDate=2017-08-06&pageSize=10&pageNo=1
+    //财务管理
+    public void historySettleBillList(String fromDate, String endDate, boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+            String url = String.format("https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=%s&endDate=%s", fromDate, endDate);
+            String json = HttpClientUtil.executeGetWithResult(client, url);
+            log.info("read json is {}", json);
+            ReadContext parse = JsonPath.parse(json);
+            int taskNo = parse.read("$.data.taskNo");
+            //{"data":{"taskNo":1001079},"code":0,"msg":"success"}
+
+
+            String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-06-1001079.xls", format, taskNo);
+            log.info("excel url is {}", url);
+            while (true) {
+                try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
+                    XSSFWorkbook hssfWorkbook = new XSSFWorkbook(execute.getEntity().getContent());
+                    XSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+                    if (sheet == null) {
+                        TimeUnit.SECONDS.sleep(10);
+                        log.info("sleep...");
+                        continue;
+                    }
+                    for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                        XSSFRow hssfRow = sheet.getRow(rowNum);
+                        if (hssfRow != null) {
+                            log.info("cell is {}", hssfRow.getCell(0));
+                        }
+
+                    }
+
+                }
+                break;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            comment(fromDate, endDate, true);
+        }
+    }
+
+    //https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs
+
+    //评价管理
+    public void acts(boolean isLogin) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookie == null || isLogin) {
+                login();
+            } else {
+                cookieStore = localCookie;
+            }
+
+
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("wmPoiId", accountInfo.wmPoiId);
+            String json = HttpClientUtil.executePostWithResult(client, "https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs", params);
+            log.info("read json is {}", json);
+            ReadContext parse = JsonPath.parse(json);
+
+
+            for (int i = 0; i < 2; i++) {
+                Map<String, String> params1 = Maps.newHashMap();
+                params1.put("isEntered", String.valueOf(i));
+                params1.put("poiId", String.valueOf(accountInfo.wmPoiId));
+                params1.put("pageStart", "0");
+                params1.put("numPerPage", "10");
+                List<BasicNameValuePair> nameValuePairs = params1.entrySet().stream().map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())).collect(toList());
+
+                String url = "https://waimaieapp.meituan.com/api/invite/query";
+                HttpPost httpPost = new HttpPost(url);
+
+                httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
+                httpPost.setHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+                httpPost.setHeader("Connection", "keep-alive");
+                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+                CloseableHttpResponse execute = client.execute(httpPost);
+                log.info("code is {}", EntityUtils.toString(execute.getEntity()));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Data
-    static class LoginBean {
+    public static class LoginBean {
         private Authenticate authenticate;
         private String parkey;
         private String captchaCode;
@@ -266,11 +504,18 @@ public class MTCrawler extends BaseCrawler {
         LoginBean loginBean = new LoginBean();
         loginBean.setAuthenticate(authenticate);
 
-        MTCrawler mtCrawler = new MTCrawler(loginBean);
+        MTCrawler mtCrawler = new MTCrawler();
+        mtCrawler.setLoginBean(loginBean);
 
         //  mtCrawler.login(loginBean);
-        mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
-
+        // mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
+        // mtCrawler.businessStatistics("20170707","20170805",false);
+        // mtCrawler.flowanalysis("30",false);
+        /// mtCrawler.hotSales("2017-07-31","2017-08-06",true);
+        //mtCrawler.comment("2017-08-01", "2017-08-06", true);
+//waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=2017-07-01&endDate=2017-07-30
+        //  mtCrawler.historySettleBillList("2017-07-03", "2017-07-29", true);
+        mtCrawler.acts(true);
     }
 }
 

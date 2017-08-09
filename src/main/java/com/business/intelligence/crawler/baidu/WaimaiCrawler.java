@@ -2,6 +2,11 @@ package com.business.intelligence.crawler.baidu;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.business.intelligence.dao.BDDao;
+import com.business.intelligence.model.baidu.BookedTable;
+import com.business.intelligence.model.baidu.BusinessData;
+import com.business.intelligence.model.baidu.HotDishes;
+import com.business.intelligence.model.baidu.ShopWthdrawal;
 import com.business.intelligence.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,20 +41,24 @@ public class WaimaiCrawler {
 
     private static final Logger log = LoggerFactory.getLogger(WaimaiCrawler.class);
 
-    private static String token;
+    private String token;
 
-    private static CloseableHttpClient client;
+    private CloseableHttpClient client;
 
     @Autowired
     private YmlConfig config;
 
-    private static CookieStore cookieStore = new BasicCookieStore();
+    @Autowired
+    private BDDao bdDao;
+
+    private CookieStore cookieStore = new BasicCookieStore();
+
+    private String shopId;
 
     public WaimaiCrawler() {
         if (client == null) {
             client = HttpClientUtil.getHttpClient(cookieStore);
         }
-
     }
 
     /**
@@ -57,16 +66,24 @@ public class WaimaiCrawler {
      *
      * @param userName 用户名
      * @param passWord 密码
-     * @param captcha  图片验证码（解析后的）
+     * @param start    开始时间
+     * @param end      结束时间
+     * @param shopId   商户id
      */
-    public void logins(String userName, String passWord, String captcha) {
+    public void logins(String userName, String passWord, String start, String end, String shopId) {
+        this.shopId = shopId;
+        boolean tag = getCookiestores(userName, passWord, start, end);
+        if (tag) {
+            return;
+        }
+        getToken();
         String loginUrl = "https://wmpass.baidu.com/api/login";
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "1");
         map.put("channel", "pc");
         map.put("account", userName);
-        map.put("upass", passWord);
-        map.put("captcha", captcha);
+        map.put("upass", getPassWord(passWord));
+        map.put("captcha", getCaptcha());
         map.put("token", token);
         map.put("redirect_url", "https://wmcrm.baidu.com/");
         map.put("return_url", "https://wmcrm.baidu.com/crm/setwmstoken");
@@ -74,24 +91,23 @@ public class WaimaiCrawler {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-//            log.info("登录时返回内容：" + content);
+            log.info(content);
             JSONObject json = JSONObject.parseObject(content);
             JSONObject data = json.getJSONObject("data");
             String return_url = data.getString("return_url");
             HttpGet rget = HttpClientUtil.get(return_url);
-            content = HttpClientUtil.executeGetWithResult(client, rget);
-//            log.info("登录后返回内容1：" + content);
+            HttpClientUtil.executeGetWithResult(client, rget);
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/");
 
             String shouye = "https://wmcrm.baidu.com/crm?qt=neworderlist";
             rget = HttpClientUtil.get(shouye);
             content = HttpClientUtil.executeGetWithResult(client, rget);
             if (content.contains("百度商户")) {
-                loadBills("2017-07-01", "2017-07-27");
+                loadBills(start, end);
+                setCookieStores(userName, passWord);
             }
-//            log.info("登录后返回内容2：" + content);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("登录百度失败", e);
         }
     }
 
@@ -128,8 +144,18 @@ public class WaimaiCrawler {
             File file = new File("/Users/wangfukun/other/img/");
             File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
+
+            try {
+                List<String> list = CSVFileUtil.importCsv(target);
+                List<BusinessData> bdList = Parser.bdParser(list, shopId);
+                for (BusinessData bd : bdList) {
+                    bdDao.insertBusinessData(bd);
+                }
+            } catch (Exception e) {
+                log.error("解析曝光数据失败", e);
+            }
         } catch (IOException e) {
-            log.error("下载曝光数据失败：" + e);
+            log.error("下载曝光数据失败", e);
         }
     }
 
@@ -142,7 +168,7 @@ public class WaimaiCrawler {
     private void dowShophotsaledish(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shophotsaledish");
-            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm?qt=exportshophotsaledishtask&from=pc&start_time=" + startTime + "&end_time=" + endTime + "&orderby=xl&display=json&");
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm?qt=exportshophotsaledishtask&from=pc&start_time=" + startTime.replace("-", "") + "&end_time=" + endTime.replace("-", "") + "&orderby=xl&display=json&");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
             CloseableHttpResponse response = client.execute(dwd);
@@ -181,7 +207,6 @@ public class WaimaiCrawler {
             try {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
-                log.info(content);
                 if (isErrorCode(content)) {
                     getExporthistory("所有现金账户流水明细导出");
                 }
@@ -256,46 +281,41 @@ public class WaimaiCrawler {
                             JSONObject j = list.getJSONObject(i);
                             String dow = j.getString("download_url");//下载链接
                             String create_time = j.getString("create_time");//导出时间
-                            String likeName = j.getString("name");//导出类型
-                            if (StringUtils.isNotEmpty(dow) && name.equals(likeName)) {
-                                StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(dow);
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
+                                StringBuilder key = new StringBuilder(name).append("_").append(create_time);
                                 String rowKey = MD5.md5(key.toString());
-                                map.put(rowKey, true);
-                                if (map.get(rowKey) != null) {
-                                    continue;
-                                } else {
-                                    //此处去下载
-                                    String day = create_time.substring(0, 10);
-                                    if (!day.equals(now)) {
-                                        //如果导出日期不是今天，就跳出去吧
-                                        flag = false;
-                                        map.clear();
-                                        break;
-                                    }
-                                    dowCsv(name, dow);
+                                String day = create_time.substring(0, 10);
+                                //下载日期是今天并且map没有该rowkey时，说明是第一次下载，初始化map，并赋值false
+                                if (day.equals(now) && map.get(rowKey) == null) {
+                                    map.put(rowKey, false);
                                 }
-                            } else {
-                                try {
-                                    Thread.sleep(1000);
+                                if (map.size() > 0) {
+                                    //当map中有值时，并且下载链接不为空、value为false时进行下载
+                                    if (StringUtils.isNotEmpty(dow) && !map.get(rowKey)) {
+                                        dowCsv(name, dow);
+                                        map.put(rowKey, true);
+                                    }
+                                }
+                                if (!map.containsValue(false)) {
+                                    //当map中不存在值为false时，说明全部下载完毕
+                                    map.clear();
+                                    flag = false;
                                     break;
-                                } catch (Exception e) {
-                                    log.error("睡眠失败了", e);
                                 }
                             }
                         }
-                    }else{
-                        flag = false;
                     }
-
                 }
             } catch (IOException e) {
                 log.error("请求导出进度查询页面出错", e);
             }
         }
+
     }
 
     /**
      * 下载csv并入库
+     *
      * @param name
      * @param url
      */
@@ -307,17 +327,40 @@ public class WaimaiCrawler {
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
             CloseableHttpResponse response = client.execute(dwd);
             InputStream in = response.getEntity().getContent();
-            File file = new File("/Users/wangfukun/other/img/");
-//            File file = new File(config.getCsvPath());
+//            File file = new File("/Users/wangfukun/other/img/"+"baidu/");
+            File file = new File(config.getCsvPath() + "baidu/");
             File target = new File(file.getParentFile(), name + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
             //此处去解析入库
             List<String> list = CSVFileUtil.importCsv(target);
-            if (list.size() <= 1) {
+            if (list.size() <= 0) {
+                log.info("{0}没有需要的数据", name);
                 return;
             }
+            switch (name) {
+                case "热销菜品导出":
+                    List<HotDishes> hotList = Parser.hotParser(list, shopId);
+                    for (HotDishes hot : hotList) {
+                        bdDao.insertHotDishes(hot);
+                    }
+                    break;
+                case "所有现金账户流水明细导出":
+                    List<BookedTable> btList = Parser.btParser(list, shopId);
+                    for (BookedTable bt : btList) {
+                        bdDao.insertBookedTable(bt);
+                    }
+                    break;
+                case "自动提现账户页面导出":
+                    List<ShopWthdrawal> swList = Parser.swParser(list, shopId);
+                    for (ShopWthdrawal sw : swList) {
+                        bdDao.insertShopWthdrawal(sw);
+                    }
+                    break;
+                default:
+                    break;
+            }
         } catch (Exception e) {
-            log.error("下载 【" + name + "】 csv失败", e);
+            log.error("下载 【{0}】 csv失败", name, e);
         }
     }
 
@@ -339,7 +382,7 @@ public class WaimaiCrawler {
                 token = data.getString("token");
             }
         } catch (Exception e) {
-            log.error("获取图片验证token出错：" + e);
+            log.error("获取图片验证token出错", e);
         }
     }
 
@@ -361,7 +404,7 @@ public class WaimaiCrawler {
             }
 
         } catch (Exception e) {
-            log.error("获取加密密码失败：" + e);
+            log.error("获取加密密码失败,密码：{}", sourcePwd, e);
         }
         return upass;
     }
@@ -376,25 +419,77 @@ public class WaimaiCrawler {
         return flag;
     }
 
-    public static void main(String[] args) {
+    private void setCookieStores(String userName, String pwd) {
+        CookieStoreUtils.storeCookie(cookieStore, MD5.md5(userName + "_" + pwd) + ".cookies");
+    }
 
 
-        WaimaiCrawler l = new WaimaiCrawler();
-//        l.getExporthistory();
-        l.getToken();
-        CloseableHttpClient httpRequest = HttpClients.createDefault();
+    private boolean getCookiestores(String userName, String pwd, String start, String end) {
+        try {
+            CookieStore localCookie = CookieStoreUtils.readStore(MD5.md5(userName + "_" + pwd) + ".cookies");
+            if (localCookie == null) {
+                return false;
+            } else {
+                cookieStore = localCookie;
+                client = HttpClientUtil.getHttpClient(cookieStore);
+                String shouye = "https://wmcrm.baidu.com/crm?qt=neworderlist";
+                HttpGet get = HttpClientUtil.get(shouye);
+                String content = HttpClientUtil.executeGetWithResult(client, get);
+                if (content.contains("百度商户")) {
+                    try {
+                        new Thread(new Runnable() {
+                            public void run() {
+                                loadBills(start, end);
+                                setCookieStores(userName, pwd);
+                            }
+                        }).start();
+                    } catch (Exception e) {
+                        log.error("异步调用失败{}", userName, e);
+                    }
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+
+        }
+
+
+        return false;
+    }
+
+    /**
+     * 获取图片验证码
+     *
+     * @return
+     */
+
+    private String getCaptcha() {
         String url = "https://wmpass.baidu.com/wmpass/openservice/imgcaptcha?token=" + token + "&t=" + System.currentTimeMillis() + "&color=3c78d8";
         HttpGet httpget = new HttpGet(url);
         String path = HttpUtil.getCaptchaCodeImage(client, httpget);
-        String imgCode = CodeImage.Imgencode(path);
-        String pwd = getPassWord("wang170106");
-        log.info("密码：" + pwd);
-        ;
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.print("请输入验证码：");
-//        String img = scanner.nextLine();
-        log.info("图片验证码" + imgCode);
-        l.logins("twfhscywjd", pwd, imgCode);
+        return CodeImage.Imgencode(path);
     }
+
+    //
+//    public static void main(String[] args) {
+//
+//
+//        WaimaiCrawler l = new WaimaiCrawler();
+////        l.getExporthistory();
+//        l.getToken();
+//        CloseableHttpClient httpRequest = HttpClients.createDefault();
+//        String url = "https://wmpass.baidu.com/wmpass/openservice/imgcaptcha?token=" + token + "&t=" + System.currentTimeMillis() + "&color=3c78d8";
+//        HttpGet httpget = new HttpGet(url);
+////        String path = HttpUtil.getCaptchaCodeImage(client, httpget);
+////        String imgCode = CodeImage.Imgencode(path);
+//        String pwd = getPassWord("wang170106");
+//        log.info("密码{}", pwd);
+//        ;
+////        Scanner scanner = new Scanner(System.in);
+////        System.out.print("请输入验证码：");
+////        String img = scanner.nextLine();
+//        log.info("图片验证码{}",imgCode);
+//        l.logins("twfhscywjd", pwd, imgCode);
+//    }
 
 }

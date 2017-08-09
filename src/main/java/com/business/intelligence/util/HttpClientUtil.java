@@ -202,6 +202,7 @@ public class HttpClientUtil {
                                                String charset) throws ClientProtocolException, IOException {
         HttpPost post = params == null ? post(url) : post(url, params);
         CloseableHttpResponse resp = client.execute(post);
+
         String result = EntityUtils.toString(resp.getEntity(), charset);
         resp.close();
         return result;
