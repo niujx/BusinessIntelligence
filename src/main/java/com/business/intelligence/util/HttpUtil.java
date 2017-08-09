@@ -43,9 +43,8 @@ public class HttpUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
     static String proxyHost = "127.0.0.1";
     static int proxyPort = 8087;
-
     @Autowired
-    private YmlConfig config;
+    private static YmlConfig config;
 
     public  static String doGets(String url){
         CloseableHttpClient httpRequest = HttpClients.createDefault();
@@ -471,7 +470,7 @@ public class HttpUtil {
         logger.info("验证码图片url:" + get.getURI().toString());
         try {
             CloseableHttpResponse response = client.execute(get);
-//            File codeFile = new File(config.getImgPath(), System.currentTimeMillis() + ".jpg");
+//            File codeFile = new File(config.getImgPath()+"baidu/", System.currentTimeMillis() + ".jpg");
             File codeFile = new File("/Users/wangfukun/other/img", System.currentTimeMillis() + ".jpg");
             String path = codeFile.getPath();
             logger.info("图片验证码存储地址："+path);

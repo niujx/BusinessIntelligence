@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/table.css" />
+
+	</head>
+	<body>
+		
+		<!--百度外卖-->
+		<div class="tableDetail baidu">
+			<table border="1">
+				<!--表头-->
+				<thead>
+					<tr>
+						<!--colspan 相当于合并水平方向的单元格  合并几个就写几-->
+						<th colspan="7">百度外卖</th>
+					</tr>
+					<tr class="menu">
+						<th colspan = "3">数据名称</th>
+						<th>设置抓取开始时间</th>
+						<th>设置抓取结束时间</th>
+						<!--<th>当前抓取截止时间</th>-->
+						<th>操作</th>
+					</tr>
+				</thead>
+				<!--表内容-->
+				<tbody>
+					<!--tr 代表行-->
+					<tr>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">20170717</td>-->
+						<td>
+							<button class="orderBegin">启动</button>
+							<button class="orderDownload">下载</button>
+						</td>
+						
+					</tr>
+					<tr>
+						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
+						<td rowspan="2">营业数据</td>
+						<td rowspan="2">运营中心</td>
+						<td>曝光数据</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>热销菜品</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>财务管理</td>
+						<td>运营中心</td>
+						<td>账户结算</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>评价管理</td>
+						<td>运营中心</td>
+						<td>账户结算</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<!--美团外卖-->
+		<div class="tableDetail meituan">
+			<table border="1">
+				<!--表头-->
+				<thead>
+					<tr>
+						<!--colspan 相当于合并水平方向的单元格  合并几个就写几-->
+						<th colspan="7">美团外卖</th>
+					</tr>
+					<tr class="menu">
+						<th colspan = "3">数据名称</th>
+						<th>设置抓取开始时间</th>
+						<th>设置抓取结束时间</th>
+						<!--<th>当前抓取时间</th>-->
+						<th>操作</th>
+					</tr>
+				</thead>
+				<!--表内容-->
+				<tbody>
+					<!--tr 代表行-->
+					<tr>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>报表下载</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+						
+					</tr>
+					<tr>
+						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
+						<td rowspan="3">营业数据</td>
+						<td rowspan="3">运营中心</td>
+						<td>营业统计</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>流量分析</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>热门商品</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>财务管理</td>
+						<td>运营中心</td>
+						<td>订单对账</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>评价管理</td>
+						<td>运营中心</td>
+						<td>查询指定门店点评内容</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td rowspan="2">平台活动抓取</td>
+						<td rowspan="2">运营中心</td>
+						<td>店铺活动</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>流量活动</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<!--饿了么-->
+		<div class="tableDetail eleme">
+			<table border="1">
+				<!--表头-->
+				<thead>
+					<tr>
+						<!--colspan 相当于合并水平方向的单元格  合并几个就写几-->
+						<th colspan="7">饿了么</th>
+					</tr>
+					<tr class="menu">
+						<th colspan = "3">数据名称</th>
+						<th>设置抓取开始时间</th>
+						<th>设置抓取结束时间</th>
+						<!--<th>当前抓取时间</th>-->
+						<th>操作</th>
+					</tr>
+				</thead>
+				<!--表内容-->
+				<tbody>
+					<!--tr 代表行-->
+					<tr>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="crawlerOrder">启动</button>
+							<button class="orderDownload">下载</button>
+						</td>
+						
+					</tr>
+					<tr>
+						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
+						<td rowspan="3">经营数据</td>
+						<td rowspan="3">运营中心</td>
+						<td>营业统计</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>排名流量</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>商品分析</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>财务数据</td>
+						<td>运营中心</td>
+						<td>账单记录</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>平台活动抓取</td>
+						<td>运营中心</td>
+						<td>平台活动</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="begin">启动</button>
+							<button class="download">下载</button>
+						</td>
+					</tr>
+					<tr>
+						<td>评价管理</td>
+						<td>运营中心</td>
+						<td>顾客评价</td>
+						<td>
+							<input type="text" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="text" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<!--<td class="getTime">当前的时间为</td>-->
+						<td>
+							<button class="crawlerEvaluate">启动</button>
+							<button class="evaluateDownload">下载</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<script src="js/jquery2.0.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/baiduCrawler.js"></script>
+		<script src="js/baiduDownload.js"></script>
+		<script src="js/elemeCrawler.js"></script>
+		<script src="js/elemeDownload.js"></script>
+		<script src="js/meituanCrawler.js"></script>
+		<script src="js/meituanDownload.js"></script>
+	</body>
+</html>

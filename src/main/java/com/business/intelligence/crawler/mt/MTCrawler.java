@@ -2,6 +2,7 @@ package com.business.intelligence.crawler.mt;
 
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
+import com.business.intelligence.dao.MTDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.mt.MTOrder;
 import com.business.intelligence.util.CookieStoreUtils;
@@ -18,7 +19,9 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.Header;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -33,11 +36,16 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.assertj.core.util.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,19 +56,26 @@ import static com.business.intelligence.util.HttpClientUtil.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
     private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
     private CloseableHttpClient client;
     private CookieStore cookieStore = new BasicCookieStore();
     private LoginBean loginBean;
     private AccountInfo accountInfo;
-    private CookieStore cookieStore2;
 
+    @Autowired
+    private MTDao mtDao;
 
-    public MTCrawler(LoginBean loginBean) {
+    public MTCrawler() {
         client = HttpClientUtil.getHttpClient(cookieStore);
+    }
+
+    public void setLoginBean(LoginBean loginBean) {
         this.loginBean = loginBean;
     }
+
 
     @Override
     public void doRun() {
@@ -178,18 +193,18 @@ public class MTCrawler extends BaseCrawler {
 
             url = new URI(url).toString();
             log.info("csv url is {}", url);
-            List<MTOrder> orders = Lists.newArrayList();
             try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                 if (execute.getStatusLine().getStatusCode() == 200) {
                     Reader reader = new InputStreamReader(new BOMInputStream(execute.getEntity().getContent()), "GBK");
                     CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
+                    log.info("load bizData size is {}",csvRecords.getCurrentLineNumber());
                     for (CSVRecord record : csvRecords) {
                         log.info("length is {}", record.size());
                         int i = 0;
                         MTOrder order = new MTOrder();
                         order.setAppNo(record.get(i++));
-                        order.setOrderTime(record.get(i++));
-                        order.setHourLong(record.get(i++));
+                        order.setOrderTime(toDate(record.get(i++)));
+                        order.setHourLong(toDate(record.get(i++)));
                         order.setName(record.get(i++));
                         order.setId(record.get(i++));
                         order.setCity(record.get(i++));
@@ -208,19 +223,18 @@ public class MTCrawler extends BaseCrawler {
                         order.setIsPress(record.get(i++));
                         order.setReplyStatus(record.get(i++));
                         order.setMerchantReplay(record.get(i++));
-                        order.setComplaintTime(record.get(i++));
+                        order.setComplaintTime(toDate(record.get(i++)));
                         order.setComplaintInfo(record.get(i++));
-                        order.setAppraiseTime(record.get(i++));
-                        order.setDeliveryTime(record.get(i++));
+                        order.setAppraiseTime(toDate(record.get(i++)));
+                        order.setDeliveryTime(toDate(record.get(i++)));
                         order.setStar(record.get(i++));
                         order.setAppraiseInfo(record.get(i++));
                         order.setFoodBoxPrice(record.get(i++));
                         order.setFoodBoxQuantity(record.get(i++));
-                        order.setOrderDoneTime(record.get(i++));
+                        order.setOrderDoneTime(toDate(record.get(i++)));
                         order.setOrderCancelInfo(record.get(i++));
+                        mtDao.insertOrder(order);
                         log.info("order info is {}", order);
-                        orders.add(order);
-
                     }
                 }
             }
@@ -230,6 +244,15 @@ public class MTCrawler extends BaseCrawler {
         }
 
 
+    }
+
+    private Date toDate(String dateStr) {
+        if (StringUtils.isBlank(dateStr)) return null;
+        try {
+            return DateUtils.parseDate(dateStr.trim(), "yyyy-MM-dd HH:mm:ss");
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     //营业数据 营业统计
@@ -438,7 +461,7 @@ public class MTCrawler extends BaseCrawler {
 
 
     @Data
-    static class LoginBean {
+    public static class LoginBean {
         private Authenticate authenticate;
         private String parkey;
         private String captchaCode;
@@ -481,7 +504,8 @@ public class MTCrawler extends BaseCrawler {
         LoginBean loginBean = new LoginBean();
         loginBean.setAuthenticate(authenticate);
 
-        MTCrawler mtCrawler = new MTCrawler(loginBean);
+        MTCrawler mtCrawler = new MTCrawler();
+        mtCrawler.setLoginBean(loginBean);
 
         //  mtCrawler.login(loginBean);
         // mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.intelligence">
+
+    <insert id="insertHotDishes" keyProperty="id" parameterType="HotDishes">
+        INSERT INTO "HYF"."BIL_BD_HOT_DISHES"
+        (ID, SORT, DISHES_NAME, SALES, SALES_AMOUNT, PRICE, SALES_ACCOUNTED,SALES_NUMBER_ACCOUNTED, SHOP_ID, CREAT_TIME, UPDATE_TIME)
+        VALUES
+        (#{id}, #{sort}, #{dishesName}, #{sales},#{salesAmount}, #{price}, #{salesAccounted}, #{salesNumberAccounted}, #{shopId}, #{creatTime}, #{updateTime})
+    </insert>
+
+    <insert id="insertBookedTable" keyProperty="id" parameterType="BookedTable">
+        Insert into "HYF"."BIL_BD_BOOKED_TABLE"
+        (ID,ORDER_TYPE,LOSS_BEARS,FOOD_EFFECT,BOXES_EFFECT,SUBSIDIE_EFFECT,COMMISSION_EFFECT,SHIPP_EFFECT,BD_SUBSIDIE_EFFECT,SUBSIDIE_AGENTS_EFFECT,USER_PAY_EFFECT,FOOD_DON_EFFECT,BOXES_DON_EFFECT,SUBSIDIE_DON_EFFECT,COMMISSION_DON_EFFECT,SHIPP_DON_EFFECT,BD_SUBSIDIE_DON_EFFECT,SUBSIDIE_AGENTS_DON_EFFECT,USER_PAY_DON_EFFECT,SUPPLIER,LOGISTIC,AGENT,KNIGHT,SHOP_ID,CREAT_TIME,UPDATE_TIME,ORDER_SORT_NUMBER,ORDER_NUMBER,ACTUAL_PAY,FINANCIAL_TYPE,SERIAL_NUMBER,BUSINESS_NUMBET,ORDER_STATUS,ORDER_TIME,FINANCIAL_TIME,YS_MAX,YX_MIN,ACCOUNT_BALANCE,NOTE,SECONDARY_SUBJECT,BUSINESS_TYPE,PRESSURE)
+        values
+        (#{id},#{orderType},#{lossBears},#{foodEffect},#{boxesEffect},#{subsidieEffect},#{commissionEffect},#{shippEffect},#{bdSubsidieEffect},#{subsidieAgentsEffect},#{userPayEffect},#{foodDonEffect},#{boxesDonEffect},#{subsidieDonEffect},#{commissionDonEffect},#{shippDonEffect},#{bdSubsidieDonEffect},#{subsidieAgentsDonEffect},#{userPayDonEffect},#{supplier},#{logistic},#{agent},#{knight},#{shopId},#{creatTime},#{updateTime},#{orderSortNumber},#{orderNumber},#{actualPay},#{financialType},#{serialNumber},#{businessNumbet},#{orderStatus},#{orderTime},#{financialTime},#{ysMax},#{yxMin},#{accountBalance},#{note},#{secondarySubject},#{businessType},#{pressure})
+    </insert>
+
+    <insert id="insertBusinessData" keyProperty="id" parameterType="BusinessData">
+        INSERT INTO "HYF"."BIL_BD_BUSINESS_DATA"
+        (ID,TIME, VISITING_RS, VISITING_CS, VISITING_PER, EXPOSURE_RS,EXPOSURE_CS, ORDER_AMOUNT, ORDER_CONVERT, SHOP_RANKING, SHOP_ID, CREAT_TIME, UPDATE_TIME)
+        VALUES
+        (#{id},#{time},#{visitingRs}, #{visitingCs}, #{visitingPer}, #{exposureRs}, #{exposureCs}, #{orderAmount}, #{orderConvert},#{shopRanking}, #{shopId}, #{creatTime}, #{updateTime})
+    </insert>
+
+    <insert id="insertShopWthdrawal" keyProperty="id" parameterType="ShopWthdrawal">
+        Insert into "HYF"."BIL_BD_SHOP_WITHDRAWAL"
+        (ID,BILL_DATE,ACCOUNT_DATE,SERIAL_NUMBER,TURN_SERIAL_NUMBER,ACCOUNT_TYPE,AMOUNT,ACCOUNT_BALANCE,FREEZE_AMOUNT,SUM_FREEZE_AMOUNT,PAYMENT_ACCOUNT,PAYMENT_NAME,PAYMENT_STATUS,NOTE,APPLICATION_DATE,SHOP_ID,UPDATE_TIME,CREAT_TIME)
+        values
+        (#{id},#{billDate},#{accountDate},#{serialNumber},#{turnSerialNumber},#{accountType},#{amount},#{accountBalance},#{freezeAmount},#{sumFreezeAmount},#{paymentAccount},#{paymentName},#{paymentStatus},#{note},#{applicationDate},#{shopId},#{updateTime},#{creatTime})
+    </insert>
+
+    <insert id="insertOrderDetails" keyProperty="id" parameterType="OrderDetails">
+        Insert into "HYF"."BIL_BD_ORDER_DETAILS"
+        (ID,ORDER_ID,SEND_IMMEDIATELY,ORDER_INDEX,STATUS,EXPECT_TIME_MODE,SEND_TIME,PICKUP_TIME,ATSHOP_TIME,DELIVERY_TIME,DELIVERY_PHONE,FINISHED_TIME,CONFIRM_TIME,CANCEL_TIME,SEND_FEE,PACKAGE_FEE,DISCOUNT_FEE,SHOP_FEE,TOTAL_FEE,USER_FEE,PAY_TYPE,NEED_INVOICE,INVOICE_TITLE,TAXER_ID,REMARK,DELIVERY_PARTY,CREATE_TIME,MEAL_NUM,RESPONSIBLE_PARTY,COMMISSION,NAME,PROVINCE,CITY,DISTRICT,PHONE,GENDER,ADDRESS,LONGITUDE,LATITUDE,SHOP_ID,BAIDU_SHOP_ID,BAIDU_NAME,PRODUCTS,DISCOUNT,PART_REFUND_INFO,CREAT_TIME,UPDATE_TIME)
+        values
+        (#{id},#{orderId},#{sendImmediately},#{orderIndex},#{status},#{expectTimeMode},#{sendTime},#{pickupTime},#{atshopTime},#{deliveryTime},#{deliveryPhone},#{finishedTime},#{confirmTime},#{cancelTime},#{sendFee},#{packageFee},#{discountFee},#{shopFee},#{totalFee},#{userFee},#{payType},#{needInvoice},#{invoiceTitle},#{taxerId},#{remark},#{deliveryParty},#{createTime},#{mealNum},#{responsibleParty},#{commission},#{name},#{province},#{city},#{district},#{phone},#{gender},#{address},#{longitude},#{latitude},#{shopId},#{baiduShopId},#{baiduName},#{products},#{discount},#{partEefundInfo},#{creatTime},#{updateYime})
+    </insert>
+
+    <insert id="insertComment" keyProperty="id" parameterType="Comment">
+        Insert into "HYF"."BIL_BD_SHOP_COMMENT"
+        (ID,COMMENT_ID,CONTENT,SCORE,SERVICE_SCORE,DISH_SCORE,RECOMMEND_DISHES,BAD_DISHES,COMMENT_LABELS,REPLY_CONTENT,CREATE_TIME,USERNAME,SHOP_ID,SHOP_NAME,COST_TIME,CREAT_TIME,UPDATETIME)
+        values
+        (#{id},#{commentId},#{content},#{score},#{serviceScore},#{dishScore},#{recommendDishes},#{badDishes},#{commentLabels},#{replyContent},#{createTime},#{userName},#{shopId},#{shopName},#{costTime},#{creatTime},#{updateTime})
+    </insert>
+</mapper>

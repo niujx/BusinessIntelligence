@@ -2,6 +2,7 @@ package com.business.intelligence.crawler.baidu;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.business.intelligence.dao.BDDao;
 import com.business.intelligence.model.baidu.*;
 import com.business.intelligence.util.HttpClientUtil;
 import org.apache.commons.lang.StringUtils;
@@ -11,6 +12,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,13 +26,12 @@ public class WaimaiApi {
 
     private static final Logger logger = LoggerFactory.getLogger(WaimaiApi.class);
 
-    public static final int SOURCE = 64614;
-
-    public static final String SECRET = "597383a4f4b96334";
-
     private static CloseableHttpClient client;
 
     private static CookieStore cookieStore = new BasicCookieStore();
+
+    @Autowired
+    private BDDao bdDao;
 
     public WaimaiApi() {
         if (client == null) {
@@ -40,24 +41,27 @@ public class WaimaiApi {
 
     public static void main(String[] args) {
         client = HttpClientUtil.getHttpClient(cookieStore);
-//        commentGet();
-
     }
 
     /**
      * 获取上行订单列表
+     *
+     * @param source 商户编号
+     * @param secret 商户秘钥
+     * @param shopId 百度商户id
+     * @return
      */
-    public String ouderListGet() {
+    public String ouderListGet(String source, String secret, String shopId,String merchantId) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.list");
         params.put("version", 3);
         params.put("timestamp", (int) (System.currentTimeMillis() / 1000));
         params.put("ticket", UUID.randomUUID().toString().toUpperCase());
-        params.put("source", SOURCE);
+        params.put("source", source);
         params.put("encrypt", "");
-        params.put("secret", SECRET);
+        params.put("secret", secret);
         Map<String, Object> map = new HashMap<>();
-        map.put("shop_id", "test_64614");
+        map.put("shop_id", shopId);
         params.put("body", JSONObject.toJSON(map));
 
         List<String> s = new ArrayList<>();
@@ -77,7 +81,7 @@ public class WaimaiApi {
                 List<OrderUpList> orderList = array.toJavaList(OrderUpList.class);
                 for (OrderUpList orderUpList : orderList) {
                     //此处由于百度不支持批量查询，只能循环查询
-                    orderGet(orderUpList.getOrderId());
+                    orderGet(orderUpList.getOrderId(), source, secret,merchantId);
                 }
             }
 
@@ -91,16 +95,19 @@ public class WaimaiApi {
      * 获取订单详情
      *
      * @param orderId 订单编号
+     * @param source  商户编号
+     * @param secret  商户秘钥
+     * @return
      */
-    private String orderGet(String orderId) {
+    private String orderGet(String orderId, String source, String secret,String merchantId) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.get");
         params.put("version", 3);
         params.put("timestamp", (int) (System.currentTimeMillis() / 1000));
         params.put("ticket", UUID.randomUUID().toString().toUpperCase());
-        params.put("source", SOURCE);
+        params.put("source", source);
         params.put("encrypt", "");
-        params.put("secret", SECRET);
+        params.put("secret", secret);
         Map<String, Object> map = new HashMap<>();
 
         map.put("order_id", orderId);
@@ -117,7 +124,12 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            logger.info(content);
+            if(StringUtils.isNotEmpty(content)){
+                List<OrderDetails> odList = Parser.odParser(content,merchantId);
+                for (OrderDetails od : odList){
+                    bdDao.insertOrderDetails(od);
+                }
+            }
 
         } catch (IOException e) {
             logger.error("获取上行订单详情出错", e);
@@ -127,19 +139,24 @@ public class WaimaiApi {
 
     /**
      * 获取评论
+     *
+     * @param source 商户编号
+     * @param secret 秘钥
+     * @param shopId 百度商户id
+     * @return
      */
-    public String commentGet() {
+    public String commentGet(String source, String secret, String shopId,String merchantId) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "shop.comment.get");
         params.put("version", 3);
         params.put("timestamp", (int) (System.currentTimeMillis() / 1000));
         params.put("ticket", UUID.randomUUID().toString().toUpperCase());
-        params.put("source", SOURCE);
+        params.put("source", source);
         params.put("encrypt", "");
-        params.put("secret", SECRET);
+        params.put("secret", secret);
         Map<String, Object> map = new HashMap<>();
 
-        map.put("shop_id", "test_64614");
+        map.put("shop_id", shopId);
 //        map.put("start_time", "");
 //        map.put("end_time", "");
         params.put("body", JSONObject.toJSON(map));
@@ -155,8 +172,12 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            logger.info(content);
-
+            if(StringUtils.isNotEmpty(content)){
+                List<Comment> ctList = Parser.ctParser(content,merchantId);
+                for (Comment ct : ctList){
+                    bdDao.insertComment(ct);
+                }
+            }
         } catch (IOException e) {
             logger.error("获取商户评论列表出错", e);
         }

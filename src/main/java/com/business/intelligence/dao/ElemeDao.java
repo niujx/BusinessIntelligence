@@ -18,31 +18,59 @@ public class ElemeDao {
     private SqlSessionTemplate sqlSessionTemplate;
 
     public void insertEvaluate(ElemeEvaluate elemeEvaluate){
-        sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeEvaluate.getId());
+        }
     }
 
     public void insertActivity(ElemeActivity elemeActivity){
-        sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeActivity.getId());
+        }
     }
 
     public void insertBill(ElemeBill elemeBill){
-        sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeBill.getClosingDate());
+        }
     }
 
     public void insertCommodity(ElemeCommodity elemeCommodity){
-        sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeCommodity.getMessageDate());
+        }
     }
 
     public void insertFlow(ElemeFlow elemeFlow){
-        sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeFlow.getFlowId());
+        }
     }
 
     public void insertSale(ElemeSale elemeSale){
-        sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeSale.getSaleId());
+        }
     }
 
     public void insertOrder(ElemeOrder elemeOrder){
-        sqlSessionTemplate.insert("com.business.intelligence.insertOrder",elemeOrder);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertOrder",elemeOrder);
+        }catch(Exception e){
+            log.error("{} 数据已经存在",elemeOrder.getOrderId());
+        }
     }
 
 

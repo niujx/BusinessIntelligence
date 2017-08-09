@@ -28,7 +28,7 @@ public class DruidAutoConfig {
         druidDataSource.setInitialSize(5);
         druidDataSource.setMinIdle(5);
         druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
-        druidDataSource.setValidationQuery("SELECT 1 FROM DUAL");
+//        druidDataSource.setValidationQuery("SELECT 1 FROM DUAL");
         druidDataSource.setTestOnBorrow(false);
         druidDataSource.setTestOnReturn(false);
         druidDataSource.setTestWhileIdle(true);

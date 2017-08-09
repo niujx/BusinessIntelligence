@@ -13,6 +13,10 @@ public class MTDao {
     private SqlSessionTemplate sqlSessionTemplate;
 
     public void insertOrder(MTOrder order) {
-        sqlSessionTemplate.insert("com.business.intelligence.mt.insertOrder", order);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.mt.insertOrder", order);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

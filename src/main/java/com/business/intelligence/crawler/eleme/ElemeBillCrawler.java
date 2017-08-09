@@ -37,7 +37,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
     public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,elemeBean.getUsername());
         List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
         List<ElemeBill> billList = getElemeBillBeans(billText);
         for(ElemeBill elemeBill : billList){
