@@ -15,7 +15,4 @@ public class ElemeBean {
     private String password;
     //商铺id
     private String shopId;
-    //登录标识id
-    private String ksId;
-
 }

@@ -48,7 +48,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
             elemeDao.insertEvaluate(elemeEvaluate);
         }
-        log.info("用户名为 {} 的顾客评价已入库",username);
+        log.info("用户名为 {} 的顾客评价已入库完毕",username);
 
     }
 
@@ -76,15 +76,15 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
             Object count = WebUtils.getOneByJsonPath(result, "$.result.total");
-            log.info("爬取的个数为 {}",count);
+            log.info("count result {}",count);
             //开始爬取内容
-            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+shopId+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZTRkYWJlODQtMzZhZi00MmU1LWFjYTMTE2Zm\"},\"ncp\":\"2.0.0\"}";
-            log.info("request json is {}",json);
+            json = "{\"id\":\"4b6e096e-0d39-49a6-adb7-c6fe3b6583b4\",\"method\":\"querySingleShopRating\",\"service\":\"shopRating\",\"params\":{\"shopId\":"+shopId+",\"query\":{\"beginDate\":\""+beginDate+"T00:00:00\",\"endDate\":\""+endDate+"T00:00:00\",\"hasContent\":null,\"level\":null,\"replied\":null,\"tag\":null,\"limit\":"+(Integer)count+",\"offset\":0,\"state\":null,\"deadline\":{\"name\":\"昨日\",\"count\":1,\"value\":\"-1\",\"$$hashKey\":\"object:2467\"}}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             execute = client.execute(post);
             entity = execute.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result is {}",result);
             return result;
         } catch (IOException e) {
             e.printStackTrace();
@@ -134,7 +134,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         List<ElemeEvaluate> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : orderList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
-            elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Integer)map.getOrDefault("ratingId",null)*1l);
+            elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Long)map.getOrDefault("ratingId",null));
             elemeEvaluate.setShopId(Long.valueOf(shopId));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
