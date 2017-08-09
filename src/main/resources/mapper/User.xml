@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.intelligence.model">
+
+    <select id="getUsers" resultType="User" parameterType="String">
+        SELECT
+            MERCHANT_ID as merchantId,
+            USER_NAME as userName,
+            PASSWORD as password,
+            IS_LAUNCH as isLaunch,
+            PLATFORM as platform,
+            UPDATE_TIME as updateTime,
+            MERCHANT_NAME as merchantName,
+            MERCHANT_ADDRESS as merchantAddress,
+            PHONE as phone,
+            SOURCE as source,
+            SECRET as secret,
+            SHOP_ID  as shopId
+        FROM
+            TB_ALL_MERCHANTINFO
+        where
+            PLATFORM = #{platform}
+
+    </select>
+
+</mapper>
