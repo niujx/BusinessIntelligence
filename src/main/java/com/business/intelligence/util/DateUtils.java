@@ -8,16 +8,19 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
-     /**将时间按照yyyy-MM-dd的格式转换为String
+    /**
+     * 将时间按照yyyy-MM-dd的格式转换为String
      */
-    public static String date2String(Date date){
+    public static String date2String(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
-     /**将毫秒值按照yyyy-MM-dd的格式转换为时间字符串
+
+    /**
+     * 将毫秒值按照yyyy-MM-dd的格式转换为时间字符串
      */
-    public static String long2Date(Long l){
-        if(l != null){
+    public static String long2Date(Long l) {
+        if (l != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date date = new Date(l);
             return sdf.format(date);
@@ -345,5 +348,15 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         return formatter.format(calendar.getTime());
 
+    }
+
+    public static String timeStamp(String sourceTime, String format) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            return String.valueOf(sdf.parse(sourceTime).getTime() / 1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

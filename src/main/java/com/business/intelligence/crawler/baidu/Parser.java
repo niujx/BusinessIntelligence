@@ -61,7 +61,7 @@ public class Parser {
         try {
             for (int i = 0; i < list.size(); i++) {
                 String content = list.get(i);
-                String[] array = content.split(",\t");
+                String[] array = content.split(",");
                 BusinessData bd = new BusinessData();
                 if (array.length == 9) {
                     bd.setTime(array[0].trim());
@@ -97,7 +97,7 @@ public class Parser {
         try {
             for (int i = 0; i < list.size(); i++) {
                 String content = list.get(i);
-                String[] array = content.split(",\t");
+                String[] array = content.split(",");
                 ShopWthdrawal sw = new ShopWthdrawal();
                 if (array.length == 14) {
                     sw.setBillDate(array[0].trim());
@@ -138,7 +138,7 @@ public class Parser {
         try {
             for (int i = 0; i < list.size(); i++) {
                 String content = list.get(i);
-                String[] array = content.split(",\t");
+                String[] array = content.split(",");
                 BookedTable bt = new BookedTable();
                 if (array.length == 38) {
                     bt.setOrderSortNumber(Integer.valueOf(array[0].toString()));
@@ -304,7 +304,7 @@ public class Parser {
                     od.setResponsibleParty(order.getString("responsible_party"));
                     od.setCommission(order.getString("commission"));
                     od.setCreatTime(new Date());
-                    od.setUpdateYime(new Date());
+                    od.setUpdateTime(new Date());
                     odList.add(od);
 
                 }

@@ -281,27 +281,26 @@ public class WaimaiCrawler {
                             JSONObject j = list.getJSONObject(i);
                             String dow = j.getString("download_url");//下载链接
                             String create_time = j.getString("create_time");//导出时间
-                            String likeName = j.getString("name");//导出类型
-                            if (StringUtils.isNotEmpty(dow) && name.equals(likeName)) {
-                                StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(dow);
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
+                                StringBuilder key = new StringBuilder(name).append("_").append(create_time);
                                 String rowKey = MD5.md5(key.toString());
-                                if (map.get(rowKey) != null) {
-                                    continue;//如果rowkey存在说明已经下载过了
-                                } else {
-                                    //此处去下载
-                                    String day = create_time.substring(0, 10);
-                                    if (!day.equals(now)) {
-                                        //如果导出日期不是今天，就跳出去吧
-                                        if (map.size() > 0) {
-                                            map.clear();
-                                            return;
-                                        }
-                                        flag = false;
-                                        break;
+                                String day = create_time.substring(0, 10);
+                                //下载日期是今天并且map没有该rowkey时，说明是第一次下载，初始化map，并赋值false
+                                if (day.equals(now) && map.get(rowKey) == null) {
+                                    map.put(rowKey, false);
+                                }
+                                if (map.size() > 0) {
+                                    //当map中有值时，并且下载链接不为空、value为false时进行下载
+                                    if (StringUtils.isNotEmpty(dow) && !map.get(rowKey)) {
+                                        dowCsv(name, dow);
+                                        map.put(rowKey, true);
                                     }
-                                    map.put(rowKey, true);
-                                    dowCsv(name, dow);
-//                                    flag = false;
+                                }
+                                if (!map.containsValue(false)) {
+                                    //当map中不存在值为false时，说明全部下载完毕
+                                    map.clear();
+                                    flag = false;
+                                    break;
                                 }
                             }
                         }
@@ -311,6 +310,7 @@ public class WaimaiCrawler {
                 log.error("请求导出进度查询页面出错", e);
             }
         }
+
     }
 
     /**
@@ -469,7 +469,8 @@ public class WaimaiCrawler {
         String path = HttpUtil.getCaptchaCodeImage(client, httpget);
         return CodeImage.Imgencode(path);
     }
-//
+
+    //
 //    public static void main(String[] args) {
 //
 //

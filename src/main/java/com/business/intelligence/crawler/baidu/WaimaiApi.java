@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.dao.BDDao;
 import com.business.intelligence.model.baidu.*;
+import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.CookieStore;
@@ -51,7 +52,7 @@ public class WaimaiApi {
      * @param shopId 百度商户id
      * @return
      */
-    public String ouderListGet(String source, String secret, String shopId,String merchantId) {
+    public String ouderListGet(String source, String secret, String shopId,String merchantId,String star,String end) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.list");
         params.put("version", 3);
@@ -62,6 +63,8 @@ public class WaimaiApi {
         params.put("secret", secret);
         Map<String, Object> map = new HashMap<>();
         map.put("shop_id", shopId);
+        map.put("start_time", DateUtils.timeStamp(star,"yyyy-MM-dd"));
+        map.put("end_time", DateUtils.timeStamp(end,"yyyy-MM-dd"));
         params.put("body", JSONObject.toJSON(map));
 
         List<String> s = new ArrayList<>();
@@ -145,7 +148,7 @@ public class WaimaiApi {
      * @param shopId 百度商户id
      * @return
      */
-    public String commentGet(String source, String secret, String shopId,String merchantId) {
+    public String commentGet(String source, String secret, String shopId,String merchantId,String star,String end) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "shop.comment.get");
         params.put("version", 3);
@@ -157,8 +160,8 @@ public class WaimaiApi {
         Map<String, Object> map = new HashMap<>();
 
         map.put("shop_id", shopId);
-//        map.put("start_time", "");
-//        map.put("end_time", "");
+        map.put("start_time", DateUtils.timeStamp(star,"yyyy-MM-dd"));
+        map.put("end_time", DateUtils.timeStamp(end,"yyyy-MM-dd"));
         params.put("body", JSONObject.toJSON(map));
 
         List<String> s = new ArrayList<>();
