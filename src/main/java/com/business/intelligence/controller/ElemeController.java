@@ -42,7 +42,8 @@ public class ElemeController {
         elemeBean.setUsername("hwfzhongke");
         elemeBean.setPassword("abc123456");
         elemeBean.setShopId("204666");
-        elemeBean.setKsId("NTNlMmI4OTItODhjMC00ZGYzLTg3YTNWI5MW");
+        elemeBean.setKsId("N2MzZDM2ZmMtNDNiNS00ZGIwLTg2MDZDY2Yj");
+        elemeBeans.add(elemeBean);
         return elemeBeans;
     }
 
