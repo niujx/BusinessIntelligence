@@ -21,8 +21,8 @@ mybatis:
     mapper-locations:
        - mapper/*
 
-imgPath: /Users/yanshi/image
-csvPath: /Users/yanshi/image
+imgPath: /Users/wangfukun/other/img/
+csvPath: /Users/wangfukun/other/csv/
 
 
 
