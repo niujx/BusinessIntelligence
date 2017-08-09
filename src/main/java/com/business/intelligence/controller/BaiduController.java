@@ -39,7 +39,7 @@ public class BaiduController {
                                @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
         List<User> userList =userDao.getUsersForPlatform(Platform.BD);
         for(User u : userList){
-            String content = waimaiApi.ouderListGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId());
+            String content = waimaiApi.ouderListGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId(),star.replace("/","-"),end.replace("/","-"));
             return  content;
         }
         return "获取用户名密码失败";
@@ -51,7 +51,7 @@ public class BaiduController {
                              @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
         List<User> userList =userDao.getUsersForPlatform(Platform.BD);
         for(User u : userList){
-            String content = waimaiApi.commentGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId());
+            String content = waimaiApi.commentGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId(),star.replace("/","-"),end.replace("/","-"));
             return  content;
         }
         return "获取用户名密码失败";

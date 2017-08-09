@@ -208,7 +208,7 @@ public class OrderDetails {
     /**
      * 更新时间
      */
-    private Date updateYime;
+    private Date updateTime;
 
     public int getId() {
         return id;
@@ -602,12 +602,12 @@ public class OrderDetails {
         this.creatTime = creatTime;
     }
 
-    public Date getUpdateYime() {
-        return updateYime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdateYime(Date updateYime) {
-        this.updateYime = updateYime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override
@@ -659,7 +659,7 @@ public class OrderDetails {
                 ", discount='" + discount + '\'' +
                 ", partEefundInfo='" + partEefundInfo + '\'' +
                 ", creatTime=" + creatTime +
-                ", updateYime=" + updateYime +
+                ", updateTime=" + updateTime +
                 '}';
     }
 }
