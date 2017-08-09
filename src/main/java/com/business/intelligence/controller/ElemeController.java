@@ -39,9 +39,9 @@ public class ElemeController {
     public List<ElemeBean> getBeans(){
         List<ElemeBean> elemeBeans = new ArrayList<>();
         ElemeBean elemeBean = new ElemeBean();
-        elemeBean.setUsername("15201633321_eleme");
-        elemeBean.setPassword("yang170106");
-        elemeBean.setShopId("150148671");
+        elemeBean.setUsername("xjdzm");
+        elemeBean.setPassword("xj321321");
+        elemeBean.setShopId("404897");
         elemeBeans.add(elemeBean);
         return elemeBeans;
     }
