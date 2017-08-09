@@ -49,7 +49,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         for(ElemeActivity elemeActivity : elemeActivityBeans){
             elemeDao.insertActivity(elemeActivity);
         }
-        log.info("用户名为 {} 的商店活动已入库",username);
+        log.info("用户名为 {} 的商店活动已入库完毕",username);
     }
 
     /**
@@ -72,6 +72,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result is {}",result);
             List<LinkedHashMap<String, Object>> list = WebUtils.getMapsByJsonPath(result, "$.result");
             return list;
         } catch (IOException e) {
@@ -103,8 +104,9 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : activityList){
             LinkedHashMap<String, Object> contentMap = (LinkedHashMap)map.get("content");
             ElemeActivity  elemeActivity= new ElemeActivity();
+            elemeActivity.setPri(map.get("id")+"~"+shopId);
             elemeActivity.setId((Integer) map.get("id"));
-            elemeActivity.setShopId(150148671l);
+            elemeActivity.setShopId(Long.valueOf(shopId));
             elemeActivity.setBeginDate(notNull((String)map.getOrDefault("beginDate","")));
             elemeActivity.setEndDate(notNull((String)map.getOrDefault("endDate","")));
             elemeActivity.setName(notNull((String)map.getOrDefault("name","")));

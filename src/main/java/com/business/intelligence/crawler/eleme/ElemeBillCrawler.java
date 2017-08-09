@@ -36,6 +36,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
+
     public void doRun(ElemeBean elemeBean) {
         log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,elemeBean.getUsername());
         List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
@@ -43,7 +44,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
         for(ElemeBill elemeBill : billList){
             elemeDao.insertBill(elemeBill);
         }
-        log.info("用户名为 {} 的账单记录已入库",username);
+        log.info("用户名为 {} 的账单记录已入库完毕",username);
     }
 
     /**
@@ -61,13 +62,14 @@ public class ElemeBillCrawler extends ElemeCrawler{
         params.put("offset","0");
         params.put("restaurantId",shopId);
         params.put("status","3");
-        params.put("token","30a23e32be094eebfa1e93ddc59eed83");
+        params.put("token","dd963032b9c366136cd4131bd5148974");
         String url2 = URL+HttpClientUtil.buildParamString(params);
         HttpGet get = new HttpGet(url2);
         try {
             execute = client.execute(get);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result json is {}",result);
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.bills");
             return mapsByJsonPath;
         } catch (IOException e) {
@@ -96,6 +98,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
         List<ElemeBill> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : billList){
             ElemeBill elemeBill = new ElemeBill();
+            elemeBill.setPri(String.valueOf(DateUtils.long2Date((Long)map.get("closingDate"))+"~"+String.valueOf(shopId)));
             elemeBill.setClosingDate(String.valueOf(DateUtils.long2Date((Long)map.get("closingDate"))));
             elemeBill.setIncome(notNull((String)map.getOrDefault("income","无")));
             elemeBill.setExpense(notNull((String)map.getOrDefault("expense","无")));

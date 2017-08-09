@@ -3,6 +3,7 @@ package com.business.intelligence.dao;
 import com.business.intelligence.model.ElemeModel.*;
 import eleme.openapi.sdk.api.entity.order.OOrder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeEvaluate.getId());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -29,7 +30,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeActivity.getId());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -37,7 +38,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeBill.getClosingDate());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -45,7 +46,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeCommodity.getMessageDate());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -53,7 +54,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeFlow.getFlowId());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -61,7 +62,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeSale.getSaleId());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -69,7 +70,7 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertOrder",elemeOrder);
         }catch(Exception e){
-            log.error("{} 数据已经存在",elemeOrder.getOrderId());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 

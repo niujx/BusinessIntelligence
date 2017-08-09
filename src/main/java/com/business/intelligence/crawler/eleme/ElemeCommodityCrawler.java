@@ -47,7 +47,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
             elemeDao.insertCommodity(elemeCommodity);
         }
-        log.info("用户名为 {} 的商品分析已入库",username);
+        log.info("用户名为 {} 的商品分析已入库完毕",username);
     }
 
 
@@ -73,13 +73,15 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("count result is {}",result);
             Object count = WebUtils.getOneByJsonPath(result, "$.result.totalRecord");
-            json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":"+shopId+",\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":"+(Integer)count+",\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\"ZGI4MGVlNDAtYTgyZC00OTM1LTg1NDZjRlOG\"},\"ncp\":\"2.0.0\"}";
+            json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":"+shopId+",\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":"+(Integer)count+",\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             execute = client.execute(post);
             entity = execute.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result is {}",result);
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.foodSalesDetails");
             return mapsByJsonPath;
         } catch (IOException e) {
@@ -122,19 +124,21 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         for(LinkedHashMap<String,Object> map : commodityList){
             index++;
             ElemeCommodity elemeCommodity = new ElemeCommodity();
+            elemeCommodity.setPri(shopId+"~"+DateUtils.date2String(beginCrawlerDate)+" ~~ " + DateUtils.date2String(crawlerDate)+" ("+index+")");
             elemeCommodity.setMessageDate(DateUtils.date2String(beginCrawlerDate)+" ~~ " + DateUtils.date2String(crawlerDate)+" ("+index+")");
             elemeCommodity.setShopId(Long.valueOf(shopId));
             elemeCommodity.setFoodName(notNull((String)map.getOrDefault("foodName","")));
             elemeCommodity.setSalesAmount((Double)map.getOrDefault("salesAmount",0));
-            String amountRate = String .valueOf((Double)map.getOrDefault("salesAmount",0)/totalSalesAmount*100);
+            String amountRate = String .valueOf((Double)map.getOrDefault("salesAmount",0)/totalSalesAmount*100)+"00";
             elemeCommodity.setSalesAmountRate(amountRate.substring(0,amountRate.indexOf(".")+3)+"%");
             elemeCommodity.setSalesVolume((Integer)map.getOrDefault("salesVolume",0));
-            String volumeRate = String.valueOf((Integer)map.getOrDefault("salesVolume",0)*1.0/totalSalesVolume*100);
+            String volumeRate = String.valueOf((Integer)map.getOrDefault("salesVolume",0)*1.0/totalSalesVolume*100)+"00";
             elemeCommodity.setSalesVolumeRate(volumeRate.substring(0,volumeRate.indexOf(".")+3)+"%");
             list.add(elemeCommodity);
         }
         return list;
     }
+
 
     @Override
     public void doRun() {
