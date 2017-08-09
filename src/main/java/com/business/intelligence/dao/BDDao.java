@@ -64,7 +64,7 @@ public class BDDao {
      *
      * @param orderDetails
      */
-    public void insertComment(OrderDetails orderDetails) {
+    public void insertOrderDetails(OrderDetails orderDetails) {
         sqlSessionTemplate.insert("com.business.intelligence.insertOrderDetails", orderDetails);
     }
 

@@ -23,5 +23,6 @@
         <mapper resource="mapper/TUser.xml"/>
         <mapper resource="mapper/ElemeCrawler.xml"/>
         <mapper resource="mapper/BDCrawler.xml"/>
+        <mapper resource="mapper/User.xml"/>
     </mappers>
 </configuration>
