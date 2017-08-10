@@ -28,4 +28,10 @@ public class UserDaoTest extends BaseTest{
 
     }
 
+    @Test
+    public void isExists(){
+        User u = userDao.ifExists("xj15","MT");
+        System.out.println(u.getPassWord());
+    }
+
 }
