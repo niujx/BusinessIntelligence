@@ -46,7 +46,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             this.crawlerDate =start;
             this.endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(end,1);
         }
-        log.info("开始爬取饿了么顾客评价，日期： {} 到 {}，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
+        log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
         String evaluateText = getEvaluateText(getClient(elemeBean));
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
         List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
