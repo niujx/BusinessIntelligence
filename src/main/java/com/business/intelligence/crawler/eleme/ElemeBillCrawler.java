@@ -12,6 +12,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +36,20 @@ public class ElemeBillCrawler extends ElemeCrawler{
     @Autowired
     private ElemeDao elemeDao;
 
+    //通过post请求获得token的url
+    private static final String GETURL = "https://app-api.shop.ele.me/arena/invoke/?method=TokenService.generateToken";
+    //通过token进行get请求的url
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
+
     public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,elemeBean.getUsername());
         List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
         List<ElemeBill> billList = getElemeBillBeans(billText);
         for(ElemeBill elemeBill : billList){
             elemeDao.insertBill(elemeBill);
         }
-        log.info("用户名为 {} 的账单记录已入库",username);
+        log.info("用户名为 {} 的账单记录已入库完毕",username);
     }
 
     /**
@@ -52,22 +58,39 @@ public class ElemeBillCrawler extends ElemeCrawler{
      * @return
      */
     public List<LinkedHashMap<String, Object>> getBillText(CloseableHttpClient client){
+        log.info("ksid is {}",ksId);
         CloseableHttpResponse execute = null;
-        Map<String,String> params = new HashMap<>();
-        params.put("beginDate",String.valueOf(crawlerDate.getTime()));
-        params.put("endDate",String.valueOf(crawlerDate.getTime()));
-        params.put("limit","10");
-        params.put("loginRestaurantId",shopId);
-        params.put("offset","0");
-        params.put("restaurantId",shopId);
-        params.put("status","3");
-        params.put("token","30a23e32be094eebfa1e93ddc59eed83");
-        String url2 = URL+HttpClientUtil.buildParamString(params);
-        HttpGet get = new HttpGet(url2);
+        //获得token
+        HttpPost post = new HttpPost(GETURL);
+        StringEntity jsonEntity = null;
+        String json = "{\"id\":\"7b898df4-ef06-40fc-a930-fcb839c63422\",\"method\":\"generateToken\",\"service\":\"TokenService\",\"params\":{\"shopId\":"+shopId+",\"appId\":\"base.rumble\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        jsonEntity = new StringEntity(json, "UTF-8");
+        post.setEntity(jsonEntity);
+        setElemeHeader(post);
+        post.setHeader("X-Eleme-RequestID", "7b898df4-ef06-40fc-a930-fcb839c63422");
         try {
-            execute = client.execute(get);
+            execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("token result is {}",result);
+            String token = (String)WebUtils.getOneByJsonPath(result, "$.result");
+            log.info("{} 爬取账单的 token 是 {}",username,token);
+            //利用得到的token进行get请求
+            Map<String,String> params = new HashMap<>();
+            params.put("beginDate",String.valueOf(crawlerDate.getTime()));
+            params.put("endDate",String.valueOf(crawlerDate.getTime()));
+            params.put("limit","10");
+            params.put("loginRestaurantId",shopId);
+            params.put("offset","0");
+            params.put("restaurantId",shopId);
+            params.put("status","3");
+            params.put("token",token);
+            String url2 = URL+HttpClientUtil.buildParamString(params);
+            HttpGet get = new HttpGet(url2);
+            execute = client.execute(get);
+            entity = execute.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result json is {}",result);
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.bills");
             return mapsByJsonPath;
         } catch (IOException e) {
@@ -96,6 +119,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
         List<ElemeBill> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : billList){
             ElemeBill elemeBill = new ElemeBill();
+            elemeBill.setPri(String.valueOf(DateUtils.long2Date((Long)map.get("closingDate"))+"~"+String.valueOf(shopId)));
             elemeBill.setClosingDate(String.valueOf(DateUtils.long2Date((Long)map.get("closingDate"))));
             elemeBill.setIncome(notNull((String)map.getOrDefault("income","无")));
             elemeBill.setExpense(notNull((String)map.getOrDefault("expense","无")));

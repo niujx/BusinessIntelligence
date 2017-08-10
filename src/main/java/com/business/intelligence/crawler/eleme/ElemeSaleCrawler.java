@@ -41,7 +41,7 @@ public class ElemeSaleCrawler extends ElemeCrawler {
         for(ElemeSale elemeSale : elemeSaleBeans){
             elemeDao.insertSale(elemeSale);
         }
-        log.info("用户名为 {} 的经营统计已入库",username);
+        log.info("用户名为 {} 的经营统计已入库完毕",username);
     }
 
     /**

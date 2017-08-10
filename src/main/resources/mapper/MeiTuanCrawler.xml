@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.business.intelligence.mt">
+    <insert id="insertOrder" parameterType="MTOrder">
+        INSERT INTO BIL_MT_ORDER
+        (APP_NO,ORDER_TIME,HOUR_LONG,NAME,ID,CITY,TYPE,STATUS,DIS_STATUS,IS_SCHEDULE,TOTAL_PRICE,POST_DISCOUNT,
+        MT_PRICE,MERCHANT_PRICE,DISH_INFO,DELIVERY_FEE,IS_DISCOUNT,PREFERENTIAL,IS_PRESS,REPLAY_STATUS,MERCHANT_REPLAY,
+        COMPLAINT_TIME,COMPLAINT_INFO,APPRAISE_TIME,DELIVERY_TIME,STAR,APPRAISE_INFO,FOOD_BOX_PRICE,FOOD_BOX_QUANTITY
+        ,ORDER_DONE_TIME,ORDER_CANCEL_INFO)
+        VALUES
+        (#{appNo,jdbcType=VARCHAR},
+        #{orderTime,jdbcType=DATE},
+        #{hourLong,jdbcType=DATE},
+        #{name,jdbcType=VARCHAR},
+        #{id,jdbcType=VARCHAR},
+        #{city,jdbcType=VARCHAR},
+        #{type,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{disStatus,jdbcType=VARCHAR},
+        #{isSchedule,jdbcType=VARCHAR},
+        #{totalPrice,jdbcType=VARCHAR},
+        #{postDiscount,jdbcType=VARCHAR},
+        #{mtPrice,jdbcType=VARCHAR},
+        #{merchantPrice,jdbcType=VARCHAR},
+        #{dishInfo,jdbcType=VARCHAR},
+        #{deliveryfee,jdbcType=VARCHAR},
+        #{isDiscount,jdbcType=VARCHAR},
+        #{preferential,jdbcType=VARCHAR},
+        #{isPress,jdbcType=VARCHAR},
+        #{replyStatus,jdbcType=VARCHAR},
+        #{merchantReplay,jdbcType=VARCHAR},
+        #{complaintTime,jdbcType=DATE},
+        #{complaintInfo,jdbcType=VARCHAR},
+        #{appraiseTime,jdbcType=DATE},
+        #{deliveryTime,jdbcType=DATE},
+        #{star,jdbcType=VARCHAR},
+        #{appraiseInfo,jdbcType=VARCHAR},
+        #{foodBoxPrice,jdbcType=VARCHAR},
+        #{foodBoxQuantity,jdbcType=VARCHAR},
+        #{orderDoneTime,jdbcType=DATE},
+        #{orderCancelInfo,jdbcType=VARCHAR})
+    </insert>
+
+</mapper>
+
+

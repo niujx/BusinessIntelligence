@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeCommodity {
-    //日期,主键
+    //主键 date~id
+    private String pri;
+    //日期
     private String messageDate;
     //商铺ID
     private Long shopId;

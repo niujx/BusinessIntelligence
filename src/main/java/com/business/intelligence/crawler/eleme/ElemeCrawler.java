@@ -4,6 +4,8 @@ import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
+import com.business.intelligence.util.KSIDUtils;
+import com.business.intelligence.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CookieStore;
@@ -13,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -22,8 +26,14 @@ import java.io.IOException;
  */
 @Slf4j
 public abstract class ElemeCrawler extends BaseCrawler{
-    private CookieStore cookieStore = new BasicCookieStore();
-    private CloseableHttpClient client;
+    protected  CookieStore cookieStore = new BasicCookieStore();
+    protected CloseableHttpClient client;
+
+   public ElemeCrawler(){
+        if(client==null){
+            client = HttpClientUtil.getHttpClient(cookieStore);
+        }
+    }
 
     //登录
     protected String username;
@@ -33,8 +43,11 @@ public abstract class ElemeCrawler extends BaseCrawler{
 
     //爬取数据需要的
     protected String ksId;
-    //登出
-    private static final String LOGOUTURL = "https://melody.shop.ele.me/app/shop/150148671/stats/business";
+//    //登出
+//    private static final String LOGOUTURL = "https://melody.shop.ele.me/app/shop/150148671/stats/business";
+    //测试Cookie的url
+    private static final String URL="https://app-api.shop.ele.me/shop/invoke/?method=shopLiveVideo.getShopVideoDevices";
+    private static final String INDEX = "https://melody.shop.ele.me";
 
 
     /**
@@ -42,7 +55,6 @@ public abstract class ElemeCrawler extends BaseCrawler{
      */
     protected CloseableHttpClient login() {
         CloseableHttpResponse httpResponse = null;
-        client = HttpClientUtil.getHttpClient(cookieStore);
         String content = null;
         HttpPost httppost = new HttpPost(LOGINURL);
         StringEntity jsonEntity = null;
@@ -56,7 +68,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         httppost.setHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
         httppost.setHeader("Accept-Encodinge", "gzip, deflate, br");
         httppost.setHeader("X-Shard", "shopid="+shopId+"");
-        httppost.setHeader("X-Eleme-RequestID", "1aa7820f-49cf-48bd-9e8a-e41e478528b8");
+        httppost.setHeader("X-Eleme-RequestID", "2bbb7b48-c428-4158-b30d-78dc93a8e6f1");
         httppost.setHeader("Referer", "https://melody.shop.ele.me/login");
         httppost.setHeader("origin", "https://melody.shop.ele.me");
         httppost.setHeader("Connection", "keep-alive");
@@ -65,8 +77,18 @@ public abstract class ElemeCrawler extends BaseCrawler{
             HttpEntity entity = httpResponse.getEntity();
             content = EntityUtils.toString(entity, "UTF-8");
             if (entity != null) {
-                System.out.println(content);
+                log.info(content);
+                ksId = (String)WebUtils.getOneByJsonPath(content, "$.result.successData.ksid");
+                log.info("登陆成功");
             }
+
+            HttpGet httpGet = new HttpGet(INDEX);
+            client.execute(httpGet);
+            //保存ksid
+            log.info("开始保存 {} 的ksid",username);
+            KSIDUtils.storeKSID(ksId,getKsidName(username,password));
+            //保存Cookie
+            log.info("开始保存 {} 的cookie",username);
             CookieStoreUtils.storeCookie(cookieStore,getCookieName(username,password));
         }catch (IOException e){
             e.printStackTrace();
@@ -77,7 +99,9 @@ public abstract class ElemeCrawler extends BaseCrawler{
             }
         }finally {
             try {
-                httpResponse.close();
+                if(httpResponse != null){
+                    httpResponse.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -105,45 +129,71 @@ public abstract class ElemeCrawler extends BaseCrawler{
     }
 
     /**
-     * 提取Cookie，没有则登录
+     * 拼接保存ksid的名字
+     * @param userName
+     * @param password
+     * @return
      */
-    public CloseableHttpClient getClient(ElemeBean elemeBean){
-        this.username = elemeBean.getUsername();
-        this.password = elemeBean.getPassword();
-        this.shopId = elemeBean.getShopId();
-        this.ksId = elemeBean.getKsId();
-        cookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
-        if (cookieStore == null) {
-            log.info("no cookie , so login");
-            login();
-        }
-        client = HttpClientUtil.getHttpClient(cookieStore);
-        return client;
-    }
-
-
-    public static void main(String[] args) {
-        ElemeCrawler elemeCrawler = new ElemeCrawler() {
-            @Override
-            public void doRun() {
-
-            }
-        };
-       elemeCrawler.logOut(elemeCrawler.login());
+    public String getKsidName(String userName,String password){
+        StringBuilder sb = new StringBuilder();
+        sb.append("elemeKsid")
+                .append("_")
+                .append(userName)
+                .append("_")
+                .append(password);
+        log.info("ksid name is {}",sb.toString());
+        return sb.toString();
     }
 
     /**
-     *登出
+     * 提取Cookie，没有则登录
      */
-    public void logOut(CloseableHttpClient client){
+    public CloseableHttpClient getClient(ElemeBean elemeBean){
+        //将前台带来的信息全局化
+        this.username = elemeBean.getUsername();
+        this.password = elemeBean.getPassword();
+        this.shopId = elemeBean.getShopId();
+        //导入本地ksid
+        String oldKsid = KSIDUtils.readKsid(getKsidName(username,password));
+        if(oldKsid == null ){
+            log.info("no ksid,so login");
+            login();
+        }else{
+            this.ksId = oldKsid;
+            CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
+            if (oldcookieStore == null) {
+                log.info("no cookie , so login");
+                login();
+            }else {
+                client = HttpClientUtil.getHttpClient(oldcookieStore);
+                log.info("无需登录");
+//            if(cookieIsOk(client) != 200){
+//                log.info("cookie 失效，从新登陆");
+//                login();
+//            }else{
+//                log.info("cookie正常");
+//            }
+            }
+        }
+        return client;
+    }
+
+    /**
+     * 测试Cookie是否有效
+     * @param client
+     */
+    public int cookieIsOk(CloseableHttpClient client){
         CloseableHttpResponse execute = null;
-        HttpGet get = new HttpGet(LOGOUTURL);
-        get.setHeader("Cookie","perf_ssid=x0ruhdmzvgqd999uv3wkznb7ett7bnbl_2017-07-20; ubt_ssid=umald6k97vny7o9pxha8pye7mxu8ijzt_2017-07-20; _utrace=8105d34303396caf9f636842a6e511b9_2017-07-20; _ga=GA1.2.1285076203.1501035869");
+        HttpPost post = new HttpPost(URL);
+        StringEntity jsonEntity = null;
+        String json = "{\"id\":\"25f9f5c3-ac95-4fa4-80bb-1bdd0fad0f6e\",\"method\":\"getShopVideoDevices\",\"service\":\"shopLiveVideo\",\"params\":{\"shopId\":"+shopId+"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+        jsonEntity = new StringEntity(json, "UTF-8");
+        post.setEntity(jsonEntity);
+        setElemeHeader(post);
+        post.setHeader("X-Eleme-RequestID", "25f9f5c3-ac95-4fa4-80bb-1bdd0fad0f6e");
         try {
-            execute = client.execute(get);
-            HttpEntity entity = execute.getEntity();
-            String result = EntityUtils.toString(entity, "UTF-8");
-            System.out.println(result);
+            execute = client.execute(post);
+            return execute.getStatusLine().getStatusCode();
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -158,7 +208,37 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 e.printStackTrace();
             }
         }
+        return 0;
     }
+
+
+    /**
+     *登出
+     */
+//    public void logOut(CloseableHttpClient client){
+//        CloseableHttpResponse execute = null;
+//        HttpGet get = new HttpGet(LOGOUTURL);
+//        get.setHeader("Cookie","perf_ssid=x0ruhdmzvgqd999uv3wkznb7ett7bnbl_2017-07-20; ubt_ssid=umald6k97vny7o9pxha8pye7mxu8ijzt_2017-07-20; _utrace=8105d34303396caf9f636842a6e511b9_2017-07-20; _ga=GA1.2.1285076203.1501035869");
+//        try {
+//            execute = client.execute(get);
+//            HttpEntity entity = execute.getEntity();
+//            String result = EntityUtils.toString(entity, "UTF-8");
+//            System.out.println(result);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }finally {
+//            try {
+//                if (execute != null){
+//                    execute.close();
+//                }
+//                if(client != null){
+//                    client.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     /**
      * 设置饿了么网页的header

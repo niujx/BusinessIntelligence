@@ -3,6 +3,7 @@ package com.business.intelligence.dao;
 import com.business.intelligence.model.ElemeModel.*;
 import eleme.openapi.sdk.api.entity.order.OOrder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,31 +19,59 @@ public class ElemeDao {
     private SqlSessionTemplate sqlSessionTemplate;
 
     public void insertEvaluate(ElemeEvaluate elemeEvaluate){
-        sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertEvaluate",elemeEvaluate);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertActivity(ElemeActivity elemeActivity){
-        sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertActivity",elemeActivity);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertBill(ElemeBill elemeBill){
-        sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertCommodity(ElemeCommodity elemeCommodity){
-        sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertCommodity",elemeCommodity);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertFlow(ElemeFlow elemeFlow){
-        sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertFlow",elemeFlow);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertSale(ElemeSale elemeSale){
-        sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertSale",elemeSale);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public void insertOrder(ElemeOrder elemeOrder){
-        sqlSessionTemplate.insert("com.business.intelligence.insertOrder",elemeOrder);
+        try{
+            sqlSessionTemplate.insert("com.business.intelligence.insertOrder",elemeOrder);
+        }catch(Exception e){
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
     }
 
 

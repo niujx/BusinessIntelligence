@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeActivity {
-    //主键，网页名称：id
+    //主键 id~shopId
+    private String pri;
+    //网页名称：id
     private Integer id;
     //商户ID
     private Long shopId;

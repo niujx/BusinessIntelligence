@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeBill {
-    //账单日期,主键
+    //主键，日期~id
+    private  String pri;
+    //账单日期
     private String closingDate;
     //本期订单收入
     private String income;
@@ -27,17 +29,5 @@ public class ElemeBill {
     //商铺ID
     private Long shopId;
 
-    @Override
-    public String toString() {
-        return "ElemeBill{" +
-                "closingDate='" + closingDate + '\'' +
-                ", income=" + income +
-                ", expense=" + expense +
-                ", deductAmount=" + deductAmount +
-                ", deuAmount=" + dueAmount +
-                ", payAmount=" + payAmount +
-                ", payDate='" + paymentDate + '\'' +
-                ", shopId=" + shopId +
-                '}';
-    }
+
 }

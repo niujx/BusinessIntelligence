@@ -61,18 +61,16 @@ public class ElemeOrderCrawler extends ElemeCrawler{
         INVOICETYPE.put("PERSONAL","个人");
         INVOICETYPE.put("COMPANY","企业");
 
-
-
     }
 
     public void doRun(ElemeBean elemeBean) {
         log.info("开始爬取饿了么订单，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
-        ElemeMessage orderText = getOrderText(HttpClientUtil.getHttpClient(new BasicCookieStore()));
+        ElemeMessage orderText = getOrderText(getClient(elemeBean));
         List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
         for(ElemeOrder elemeOrder : elemeOrderBeans){
            elemeDao.insertOrder(elemeOrder);
         }
-        log.info("用户名为 {} 的订单已入库",username);
+        log.info("用户名为 {} 的订单已入库完毕",username);
     }
 
 
