@@ -1,5 +1,6 @@
 package com.business.intelligence.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.model.ElemeModel.*;
 import com.business.intelligence.model.baidu.*;
 import eleme.openapi.sdk.api.entity.order.OOrder;
@@ -20,7 +21,11 @@ public class BDDao {
      * @param hotDishes
      */
     public void insertHotDishes(HotDishes hotDishes) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertHotDishes", hotDishes);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertHotDishes", hotDishes);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(hotDishes), e);
+        }
     }
 
     /**
@@ -29,7 +34,11 @@ public class BDDao {
      * @param bookedTable
      */
     public void insertBookedTable(BookedTable bookedTable) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertBookedTable", bookedTable);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertBookedTable", bookedTable);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(bookedTable), e);
+        }
     }
 
     /**
@@ -38,7 +47,11 @@ public class BDDao {
      * @param businessData
      */
     public void insertBusinessData(BusinessData businessData) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertBusinessData", businessData);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertBusinessData", businessData);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(businessData), e);
+        }
     }
 
     /**
@@ -47,7 +60,11 @@ public class BDDao {
      * @param shopWthdrawal
      */
     public void insertShopWthdrawal(ShopWthdrawal shopWthdrawal) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertShopWthdrawal", shopWthdrawal);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertShopWthdrawal", shopWthdrawal);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(shopWthdrawal), e);
+        }
     }
 
     /**
@@ -56,7 +73,11 @@ public class BDDao {
      * @param comment
      */
     public void insertComment(Comment comment) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertComment", comment);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertComment", comment);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(comment), e);
+        }
     }
 
     /**
@@ -65,7 +86,11 @@ public class BDDao {
      * @param orderDetails
      */
     public void insertOrderDetails(OrderDetails orderDetails) {
-        sqlSessionTemplate.insert("com.business.intelligence.insertOrderDetails", orderDetails);
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.insertOrderDetails", orderDetails);
+        } catch (Exception e) {
+            log.error("数据已存在{}", JSONObject.toJSONString(orderDetails), e);
+        }
     }
 
 }

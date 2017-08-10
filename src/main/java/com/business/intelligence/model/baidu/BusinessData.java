@@ -14,7 +14,7 @@ public class BusinessData {
     /**
      * id
      */
-    private Integer id;
+    private String id;
     /**
      * 时间
      */
@@ -30,7 +30,7 @@ public class BusinessData {
     /**
      * 人均页面访问次数
      */
-    private long visitingPer;
+    private double visitingPer;
     /**
      * 曝光人数
      */
@@ -65,11 +65,11 @@ public class BusinessData {
     private Date updateTime;
 
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -97,11 +97,11 @@ public class BusinessData {
         this.visitingCs = visitingCs;
     }
 
-    public long getVisitingPer() {
+    public double getVisitingPer() {
         return visitingPer;
     }
 
-    public void setVisitingPer(long visitingPer) {
+    public void setVisitingPer(double visitingPer) {
         this.visitingPer = visitingPer;
     }
 

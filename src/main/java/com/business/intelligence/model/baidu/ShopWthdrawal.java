@@ -12,7 +12,7 @@ public class ShopWthdrawal {
     /**
      * 自增长id
      */
-    private int id;
+    private String id;
     /**
      * 账单日期
      */
@@ -82,11 +82,11 @@ public class ShopWthdrawal {
      */
     private Date creatTime;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
