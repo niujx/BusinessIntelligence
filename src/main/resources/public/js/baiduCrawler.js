@@ -5,6 +5,7 @@
 	/**************************百度外卖*******************************/
 	//点击开抓按钮时
 	$(".baidu .orderBegin").on('click',function(){
+		
 		//获取当前抓取时间
 		var startTime = $(this).parents("tr").find(".startDateTime").val();
 		var endTime = $(this).parents("tr").find(".endDateTime").val();
@@ -23,11 +24,13 @@
 				//console.log(e)
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 				alert("请求成功，请耐心等待数据抓取，不要重复抓取");
+
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
 				console.log("请求失败，请稍后重新尝试");//控制台输出请求失败
+
 			}
 		})
 	})

@@ -26,4 +26,30 @@
 
     </select>
 
+
+    <select id="getUser" resultType="User" parameterType="map">
+        SELECT
+            MERCHANT_ID as merchantId,
+            USER_NAME as userName,
+            PASSWORD as password,
+            IS_LAUNCH as isLaunch,
+            PLATFORM as platform,
+            UPDATE_TIME as updateTime,
+            MERCHANT_NAME as merchantName,
+            MERCHANT_ADDRESS as merchantAddress,
+            PHONE as phone,
+            SOURCE as source,
+            SECRET as secret,
+            SHOP_ID  as shopId
+        FROM
+            TB_ALL_MERCHANTINFO
+        where
+            USER_NAME = #{userName}
+        and
+            PLATFORM = #{platformName}
+        AND
+            ROWNUM = 1
+
+    </select>
+
 </mapper>
