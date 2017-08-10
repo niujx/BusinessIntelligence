@@ -12,7 +12,7 @@ public class BookedTable {
     /**
      * 自增长id
      */
-    private int id;
+    private String id;
     /**
      * 订单类型
      */
@@ -177,12 +177,20 @@ public class BookedTable {
      * 压款方式
      */
     private String pressure;
+    /**
+     * 调账金额(影响)
+     */
+    private double billAmount;
+    /**
+     * 调账金额(不影响)
+     */
+    private double billDonAmount;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -514,10 +522,26 @@ public class BookedTable {
         this.pressure = pressure;
     }
 
+    public double getBillAmount() {
+        return billAmount;
+    }
+
+    public void setBillAmount(double billAmount) {
+        this.billAmount = billAmount;
+    }
+
+    public double getBillDonAmount() {
+        return billDonAmount;
+    }
+
+    public void setBillDonAmount(double billDonAmount) {
+        this.billDonAmount = billDonAmount;
+    }
+
     @Override
     public String toString() {
         return "BookedTable{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", orderType='" + orderType + '\'' +
                 ", lossBears='" + lossBears + '\'' +
                 ", foodEffect=" + foodEffect +
@@ -544,7 +568,7 @@ public class BookedTable {
                 ", creatTime=" + creatTime +
                 ", updateTime=" + updateTime +
                 ", orderSortNumber=" + orderSortNumber +
-                ", orderNumber=" + orderNumber +
+                ", orderNumber='" + orderNumber + '\'' +
                 ", actualPay='" + actualPay + '\'' +
                 ", financialType='" + financialType + '\'' +
                 ", serialNumber='" + serialNumber + '\'' +
@@ -559,6 +583,8 @@ public class BookedTable {
                 ", secondarySubject='" + secondarySubject + '\'' +
                 ", businessType='" + businessType + '\'' +
                 ", pressure='" + pressure + '\'' +
+                ", billAmount=" + billAmount +
+                ", billDonAmount=" + billDonAmount +
                 '}';
     }
 }

@@ -238,7 +238,7 @@ public class CSVFileUtil {
     }
 
     public static void main(String[] args) {
-        File file = new File("/Users/wangfukun/workspace/code1/BusinessIntelligence/所有现金账户流水明细导出_20170809_1502282298451.csv");
+        File file = new File("/Users/wangfukun/other/曝光数据表_2017-07-11_1502349548714.csv");
         List<String> list = importCsv(file);
         for (int i = 0; i < list.size(); i++) {
             String content = list.get(i);

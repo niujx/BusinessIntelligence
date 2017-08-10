@@ -3,10 +3,9 @@ package com.business.intelligence.crawler.baidu;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.model.baidu.*;
+import com.business.intelligence.util.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import springfox.documentation.spring.web.json.Json;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +39,8 @@ public class Parser {
                     hot.setShopId(shopId);
                     hot.setCreatTime(new Date());
                     hot.setUpdateTime(new Date());
+                    String id = MD5.md5(shopId+"_"+array[1].trim());//商户id+菜品名称MD5后生成主键id
+                    hot.setId(id);
                     listHot.add(hot);
                 }
             }
@@ -67,15 +68,17 @@ public class Parser {
                     bd.setTime(array[0].trim());
                     bd.setVisitingRs(Integer.valueOf(array[1].trim()));
                     bd.setVisitingCs(Integer.valueOf(array[2].trim()));
-                    bd.setVisitingPer(Long.valueOf(array[3].trim()));
+                    bd.setVisitingPer(Double.valueOf(array[3].trim()));
                     bd.setExposureRs(Integer.valueOf(array[4].trim()));
                     bd.setExposureCs(Integer.valueOf(array[5].trim()));
                     bd.setOrderAmount(Integer.valueOf(array[6].trim()));
-                    bd.setOrderConvert(Double.valueOf(array[7].trim()));
-                    bd.setShopRanking(Double.valueOf(array[8].trim()));
+                    bd.setOrderConvert(Double.valueOf(array[7].trim().replace("%","")));
+                    bd.setShopRanking(Double.valueOf(array[8].trim().replace("%","")));
                     bd.setShopId(shopId);
                     bd.setCreatTime(new Date());
                     bd.setUpdateTime(new Date());
+                    String id = MD5.md5(shopId+"_"+array[0].trim());//商户id+日期MD5后生成主键id
+                    bd.setId(id);
                     bdList.add(bd);
                 }
             }
@@ -117,6 +120,8 @@ public class Parser {
                     sw.setShopId(shopId);
                     sw.setCreatTime(new Date());
                     sw.setUpdateTime(new Date());
+                    String id = MD5.md5(shopId+"_"+array[0].trim()+"_"+array[2].trim());//商户id+账单日期+交易流水号MD5后生成主键id
+                    sw.setId(id);
                     swList.add(sw);
                 }
             }
@@ -140,7 +145,7 @@ public class Parser {
                 String content = list.get(i);
                 String[] array = content.split(",");
                 BookedTable bt = new BookedTable();
-                if (array.length == 38) {
+                if (array.length == 40) {
                     bt.setOrderSortNumber(Integer.valueOf(array[0].toString()));
                     bt.setOrderNumber(array[1].toString());
                     bt.setActualPay(array[2].toString());
@@ -167,21 +172,25 @@ public class Parser {
                     bt.setBdSubsidieEffect(Double.valueOf(array[23].toString()));
                     bt.setSubsidieAgentsEffect(Double.valueOf(array[24].toString()));
                     bt.setUserPayEffect(Double.valueOf(array[25].toString()));
-                    bt.setFoodDonEffect(Double.valueOf(array[26].toString()));
-                    bt.setBoxesDonEffect(Double.valueOf(array[27].toString()));
-                    bt.setSubsidieDonEffect(Double.valueOf(array[28].toString()));
-                    bt.setCommissionDonEffect(Double.valueOf(array[29].toString()));
-                    bt.setShippDonEffect(Double.valueOf(array[30].toString()));
-                    bt.setBdSubsidieDonEffect(Double.valueOf(array[31].toString()));
-                    bt.setSubsidieAgentsDonEffect(Double.valueOf(array[32].toString()));
-                    bt.setUserPayDonEffect(Double.valueOf(array[33].toString()));
-                    bt.setSupplier(array[34].toString());
-                    bt.setLogistic(array[35].toString());
-                    bt.setAgent(array[36].toString());
-                    bt.setKnight(array[37].toString());
+                    bt.setBillAmount(Double.valueOf(array[26].toString()));
+                    bt.setFoodDonEffect(Double.valueOf(array[27].toString()));
+                    bt.setBoxesDonEffect(Double.valueOf(array[28].toString()));
+                    bt.setSubsidieDonEffect(Double.valueOf(array[29].toString()));
+                    bt.setCommissionDonEffect(Double.valueOf(array[20].toString()));
+                    bt.setShippDonEffect(Double.valueOf(array[31].toString()));
+                    bt.setBdSubsidieDonEffect(Double.valueOf(array[32].toString()));
+                    bt.setSubsidieAgentsDonEffect(Double.valueOf(array[33].toString()));
+                    bt.setUserPayDonEffect(Double.valueOf(array[34].toString()));
+                    bt.setBillDonAmount(Double.valueOf(array[35].toString()));//
+                    bt.setSupplier(array[36].toString());
+                    bt.setLogistic(array[37].toString());
+                    bt.setAgent(array[38].toString());
+                    bt.setKnight(array[39].toString());
                     bt.setShopId(shopId);
                     bt.setCreatTime(new Date());
                     bt.setUpdateTime(new Date());
+                    String id = MD5.md5(shopId+"_"+array[1].toString()+"_"+array[4].toString());//商户id+订单号+交易流水号MD5后生成主键id
+                    bt.setId(id);
                     btList.add(bt);
                 }
             }
@@ -227,6 +236,7 @@ public class Parser {
                         ct.setCostTime(ctjson.getString("cost_time"));
                         ct.setCreatTime(new Date());
                         ct.setUpdateTime(new Date());
+                        String id = MD5.md5(shopId+"_"+ctjson.getString("comment_id")+"_"+ctjson.getString("create_time"));//商户id+评论id+评论时间Md5后生成主键id
                         ctList.add(ct);
                     }
                 }
@@ -305,6 +315,8 @@ public class Parser {
                     od.setCommission(order.getString("commission"));
                     od.setCreatTime(new Date());
                     od.setUpdateTime(new Date());
+                    String id = MD5.md5(shopId+"_"+order.getString("order_id")+"_"+order.getString("order_index"));//商户id+订单id+订单当日流水号MD5后生成主键id
+                    od.setId(id);
                     odList.add(od);
 
                 }
