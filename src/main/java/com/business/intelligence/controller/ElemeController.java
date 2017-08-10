@@ -6,9 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +37,9 @@ public class ElemeController {
     public List<ElemeBean> getBeans(){
         List<ElemeBean> elemeBeans = new ArrayList<>();
         ElemeBean elemeBean = new ElemeBean();
-        elemeBean.setUsername("xjdzm");
-        elemeBean.setPassword("xj321321");
-        elemeBean.setShopId("404897");
+        elemeBean.setUsername("hwfzhongke");
+        elemeBean.setPassword("abc123456");
+        elemeBean.setShopId("204666");
         elemeBeans.add(elemeBean);
         return elemeBeans;
     }
@@ -57,7 +55,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerActivity", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部活动", httpMethod = "GET")
-    public String crawlerActivity() {
+    public String crawlerActivity(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
         for(ElemeBean elemeBean : getBeans()){
             elemeActivityCrawler.doRun(elemeBean);
         }
@@ -66,7 +64,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerBill", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部账单", httpMethod = "GET")
-    public String crawlerBill() {
+    public String crawlerBill(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
         for(ElemeBean elemeBean : getBeans()){
             elemeBillCrawler.doRun(elemeBean);
         }
