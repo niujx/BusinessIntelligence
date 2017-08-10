@@ -31,6 +31,7 @@ import java.util.*;
 public class ElemeOrderCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
+    private Date endCrawlerDate = crawlerDate;
     @Autowired
     private ElemeDao elemeDao;
 
@@ -63,8 +64,14 @@ public class ElemeOrderCrawler extends ElemeCrawler{
 
     }
 
-    public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么订单，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+    public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        Date start = DateUtils.string2Date(startTime);
+        Date end = DateUtils.string2Date(endTime);
+        if(start != null && end != null ){
+            this.crawlerDate =start;
+            this.endCrawlerDate = end;
+        }
+        log.info("开始爬取饿了么订单，日期： {} 到 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
         ElemeMessage orderText = getOrderText(getClient(elemeBean));
         List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
         for(ElemeOrder elemeOrder : elemeOrderBeans){
@@ -85,8 +92,8 @@ public class ElemeOrderCrawler extends ElemeCrawler{
         HttpPost countpost = new HttpPost(COUNTURL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
-        log.info("request json is {}",json);
+        String endDate = DateUtils.date2String(endCrawlerDate);
+        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
         jsonEntity = new StringEntity(json, "UTF-8");
         countpost.setEntity(jsonEntity);
         setElemeHeader(countpost);
@@ -95,10 +102,10 @@ public class ElemeOrderCrawler extends ElemeCrawler{
             execute = client.execute(countpost);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
-
             Object count = WebUtils.getOneByJsonPath(result,"$.result");
+            log.info("count result is {}",count);
             HttpPost post = new HttpPost(URL);
-            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+date+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
+            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             setElemeHeader(post);
@@ -106,6 +113,7 @@ public class ElemeOrderCrawler extends ElemeCrawler{
             execute = client.execute(post);
             entity = execute.getEntity();
             result = EntityUtils.toString(entity,"UTF-8");
+            log.info("result is {}",result);
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result");
             ElemeMessage elemeMessage = new ElemeMessage();
             elemeMessage.setList(mapsByJsonPath);

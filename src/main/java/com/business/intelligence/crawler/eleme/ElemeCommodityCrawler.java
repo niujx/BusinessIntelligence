@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * Created by Tcqq on 2017/7/24.
  * 商品分析 POST请求
+ * 月为单位
  */
 @Slf4j
 @Component
@@ -40,8 +41,13 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
 
     private static final String URL ="https://app-api.shop.ele.me/stats/invoke/?method=foodSalesStats.getFoodSalesStatsV2";
 
-    public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么商品分析，日期： {}至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
+    public void doRun(ElemeBean elemeBean,String endTime) {
+        Date end = DateUtils.string2Date(endTime);
+        if(end != null){
+            this.crawlerDate = end;
+            this.beginCrawlerDate = org.apache.commons.lang3.time.DateUtils.addMonths(end,-1);
+        }
+        log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
         List<LinkedHashMap<String, Object>> commodityText = getCommodityText(getClient(elemeBean));
         List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
         for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
@@ -64,7 +70,6 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         String endDate = DateUtils.date2String(crawlerDate);
         String beginDate = DateUtils.date2String(beginCrawlerDate);
         String json = "{\"id\":\"35d39394-86eb-4951-9ef5-493b8d265f64\",\"method\":\"getFoodSalesStatsV2\",\"service\":\"foodSalesStats\",\"params\":{\"shopId\":"+shopId+",\"foodSalesQuery\":{\"asc\":false,\"beginDate\":\""+beginDate+"\",\"endDate\":\""+endDate+"\",\"limit\":20,\"orderBy\":\"SALES_AMOUNT\",\"page\":1}},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
-        log.info("request json is {}",json);
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -111,15 +116,15 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
     public List<ElemeCommodity> getElemeCommodityBeans(List<LinkedHashMap<String, Object>> commodityList){
         List<ElemeCommodity> list = new ArrayList<>();
         //销售额
-        int totalSalesAmount = 0;
+        double totalSalesAmount = 0;
         //销量
         int totalSalesVolume = 0;
         //排名
         int index = 0;
         //计算销售额和销量的总量
         for(LinkedHashMap<String,Object> map : commodityList){
-            totalSalesAmount = totalSalesAmount +=(Double)map.getOrDefault("salesAmount",0);
-            totalSalesVolume = totalSalesVolume +=(Integer)map.getOrDefault("salesVolume",0);
+            totalSalesAmount = totalSalesAmount +(Double)map.getOrDefault("salesAmount",0);
+            totalSalesVolume = totalSalesVolume +(Integer)map.getOrDefault("salesVolume",0);
         }
         for(LinkedHashMap<String,Object> map : commodityList){
             index++;
