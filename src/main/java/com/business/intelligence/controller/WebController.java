@@ -1,16 +1,11 @@
 package com.business.intelligence.controller;
 
-import com.business.intelligence.dao.CrawlerStatus;
-import com.business.intelligence.dao.UserDao;
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.model.CrawlerName;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 
 /**
  * Created by zjy on 17/7/19.
@@ -21,7 +16,7 @@ public class WebController {
     @RequestMapping(value = "getStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
     public String getStatus(@RequestParam String crawlerName) {
-        CrawlerStatus status = new CrawlerStatus();
+        CrawlerStatusDao status = new CrawlerStatusDao();
 
 
         switch (crawlerName){
@@ -48,7 +43,7 @@ public class WebController {
     @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
     public String getAllStatus(@RequestParam String crawlerName) {
-        CrawlerStatus status = new CrawlerStatus();
+        CrawlerStatusDao status = new CrawlerStatusDao();
 
 
         switch (crawlerName){

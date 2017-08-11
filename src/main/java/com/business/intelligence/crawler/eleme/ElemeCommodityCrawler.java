@@ -1,7 +1,9 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeCommodity;
 import com.business.intelligence.util.DateUtils;
@@ -38,15 +40,26 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     private static final String URL ="https://app-api.shop.ele.me/stats/invoke/?method=foodSalesStats.getFoodSalesStatsV2";
 
     public void doRun(ElemeBean elemeBean,String endTime) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_COMMODITY);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //转换前台传入的时间
         Date end = DateUtils.string2Date(endTime);
         if(end != null){
             this.crawlerDate = end;
             this.beginCrawlerDate = org.apache.commons.lang3.time.DateUtils.addMonths(end,-1);
         }
+        //开始爬取
         log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
         List<LinkedHashMap<String, Object>> commodityText = getCommodityText(getClient(elemeBean));
         List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
@@ -54,6 +67,13 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             elemeDao.insertCommodity(elemeCommodity);
         }
         log.info("用户名为 {} 的商品分析已入库完毕",username);
+        //更新爬取状态为已完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_COMMODITY);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
 
