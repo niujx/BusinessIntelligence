@@ -11,7 +11,7 @@
 
 
     <select id="getAllStatus" resultType="CrawlerStatus">
-        SELECT Crawler_name as CrawlerName,
+        SELECT CRAWLER_NAME as crawlerName,
                 STATUS  as status
         FROM TB_CRAWLER_STATUS
     </select>

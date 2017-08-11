@@ -9,6 +9,6 @@ import lombok.Data;
 public class CrawlerStatus {
 
 
-    private String CrawlerName;
+    private String crawlerName;
     private String status;
 }
