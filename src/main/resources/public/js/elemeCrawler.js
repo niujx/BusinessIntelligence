@@ -101,7 +101,7 @@
 	//点击商品分析启动按钮时
 	$(".eleme .crawlerCommodity").on('click',function(){
 		//获取当前抓取时间及用户名
-		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
+		
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
 		var merchantUserName =  $(this).parents("tr").find(".merchantUserName").val();
 		//发送请求
@@ -111,7 +111,7 @@
 			dataType:"json",//返回数据的格式
 			data:{
 				//给后台发送数据	抓取时间	startTime等是要传给后台的字段名 可换 ,startDateTime是抓取开始时间
-				startTime: startDateTime,
+				
 				endTime: endDateTime,
 				userName: merchantUserName
 			},
@@ -169,8 +169,7 @@
 	//点击平台活动启动按钮时
 	$(".eleme .crawlerActivity").on('click',function(){
 		//获取当前抓取时间及用户名
-		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
-		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
+
 		var merchantUserName =  $(this).parents("tr").find(".merchantUserName").val();
 		//发送请求
 		$.ajax({
@@ -179,8 +178,6 @@
 			dataType:"json",//返回数据的格式
 			data:{
 				//给后台发送数据	抓取时间	startTime等是要传给后台的字段名 可换 ,startDateTime是抓取开始时间
-				startTime: startDateTime,
-				endTime: endDateTime,
 				userName: merchantUserName
 			},
 			success:function(e){
