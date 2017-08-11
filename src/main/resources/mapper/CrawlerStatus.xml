@@ -19,9 +19,9 @@
 
 
     <select id="updateStatusING"  parameterType="String">
-        UPDATE TB_CRAWLER_STATUS SET STATUS="进行中" WHERE CRAWLER_NAME = #{crawlerName}
+        UPDATE TB_CRAWLER_STATUS SET STATUS='进行中' WHERE CRAWLER_NAME = #{crawlerName}
     </select>
     <select id="updateStatusFinal"  parameterType="String">
-        UPDATE TB_CRAWLER_STATUS SET STATUS="已完成" WHERE CRAWLER_NAME = #{crawlerName}
+        UPDATE TB_CRAWLER_STATUS SET STATUS='已完成' WHERE CRAWLER_NAME = #{crawlerName}
     </select>
 </mapper>
