@@ -3,13 +3,13 @@ package com.business.intelligence.dao;
 import com.business.intelligence.model.CrawlerName;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by zjy on 17/8/11.
  */
+@Component
 public class CrawlerStatus {
 
 
