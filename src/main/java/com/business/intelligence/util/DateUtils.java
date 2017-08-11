@@ -1,12 +1,14 @@
 package com.business.intelligence.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
+@Slf4j
 public class DateUtils {
     /**
      * 将时间按照yyyy-MM-dd的格式转换为String
@@ -14,6 +16,16 @@ public class DateUtils {
     public static String date2String(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
+    }
+
+    public static Date string2Date(String date){
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return sdf.parse(date);
+        } catch (Exception e) {
+            log.error("日期转换异常");
+        }
+        return null;
     }
 
     /**

@@ -39,8 +39,14 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
 
     private static final String URL = "https://app-api.shop.ele.me/ugc/invoke?method=shopRating.querySingleShopRating";
 
-    public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么顾客评价，日期： {} ，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),URL,username);
+    public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        Date start = DateUtils.string2Date(startTime);
+        Date end = DateUtils.string2Date(endTime);
+        if(start != null && end != null ){
+            this.crawlerDate =start;
+            this.endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(end,1);
+        }
+        log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
         String evaluateText = getEvaluateText(getClient(elemeBean));
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
         List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);

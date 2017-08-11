@@ -20,6 +20,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by Tcqq on 2017/7/18.
@@ -48,6 +50,8 @@ public abstract class ElemeCrawler extends BaseCrawler{
     //测试Cookie的url
     private static final String URL="https://app-api.shop.ele.me/shop/invoke/?method=shopLiveVideo.getShopVideoDevices";
     private static final String INDEX = "https://melody.shop.ele.me";
+    //测试ksid的url
+    private static final String KSIDURL = "https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
 
 
     /**
@@ -146,7 +150,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
     }
 
     /**
-     * 提取Cookie，没有则登录
+     * 提取Cookie和ksid，没有则登录
      */
     public CloseableHttpClient getClient(ElemeBean elemeBean){
         //将前台带来的信息全局化
@@ -155,26 +159,27 @@ public abstract class ElemeCrawler extends BaseCrawler{
         this.shopId = elemeBean.getShopId();
         //导入本地ksid
         String oldKsid = KSIDUtils.readKsid(getKsidName(username,password));
-        if(oldKsid == null ){
-            log.info("no ksid,so login");
+        CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
+        if (oldcookieStore == null) {
+            log.info("no cookie , so login");
             login();
-        }else{
-            this.ksId = oldKsid;
-            CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
-            if (oldcookieStore == null) {
-                log.info("no cookie , so login");
+        }else {
+            client = HttpClientUtil.getHttpClient(oldcookieStore);
+            if(oldKsid == null ){
+                log.info("no ksid,so login");
                 login();
-            }else {
-                client = HttpClientUtil.getHttpClient(oldcookieStore);
-                log.info("无需登录");
-//            if(cookieIsOk(client) != 200){
-//                log.info("cookie 失效，从新登陆");
-//                login();
-//            }else{
-//                log.info("cookie正常");
-//            }
+            }else{
+                LinkedHashMap testResult = ksidIsOk(client, oldKsid);
+                if(testResult == null ){
+                    this.ksId = oldKsid;
+                    log.info("无需登录");
+                }else{
+                    log.info("ksid 测试结果错误为 {},所以进行登录",testResult);
+                    login();
+                }
             }
         }
+
         return client;
     }
 
@@ -209,6 +214,45 @@ public abstract class ElemeCrawler extends BaseCrawler{
             }
         }
         return 0;
+    }
+
+    /**
+     * 测试ksid是否有效
+     * @param client
+     * @param oldKsid
+     * @return
+     */
+    public LinkedHashMap ksidIsOk(CloseableHttpClient client,String oldKsid){
+        log.info("测试ksid： {} 是否有效",oldKsid);
+        CloseableHttpResponse execute = null;
+        HttpPost post = new HttpPost(KSIDURL);
+        StringEntity jsonEntity = null;
+        String json = "{\"id\":\"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498\",\"method\":\"getApplyActivity\",\"service\":\"applyActivityManage\",\"params\":{\"shopId\":"+shopId+"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+oldKsid+"\"},\"ncp\":\"2.0.0\"}";
+        jsonEntity = new StringEntity(json, "UTF-8");
+        post.setEntity(jsonEntity);
+        setElemeHeader(post);
+        post.setHeader("X-Eleme-RequestID", "9368dd8a-a6e9-4e6c-855c-3d2e29ff3498");
+        try {
+            execute = client.execute(post);
+            HttpEntity entity = execute.getEntity();
+            String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("测试ksid的结果： {}",result);
+            LinkedHashMap ksidTestResult = (LinkedHashMap)WebUtils.getOneByJsonPath(result, "$.error");
+            return ksidTestResult;
+        } catch (IOException e) {
+            log.error("测试ksid时发生未知错误，不登录");
+            e.printStackTrace();
+        }finally {
+            try {
+                if (execute != null){
+                    execute.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
     }
 
 
@@ -262,4 +306,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
     public String notNull(String str){
         return str == null ? "":str;
     }
+
 }
+
+

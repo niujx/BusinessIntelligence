@@ -32,15 +32,20 @@ import java.util.List;
 public class ElemeFlowCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
-    //用户信息
-    private Authenticate authenticate;
+    private Date endCrawlerDate = crawlerDate;
     @Autowired
     private ElemeDao elemeDao;
 
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=trafficStats.getTrafficStatsV2";
 
-    public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么流量排名，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+    public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        Date start = DateUtils.string2Date(startTime);
+        Date end = DateUtils.string2Date(endTime);
+        if(start != null && end != null ){
+            this.crawlerDate =start;
+            this.endCrawlerDate = end;
+        }
+        log.info("开始爬取饿了么流量排名，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
         List<LinkedHashMap<String, Object>> flowList = getFlowText(getClient(elemeBean));
         List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
         for(ElemeFlow elemeFlow : elemeFlowBeans){
@@ -60,8 +65,8 @@ public class ElemeFlowCrawler extends ElemeCrawler{
         HttpPost post = new HttpPost(URL);
         StringEntity jsonEntity = null;
         String date = DateUtils.date2String(crawlerDate);
-        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":"+shopId+",\"beginDate\":\""+date+"\",\"endDate\":\""+date+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
-        log.info("request json is {}",json);
+        String endDate = DateUtils.date2String(endCrawlerDate);
+        String json = "{\"id\":\"bce6735e-27dd-441b-982c-19b6422327b3\",\"method\":\"getTrafficStatsV2\",\"service\":\"trafficStats\",\"params\":{\"shopId\":"+shopId+",\"beginDate\":\""+date+"\",\"endDate\":\""+endDate+"\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
         jsonEntity = new StringEntity(json, "UTF-8");
         post.setEntity(jsonEntity);
         setElemeHeader(post);
@@ -70,6 +75,7 @@ public class ElemeFlowCrawler extends ElemeCrawler{
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
             String result = EntityUtils.toString(entity, "UTF-8");
+            log.info("result is {}",result);
             List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.restaurantTrafficStatsList");
             return mapsByJsonPath;
         } catch (IOException e) {

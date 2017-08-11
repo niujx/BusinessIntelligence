@@ -43,7 +43,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     }
 
     public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么商店活动，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,username);
+        log.info("开始爬取饿了么商店活动，URL： {} ，用户名： {}",URL,username);
         List<LinkedHashMap<String, Object>> activityText = getActivityText(getClient(elemeBean));
         List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
         for(ElemeActivity elemeActivity : elemeActivityBeans){

@@ -31,6 +31,7 @@ import java.util.*;
 public class ElemeBillCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
+    private Date endCrawlerDate = crawlerDate;
     //用户信息
     private Authenticate authenticate;
     @Autowired
@@ -42,8 +43,14 @@ public class ElemeBillCrawler extends ElemeCrawler{
     private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
 
 
-    public void doRun(ElemeBean elemeBean) {
-        log.info("开始爬取饿了么账单记录，日期： {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),URL,elemeBean.getUsername());
+    public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        Date start = DateUtils.string2Date(startTime);
+        Date end = DateUtils.string2Date(endTime);
+        if(start != null && end != null ){
+            this.crawlerDate =start;
+            this.endCrawlerDate = end;
+        }
+        log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
         List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
         List<ElemeBill> billList = getElemeBillBeans(billText);
         for(ElemeBill elemeBill : billList){
@@ -78,7 +85,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
             //利用得到的token进行get请求
             Map<String,String> params = new HashMap<>();
             params.put("beginDate",String.valueOf(crawlerDate.getTime()));
-            params.put("endDate",String.valueOf(crawlerDate.getTime()));
+            params.put("endDate",String.valueOf(endCrawlerDate.getTime()));
             params.put("limit","10");
             params.put("loginRestaurantId",shopId);
             params.put("offset","0");
