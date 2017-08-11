@@ -1,6 +1,13 @@
 package com.business.intelligence.controller;
 
+import com.business.intelligence.dao.CrawlerStatus;
+import com.business.intelligence.dao.UserDao;
+import com.business.intelligence.model.CrawlerName;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -10,53 +17,61 @@ import java.io.*;
  */
 public class WebController {
 
-    //文件下载相关代码
-    @RequestMapping("/download")
-    public String downloadFile(org.apache.catalina.servlet4preview.http.HttpServletRequest request, HttpServletResponse response){
-        String fileName = "FileUploadTests.java";
-        if (fileName != null) {
-            //当前是从该工程的WEB-INF//File//下获取文件(该目录可以在下面一行代码配置)然后下载到C:\\users\\downloads即本机的默认下载的目录
-            String realPath = request.getServletContext().getRealPath(
-                    "//WEB-INF//");
-            File file = new File(realPath, fileName);
-            if (file.exists()) {
-                response.setContentType("application/force-download");// 设置强制下载不打开
-                response.addHeader("Content-Disposition",
-                        "attachment;fileName=" +  fileName);// 设置文件名
-                byte[] buffer = new byte[1024];
-                FileInputStream fis = null;
-                BufferedInputStream bis = null;
-                try {
-                    fis = new FileInputStream(file);
-                    bis = new BufferedInputStream(fis);
-                    OutputStream os = response.getOutputStream();
-                    int i = bis.read(buffer);
-                    while (i != -1) {
-                        os.write(buffer, 0, i);
-                        i = bis.read(buffer);
-                    }
-                    System.out.println("success");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+
+    @RequestMapping(value = "getStatus", method = RequestMethod.GET)
+    @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
+    public String getStatus(@RequestParam String crawlerName) {
+        CrawlerStatus status = new CrawlerStatus();
+
+
+        switch (crawlerName){
+            case "ELM_CRAWLER_ACTIVITY" :
+                return status.getStatus(CrawlerName.ELM_CRAWLER_ACTIVITY);
+            case "ELM_CRAWLER_BILL":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_BILL);
+            case "ELM_CRAWLER_COMMODITY":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_COMMODITY);
+            case "ELM_CRAWLER_EVALUATE":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_EVALUATE);
+            case "ELM_CRAWLER_FLOW":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_FLOW);
+            case "ELM_CRAWLER_ORDER":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_ORDER);
+            case "ELM_CRAWLER_SALE":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_SALE);
         }
-        return null;
+
+        return "状态获取失败";
     }
+
+
+    @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
+    @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
+    public String getAllStatus(@RequestParam String crawlerName) {
+        CrawlerStatus status = new CrawlerStatus();
+
+
+        switch (crawlerName){
+            case "ELM_CRAWLER_ACTIVITY" :
+                return status.getStatus(CrawlerName.ELM_CRAWLER_ACTIVITY);
+            case "ELM_CRAWLER_BILL":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_BILL);
+            case "ELM_CRAWLER_COMMODITY":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_COMMODITY);
+            case "ELM_CRAWLER_EVALUATE":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_EVALUATE);
+            case "ELM_CRAWLER_FLOW":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_FLOW);
+            case "ELM_CRAWLER_ORDER":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_ORDER);
+            case "ELM_CRAWLER_SALE":
+                return  status.getStatus(CrawlerName.ELM_CRAWLER_SALE);
+        }
+
+        return "状态获取失败";
+    }
+
+
+
 
 }

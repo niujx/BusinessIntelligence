@@ -12,7 +12,7 @@ public class OrderDetails {
     /**
      * 自增长id
      */
-    private int id;
+    private String id;
     /**
      * 订单ID
      */
@@ -210,11 +210,11 @@ public class OrderDetails {
      */
     private Date updateTime;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

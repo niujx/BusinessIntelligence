@@ -70,11 +70,11 @@ public class WaimaiCrawler {
      * @param end      结束时间
      * @param shopId   商户id
      */
-    public void logins(String userName, String passWord, String start, String end, String shopId) {
+    public String logins(String userName, String passWord, String start, String end, String shopId) {
         this.shopId = shopId;
         boolean tag = getCookiestores(userName, passWord, start, end);
         if (tag) {
-            return;
+            return "{errno:0000,errmsg:抓取进行中,data:null}";
         }
         getToken();
         String loginUrl = "https://wmpass.baidu.com/api/login";
@@ -94,21 +94,25 @@ public class WaimaiCrawler {
             log.info(content);
             JSONObject json = JSONObject.parseObject(content);
             JSONObject data = json.getJSONObject("data");
-            String return_url = data.getString("return_url");
-            HttpGet rget = HttpClientUtil.get(return_url);
-            HttpClientUtil.executeGetWithResult(client, rget);
-            HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/");
+            if (data != null) {
+                String return_url = data.getString("return_url");
+                HttpGet rget = HttpClientUtil.get(return_url);
+                HttpClientUtil.executeGetWithResult(client, rget);
+                HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/");
 
-            String shouye = "https://wmcrm.baidu.com/crm?qt=neworderlist";
-            rget = HttpClientUtil.get(shouye);
-            content = HttpClientUtil.executeGetWithResult(client, rget);
-            if (content.contains("百度商户")) {
-                loadBills(start, end);
-                setCookieStores(userName, passWord);
+                String shouye = "https://wmcrm.baidu.com/crm?qt=neworderlist";
+                rget = HttpClientUtil.get(shouye);
+                content = HttpClientUtil.executeGetWithResult(client, rget);
+                if (content.contains("百度商户")) {
+                    loadBills(start, end);
+                    setCookieStores(userName, passWord);
+                }
             }
+
         } catch (IOException e) {
             log.error("登录百度失败", e);
         }
+        return content;
     }
 
     /**
@@ -134,11 +138,13 @@ public class WaimaiCrawler {
     private void dowShopdata(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shopdata");
-            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=" + startTime + "&endTime=" + endTime + "&act=export");
+           // https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=20170803&endTime=20170809
+            HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=" + startTime.replace("-", "") + "&endTime=" + endTime.replace("-", "") + "&act=export");
             dwd.addHeader("referer", "https://wmcrm.baidu.com/crm?qt=shopdata");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
-            dwd.addHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
+            dwd.addHeader("Upgrade-Insecure-Requests", "1");
+            dwd.addHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0");
             CloseableHttpResponse response = client.execute(dwd);
             InputStream in = response.getEntity().getContent();
             File file = new File("/Users/wangfukun/other/img/");
@@ -198,10 +204,13 @@ public class WaimaiCrawler {
 //    @Async
     private void dowAllcashtradelist(String startTime, String endTime) {
         try {
-            HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=getstaterecordlist");
+            HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm/settlement/balanceaccounttpl");
             HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/settlement/exportallcashtradelist?begin_time=" + startTime + "&end_time=" + endTime + "&display=json");
-            dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            dwd.addHeader("Accept", "application/json, text/javascript, */*; q=0.01");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
+            dwd.addHeader("Referer", "https://wmcrm.baidu.com/crm/settlement/balanceaccounttpl");
+            dwd.addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0");
+            dwd.addHeader("X-Requested-With", "XMLHttpRequest");
             CloseableHttpResponse response = client.execute(dwd);
             InputStream in = response.getEntity().getContent();
             try {

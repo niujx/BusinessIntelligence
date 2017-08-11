@@ -37,10 +37,10 @@ public class BaiduController {
     @ApiOperation(value = "根据时间段获取订单信息", httpMethod = "GET", notes = "根据时间段获取订单信息")
     public Object getOrderList(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
                                @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList =userDao.getUsersForPlatform(Platform.BD);
-        for(User u : userList){
-            String content = waimaiApi.ouderListGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId(),star.replace("/","-"),end.replace("/","-"));
-            return  content;
+        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
+        for (User u : userList) {
+            String content = waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
+            return content;
         }
         return "获取用户名密码失败";
     }
@@ -49,22 +49,24 @@ public class BaiduController {
     @ApiOperation(value = "根据时间段获取评论信息", httpMethod = "GET", notes = "根据时间段获取评论信息")
     public Object getComment(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
                              @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList =userDao.getUsersForPlatform(Platform.BD);
-        for(User u : userList){
-            String content = waimaiApi.commentGet(u.getSource(),u.getSecret(),u.getShopId(),u.getMerchantId(),star.replace("/","-"),end.replace("/","-"));
-            return  content;
+        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
+        for (User u : userList) {
+            String content = waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
+            return content;
         }
         return "获取用户名密码失败";
     }
 
-    @RequestMapping(value = "/getHotDishes/", method = RequestMethod.GET)
-    @ApiOperation(value = "根据时间段获取热销菜品", httpMethod = "GET", notes = "根据时间段获取热销菜品")
-    public void getHotDishes(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
-                             @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList =userDao.getUsersForPlatform(Platform.BD);
-        for(User u : userList){
-            waimaiCrawler.logins(u.getUserName(),u.getPassWord(),star.replace("/","-"),end.replace("/","-"),u.getMerchantId());
+    @RequestMapping(value = "/getBaiduCarwler/", method = RequestMethod.GET)
+    @ApiOperation(value = "根据时间段获取百度外卖商户数据", httpMethod = "GET", notes = "根据时间段获取百度外卖商户数据")
+    public Object getBaiduCarwler(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
+                               @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
+        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
+        String content = "{errno:0000,errmsg:抓取进行中}";
+        for (User u : userList) {
+            content = waimaiCrawler.logins(u.getUserName(), u.getPassWord(), star.replace("/", "-"), end.replace("/", "-"), u.getMerchantId());
         }
+        return content;
     }
 }
 
