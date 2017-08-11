@@ -24,5 +24,7 @@
         <mapper resource="mapper/ElemeCrawler.xml"/>
         <mapper resource="mapper/BDCrawler.xml"/>
         <mapper resource="mapper/User.xml"/>
+        <mapper resource="mapper/CrawlerStatus.xml"/>
+
     </mappers>
 </configuration>

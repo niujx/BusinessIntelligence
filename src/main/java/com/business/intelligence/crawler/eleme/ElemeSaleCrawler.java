@@ -1,6 +1,8 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeSale;
 import com.business.intelligence.util.DateUtils;
@@ -33,15 +35,26 @@ public class ElemeSaleCrawler extends ElemeCrawler {
     private Date endCrawlerDate = crawlerDate;
     @Autowired
     private ElemeDao elemeDao;
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     private static final String URL = "https://app-api.shop.ele.me/stats/invoke/?method=saleStatsNew.getHistoryBusinessStatisticsV3";
     public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_SALE);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //转换前台传入时间
         Date start = DateUtils.string2Date(startTime);
         Date end = DateUtils.string2Date(endTime);
         if(start != null && end != null ){
             this.crawlerDate =start;
             this.endCrawlerDate = end;
         }
+        //开始爬取
         log.info("开始爬取饿了么经营统计，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
         List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient(elemeBean));
         List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
@@ -49,6 +62,13 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             elemeDao.insertSale(elemeSale);
         }
         log.info("用户名为 {} 的经营统计已入库完毕",username);
+        //更新爬取状态为已完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_SALE);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     /**
