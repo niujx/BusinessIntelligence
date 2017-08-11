@@ -7,7 +7,8 @@ import lombok.Data;
  */
 
 
-public enum  CrawlerStatus {
+public enum CrawlerName {
+
     ELM_CRAWLER_EVALUATE,  //抓取全部评论状态
     ELM_CRAWLER_ACTIVITY,  //抓取全部活动状态
     ELM_CRAWLER_BILL,  //爬取全部账单状态
