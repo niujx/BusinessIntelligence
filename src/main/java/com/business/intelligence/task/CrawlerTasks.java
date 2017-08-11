@@ -17,7 +17,7 @@ public class CrawlerTasks {
     @Autowired
     private ElemeCrawlerAll elemeCrawlerAll;
 
-    @Scheduled(cron = "* * 3 * *")
+    @Scheduled(cron = "* * 3 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
     }

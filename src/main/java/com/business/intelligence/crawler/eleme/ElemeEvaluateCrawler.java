@@ -1,7 +1,9 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeBill;
 import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
@@ -36,16 +38,27 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
     private Date endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,1);
     @Autowired
     private ElemeDao elemeDao;
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     private static final String URL = "https://app-api.shop.ele.me/ugc/invoke?method=shopRating.querySingleShopRating";
 
     public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_EVALUATE);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //转换前台传入的日期
         Date start = DateUtils.string2Date(startTime);
         Date end = DateUtils.string2Date(endTime);
         if(start != null && end != null ){
             this.crawlerDate =start;
             this.endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(end,1);
         }
+        //开始爬取
         log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
         String evaluateText = getEvaluateText(getClient(elemeBean));
         List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
@@ -55,6 +68,13 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             elemeDao.insertEvaluate(elemeEvaluate);
         }
         log.info("用户名为 {} 的顾客评价已入库完毕",username);
+        //更新爬取状态为已完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_EVALUATE);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
 
     }
 

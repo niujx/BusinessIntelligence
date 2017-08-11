@@ -1,7 +1,8 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
-import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeActivity;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.util.DateUtils;
@@ -9,7 +10,6 @@ import com.business.intelligence.util.WebUtils;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -32,7 +32,8 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     private Date crawlerDate = super.crawlerDate;
     @Autowired
     private ElemeDao elemeDao;
-
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
     private static final String URL ="https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
     private static final Map<Boolean, String> ISSHARE = Maps.newHashMap();
 
@@ -43,6 +44,14 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     }
 
     public void doRun(ElemeBean elemeBean) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_ACTIVITY);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //开始爬取
         log.info("开始爬取饿了么商店活动，URL： {} ，用户名： {}",URL,username);
         List<LinkedHashMap<String, Object>> activityText = getActivityText(getClient(elemeBean));
         List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
@@ -50,6 +59,13 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             elemeDao.insertActivity(elemeActivity);
         }
         log.info("用户名为 {} 的商店活动已入库完毕",username);
+        //更新爬取状态为完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ACTIVITY);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     /**
