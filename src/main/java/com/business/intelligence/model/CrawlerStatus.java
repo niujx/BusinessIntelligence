@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * Created by zjy on 17/8/11.
  */
-@Data
+
 public enum  CrawlerStatus {
     ELM_CRAWLER_EVALUATE,
     ELM_CRAWLER_ACTIVITY,
