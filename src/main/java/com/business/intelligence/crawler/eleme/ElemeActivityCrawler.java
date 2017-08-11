@@ -103,7 +103,9 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         for(LinkedHashMap<String,Object> map : activityList){
             LinkedHashMap<String, Object> contentMap = (LinkedHashMap)map.get("content");
             ElemeActivity  elemeActivity= new ElemeActivity();
-            elemeActivity.setPri(map.get("id")+"~"+shopId);
+            String crawlerDateString = DateUtils.date2String(crawlerDate);
+            elemeActivity.setPri(map.get("id")+"~"+shopId+"~"+crawlerDateString);
+            elemeActivity.setCrawlerDate(crawlerDateString);
             elemeActivity.setId((Integer) map.get("id"));
             elemeActivity.setShopId(Long.valueOf(shopId));
             elemeActivity.setBeginDate(notNull((String)map.getOrDefault("beginDate","")));
