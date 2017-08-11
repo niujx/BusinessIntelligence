@@ -14,9 +14,9 @@
 
     <insert id="insertActivity" keyProperty="pri" parameterType="ElemeActivity">
         INSERT INTO "HYF"."BIL_ELEME_ACTIVITY"
-            (PRI,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE)
+            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE)
         VALUES
-            (#{pri},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare})
+            (#{pri},#{crawlerDate},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare})
     </insert>
 
     <insert id="insertBill" keyProperty="pri" parameterType="ElemeBill">

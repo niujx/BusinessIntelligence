@@ -1,7 +1,9 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeBill;
 import com.business.intelligence.util.DateUtils;
@@ -36,6 +38,8 @@ public class ElemeBillCrawler extends ElemeCrawler{
     private Authenticate authenticate;
     @Autowired
     private ElemeDao elemeDao;
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     //通过post请求获得token的url
     private static final String GETURL = "https://app-api.shop.ele.me/arena/invoke/?method=TokenService.generateToken";
@@ -44,12 +48,21 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
 
     public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_BILL);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //装换前台输入的时间
         Date start = DateUtils.string2Date(startTime);
         Date end = DateUtils.string2Date(endTime);
         if(start != null && end != null ){
             this.crawlerDate =start;
             this.endCrawlerDate = end;
         }
+        //开始爬取
         log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
         List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
         List<ElemeBill> billList = getElemeBillBeans(billText);
@@ -57,6 +70,13 @@ public class ElemeBillCrawler extends ElemeCrawler{
             elemeDao.insertBill(elemeBill);
         }
         log.info("用户名为 {} 的账单记录已入库完毕",username);
+        //更新爬取状态为已完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_BILL);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     /**
