@@ -46,7 +46,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     public void doRun(ElemeBean elemeBean) {
         //更新爬取状态为进行中
         int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_ACTIVITY);
-        if(i ==0){
+        if(i ==1){
             log.info("更新爬取状态成功");
         }else{
             log.info("更新爬取状态失败");
@@ -61,7 +61,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         log.info("用户名为 {} 的商店活动已入库完毕",username);
         //更新爬取状态为完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ACTIVITY);
-        if(f ==0){
+        if(f ==1){
             log.info("更新爬取状态成功");
         }else{
             log.info("更新爬取状态失败");
