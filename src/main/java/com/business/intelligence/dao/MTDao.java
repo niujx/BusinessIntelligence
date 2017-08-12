@@ -1,5 +1,6 @@
 package com.business.intelligence.dao;
 
+import com.alibaba.druid.support.monitor.annotation.MTable;
 import com.business.intelligence.model.mt.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -56,6 +57,14 @@ public class MTDao {
     public void insertBill(MTBill bill) {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.mt.insertBill", bill);
+        } catch (Exception e) {
+            log.warn("insert error info {}", ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    public void insertAct(MTAct act){
+        try {
+            sqlSessionTemplate.insert("com.business.intelligence.mt.insertAct", act);
         } catch (Exception e) {
             log.warn("insert error info {}", ExceptionUtils.getStackTrace(e));
         }

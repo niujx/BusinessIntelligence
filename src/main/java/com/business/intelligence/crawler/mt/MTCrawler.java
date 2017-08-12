@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static com.business.intelligence.util.HttpClientUtil.UTF_8;
 import static java.util.stream.Collectors.toList;
@@ -210,7 +211,7 @@ public class MTCrawler extends BaseCrawler {
                         order.setOrderTime(toDate(record.get(i++)));
                         order.setHourLong(toDate(record.get(i++)));
                         order.setName(record.get(i++));
-                        order.setId(record.get(i++));
+                        order.setId(accountInfo.wmPoiId + "$" + record.get(i++)+"$"+order.getAppNo());
                         order.setCity(record.get(i++));
                         order.setType(record.get(i++));
                         order.setStatus(record.get(i++));
@@ -309,6 +310,8 @@ public class MTCrawler extends BaseCrawler {
                                 mtBusiness.setEstimate(hssfRow.getCell(i++).getStringCellValue());
                                 mtBusiness.setValidateOrder(hssfRow.getCell(i++).getStringCellValue());
                                 mtBusiness.setInvalidateOrder(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setId(accountInfo.wmPoiId + "$" + mtBusiness.getDate());
+                                mtBusiness.setShopName(accountInfo.name);
                                 mtDao.insertBusiness(mtBusiness);
                                 log.info("MTBusiness info is {}", mtBusiness);
                             }
@@ -472,12 +475,10 @@ public class MTCrawler extends BaseCrawler {
                 return;
             }
 
-            //{"data":{"taskNo":1001079},"code":0,"msg":"success"}
             int taskNo = parse.read("$.data.taskNo");
-//            date="2017-08-11";
-
             String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", date, taskNo);
+
+            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             log.info("excel url is {}", url);
             while (true) {
 
@@ -553,6 +554,35 @@ public class MTCrawler extends BaseCrawler {
             params.put("wmPoiId", accountInfo.wmPoiId);
             String json = HttpClientUtil.executePostWithResult(client, "https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs", params);
             log.info("read json is {}", json);
+            ReadContext parse = JsonPath.parse(json);
+            int endActCount = parse.read("$.data.endActs.length()");
+            for (int endActIndex = 0; endActIndex < endActCount; endActIndex++) {
+                String key = "$.data.endActs[" + endActIndex + "].";
+                MTAct mtAct = new MTAct();
+                mtAct.setName(accountInfo.name);
+                mtAct.setIsEnd(1);
+                mtAct.setActName(parse.read(key + "actName"));
+                mtAct.setId(accountInfo.wmPoiId + "$" + mtAct.getActName() + "$" + parse.read(key + "actId"));
+                mtAct.setStartTime(toDate(parse.read(key + "startTime")));
+                mtAct.setEndTime(toDate(parse.read(key + "endTime")));
+                mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtDao.insertAct(mtAct);
+            }
+
+
+            int goActCount = parse.read("$.data.onGoingActs.length()");
+            for (int goActIndex = 0; goActIndex < goActCount; goActIndex++) {
+                String key = "$.data.onGoingActs[" + goActIndex + "].";
+                MTAct mtAct = new MTAct();
+                mtAct.setName(accountInfo.name);
+                mtAct.setIsEnd(0);
+                mtAct.setActName(parse.read(key + "actName"));
+                mtAct.setId(accountInfo.wmPoiId + "$" + mtAct.getActName() + "$" + parse.read(key + "actId"));
+                mtAct.setStartTime(toDate(parse.read(key + "startTime")));
+                mtAct.setEndTime(toDate(parse.read(key + "endTime")));
+                mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtDao.insertAct(mtAct);
+            }
 
             for (int i = 0; i < 2; i++) {
                 Map<String, String> params1 = Maps.newHashMap();
@@ -572,12 +602,75 @@ public class MTCrawler extends BaseCrawler {
                 httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
                 CloseableHttpResponse execute = client.execute(httpPost);
-                log.info("code is {}", EntityUtils.toString(execute.getEntity()));
+                json = EntityUtils.toString(execute.getEntity());
+                parse = JsonPath.parse(json);
+                int count = parse.read("$.data.length()");
+                for (int j = 0; j < count; j++) {
+                    String key = "$.data[" + j + "]";
+                    MTAct mtAct = new MTAct();
+                    mtAct.setName(accountInfo.name);
+                    mtAct.setIsEnd(0);
+                    mtAct.setActName(parse.read(key + "name"));
+                    mtAct.setId(accountInfo.wmPoiId + "$" + mtAct.getActName() + "$" + parse.read(key + "id"));
+                    int st = parse.read(key + "activityStartTime");
+                    int et = parse.read(key + "activityEndTime");
+                    mtAct.setStartTime(new Date(st));
+                    mtAct.setEndTime(new Date(et));
+                    String activityType = parse.read(key + "activityType");
+                    String activityRule = parse.read(key + "activityRule");
+                    String activityIntroduction = parse.read(key + "activityIntroduction");
+                    mtAct.setContext(html2Text(activityType) + "||" + html2Text(activityRule) + "||" + html2Text(activityIntroduction));
+                    mtDao.insertAct(mtAct);
+                }
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String html2Text(String inputString) {
+        String htmlStr = inputString; // 含html标签的字符串
+        String textStr = "";
+        java.util.regex.Pattern p_script;
+        java.util.regex.Matcher m_script;
+        java.util.regex.Pattern p_style;
+        java.util.regex.Matcher m_style;
+        java.util.regex.Pattern p_html;
+        java.util.regex.Matcher m_html;
+
+        java.util.regex.Pattern p_html1;
+        java.util.regex.Matcher m_html1;
+
+        try {
+            String regEx_script = "<[//s]*?script[^>]*?>[//s//S]*?<[//s]*?///[//s]*?script[//s]*?>"; // 定义script的正则表达式{或<script[^>]*?>[//s//S]*?<///script>
+            String regEx_style = "<[//s]*?style[^>]*?>[//s//S]*?<[//s]*?///[//s]*?style[//s]*?>"; // 定义style的正则表达式{或<style[^>]*?>[//s//S]*?<///style>
+            String regEx_html = "<[^>]+>"; // 定义HTML标签的正则表达式
+            String regEx_html1 = "<[^>]+";
+            p_script = Pattern.compile(regEx_script, Pattern.CASE_INSENSITIVE);
+            m_script = p_script.matcher(htmlStr);
+            htmlStr = m_script.replaceAll(""); // 过滤script标签
+
+            p_style = Pattern.compile(regEx_style, Pattern.CASE_INSENSITIVE);
+            m_style = p_style.matcher(htmlStr);
+            htmlStr = m_style.replaceAll(""); // 过滤style标签
+
+            p_html = Pattern.compile(regEx_html, Pattern.CASE_INSENSITIVE);
+            m_html = p_html.matcher(htmlStr);
+            htmlStr = m_html.replaceAll(""); // 过滤html标签
+
+            p_html1 = Pattern.compile(regEx_html1, Pattern.CASE_INSENSITIVE);
+            m_html1 = p_html1.matcher(htmlStr);
+            htmlStr = m_html1.replaceAll(""); // 过滤html标签
+
+            textStr = htmlStr;
+
+        } catch (Exception e) {
+            System.err.println("Html2Text: " + e.getMessage());
+        }
+
+        return textStr;// 返回文本字符串
     }
 
 
@@ -635,8 +728,8 @@ public class MTCrawler extends BaseCrawler {
         // mtCrawler.flowanalysis("30", false);
         //mtCrawler.hotSales("2017-07-31","2017-08-06",true);
         // mtCrawler.comment("2017-08-01", "2017-08-06", true);
-      //  mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
-         mtCrawler.acts(true);
+        //  mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
+        mtCrawler.acts(true);
     }
 }
 

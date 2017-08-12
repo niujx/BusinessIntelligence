@@ -2,6 +2,8 @@ package com.business.intelligence.model.mt;
 
 import lombok.Data;
 
+import javax.naming.ldap.PagedResultsControl;
+
 @Data
 public class MTBusiness {
 
@@ -19,5 +21,9 @@ public class MTBusiness {
     private String validateOrder;
     //无效订单
     private String invalidateOrder;
+
+    private String id;
+
+    private String shopName;
 
 }

@@ -48,7 +48,7 @@
         INSERT INTO BIL_MT_BUSINESS
         (DATE_,TOTAL,SHOP_SUBIDY,
         MEITUAN_SUBIDY,ESTIMATE,
-        VALIDATE_ORDER,INVALIDATE_ORDER)
+        VALIDATE_ORDER,INVALIDATE_ORDER,SHOP_NAME,ID)
         VALUES(
         #{date,jdbcType=VARCHAR},
         #{total,jdbcType=VARCHAR},
@@ -56,7 +56,9 @@
         #{meiTuanSubsidy,jdbcType=VARCHAR},
         #{estimate,jdbcType=VARCHAR},
         #{validateOrder,jdbcType=VARCHAR},
-        #{invalidateOrder,jdbcType=VARCHAR}
+        #{invalidateOrder,jdbcType=VARCHAR},
+        #{shopName,jdbcType=VARCHAR},
+        #{id,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -189,6 +191,27 @@
         )
     </insert>
 
+    <insert id="insertAct" parameterType="MTAct">
+        INSERT INTO BIL_MT_ACT (
+        ID,
+        SHOP_NAME,
+        START_TIME,
+        END_TIME,
+        TYPE,
+        ACT_NAME,
+        IS_END,
+        CONTEXT)
+        VALUES(
+        #{id,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR},
+        #{startTime,jdbcType=DATE},
+        #{endTime,jdbcType=DATE},
+        #{type,jdbcType=VARCHAR},
+        #{actName,jdbcType=VARCHAR},
+        #{isEnd,jdbcType=VARCHAR},
+        #{context,jdbcType=VARCHAR}
+        )
+    </insert>
 </mapper>
 
 
