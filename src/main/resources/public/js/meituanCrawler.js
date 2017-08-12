@@ -1,10 +1,10 @@
 (function($){
 	
-	var address = "http://localhost:9578/bi/mt";
+	var address = "http://localhost:9578/bi/mt/";
 	/**************************美团外卖*******************************/
 	
 	//点击报表下载启动按钮时
-	$(".eleme .mt_report_forms").on('click',function(){
+	$(".meituan .mt_report_forms").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -37,7 +37,7 @@
 	
 	
 	//点击营业统计启动按钮时
-	$(".eleme .mt_crawler_sale").on('click',function(){
+	$(".meituan .mt_crawler_sale").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -71,7 +71,7 @@
 	
 	
 	//点击流量分析启动按钮时
-	$(".eleme .mt_crawler_flow").on('click',function(){
+	$(".meituan .mt_crawler_flow").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -106,7 +106,7 @@
 	
 	
 	//点击热销商品启动按钮时
-	$(".eleme .mt_goods_sale").on('click',function(){
+	$(".meituan .mt_goods_sale").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -138,7 +138,7 @@
 	
 	
 	//点击订单对账启动按钮时
-	$(".eleme .mt_order_checking").on('click',function(){
+	$(".meituan .mt_order_checking").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -171,7 +171,7 @@
 	
 	
 	//点击指定门店点评内容启动按钮时
-	$(".eleme .mt_crawler_evaluate").on('click',function(){
+	$(".meituan .mt_crawler_evaluate").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();
@@ -205,7 +205,7 @@
 	
 	
 	//点击营销活动启动按钮时
-	$(".eleme .mt_sale_activity").on('click',function(){
+	$(".meituan .mt_sale_activity").on('click',function(){
 		//获取当前抓取时间及用户名
 		var startDateTime = $(this).parents("tr").find(".startDateTime").val();
 		var endDateTime = $(this).parents("tr").find(".endDateTime").val();

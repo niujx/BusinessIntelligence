@@ -13,16 +13,17 @@ window.onload=function(){
 			},
 			success:function(e){
 				//e 为请求成功后返回的数据
-				
-				$(".elmstate").each(function(i,val){
-					$(val).html(e.eleme[i].status);
-				})
+				$(".bdstate").each(function(i,val){
+					$(val).html(e.bd[i].status);
+				})	
 				$(".mtstate").each(function(i,val){
 					$(val).html(e.mt[i].status);
 				})
-				$(".bdstate").each(function(i,val){
-					$(val).html(e.bd[i].status);
+				$(".elmstate").each(function(i,val){
+					$(val).html(e.elm[i].status);
 				})
+
+	
 				
 				
 				
