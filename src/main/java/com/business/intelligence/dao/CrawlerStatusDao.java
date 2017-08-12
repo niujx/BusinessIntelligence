@@ -33,7 +33,26 @@ public class CrawlerStatusDao {
                 return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","ELM_CRAWLER_ORDER");
             case ELM_CRAWLER_SALE:
                 return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","ELM_CRAWLER_SALE");
-
+            case BD_COMMENT:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","BD_COMMENT");
+            case BD_CRAWLER:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","BD_CRAWLER");
+            case BD_ORDERDETAILS:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","BD_ORDERDETAILS");
+            case MT_CRAWLER_EVALUATE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_CRAWLER_EVALUATE");
+            case MT_CRAWLER_FLOW:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_CRAWLER_FLOW");
+            case MT_CRAWLER_SALE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_CRAWLER_SALE");
+            case MT_GOODS_SALE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_GOODS_SALE");
+            case MT_ORDER_CHECKING:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_ORDER_CHECKING");
+            case MT_REPORT_FORMS:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_REPORT_FORMS");
+            case MT_SALE_ACTIVITY:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusING","MT_SALE_ACTIVITY");
         }
 
         return 0;
@@ -57,6 +76,26 @@ public class CrawlerStatusDao {
                 return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","ELM_CRAWLER_ORDER");
             case ELM_CRAWLER_SALE:
                 return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","ELM_CRAWLER_SALE");
+            case BD_COMMENT:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","BD_COMMENT");
+            case BD_CRAWLER:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","BD_CRAWLER");
+            case BD_ORDERDETAILS:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","BD_ORDERDETAILS");
+            case MT_CRAWLER_EVALUATE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_CRAWLER_EVALUATE");
+            case MT_CRAWLER_FLOW:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_CRAWLER_FLOW");
+            case MT_CRAWLER_SALE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_CRAWLER_SALE");
+            case MT_GOODS_SALE:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_GOODS_SALE");
+            case MT_ORDER_CHECKING:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_ORDER_CHECKING");
+            case MT_REPORT_FORMS:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_REPORT_FORMS");
+            case MT_SALE_ACTIVITY:
+                return sqlSessionTemplate.update("com.business.intelligence.model.updateStatusFinal","MT_SALE_ACTIVITY");
 
         }
 

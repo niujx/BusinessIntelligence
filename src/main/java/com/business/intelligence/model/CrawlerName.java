@@ -27,5 +27,8 @@ public enum CrawlerName {
     MT_CRAWLER_EVALUATE, //指定门店点评内容
     MT_SALE_ACTIVITY, //店铺活动
 
+    BD_ORDERDETAILS,   //订单信息
+    BD_CRAWLER,   //百度外卖商户数据
+    BD_COMMENT   //用户评论信息
 
 }
