@@ -640,7 +640,7 @@ public class MTCrawler extends BaseCrawler {
             }
 
             //更新爬取状态为进行中
-            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_SHOP_ACTIVITY);
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_SALE_ACTIVITY);
             if (ii == 1) {
                 log.info("更新爬取状态成功");
             } else {
@@ -726,7 +726,7 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
         }
 
-        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_SHOP_ACTIVITY);
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_SALE_ACTIVITY);
         if (f == 1) {
             log.info("更新爬取状态成功");
         } else {
