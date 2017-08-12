@@ -51,192 +51,41 @@
 					</tr>
 					<tr>
 						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
-						<td rowspan="2">营业数据</td>
+						<td rowspan="2" >营业数据</td>
 						<td rowspan="2">运营中心</td>
 						<td>曝光数据</td>
-						<td>
+						<td rowspan="4">
 							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
 						</td>
-						<td>
+						<td rowspan="4">
 							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
 						</td>
-						<td>
+						<td rowspan="4">
 							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
 						</td>
-						<td class="bdstate">已完成</td>
-						<td>
-							<button class="begin">启动</button>
+						<td  rowspan="4" class="bdstate">已完成</td>
+						<td rowspan="4">
+							<button class="baiduCrawler">启动</button>
 						</td>
 					</tr>
 					<tr>
 						<td>热销菜品</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="bdstate">已完成</td>
-						<td>
-							<button class="begin">启动</button>
-						</td>
-					</tr>
-					<tr>
-						<td>财务管理</td>
-						<td>运营中心</td>
-						<td>账户结算</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="bdstate">已完成</td>
-						<td>
-							<button class="begin">启动</button>
-						</td>
-					</tr>
-					<tr>
-						<td>评价管理</td>
-						<td>运营中心</td>
-						<td>账户结算</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="bdstate">已完成</td>
-						<td>
-							<button class="begin">启动</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		
-		<!--美团外卖-->
-		<div class="tableDetail meituan">
-			<table border="1">
-				<!--表头-->
-				<thead>
-					<tr>
-						<!--colspan 相当于合并水平方向的单元格  合并几个就写几-->
-						<th colspan="8">美团外卖</th>
-					</tr>
-					<tr class="menu">
-						<th colspan = "3">数据名称</th>
-						<th>设置抓取开始时间</th>
-						<th>设置抓取结束时间</th>
-						<th>抓取用户</th>
-						<th>抓取状态</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-				<!--表内容-->
-				<tbody>
-					<!--tr 代表行-->
-					<tr>
-						<td>订单数据</td>
-						<td>订单数据</td>
-						<td>报表下载</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_report_forms">启动</button>
-						</td>
 						
 					</tr>
 					<tr>
-						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
-						<td rowspan="3">营业数据</td>
-						<td rowspan="3">运营中心</td>
-						<td>营业统计</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_crawler_sale">启动</button>
-						</td>
+						<td rowspan="2">财务管理</td>
+						<td rowspan="2" >运营中心</td>
+						<td>账户提现</td>
+						
+	
 					</tr>
 					<tr>
-						<td>流量分析</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_crawler_flow">启动</button>
-						</td>
-					</tr>
-					<tr>
-						<td>热门商品</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_goods_sale">启动</button>
-						</td>
-					</tr>
-					<tr>
-						<td>财务管理</td>
-						<td>运营中心</td>
-						<td>订单对账</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_order_checking">启动</button>
-						</td>
+						<td>账户流水</td>
 					</tr>
 					<tr>
 						<td>评价管理</td>
 						<td>运营中心</td>
-						<td>查询指定门店点评内容</td>
+						<td>用户评价</td>
 						<td>
 							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
 						</td>
@@ -246,30 +95,12 @@
 						<td>
 							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
 						</td>
-						<td class="mtstate">已完成</td>
+						<td class="bdstate">已完成</td>
 						<td>
-							<button class="mt_crawler_evaluate">启动</button>
+							<button class="comment">启动</button>
 						</td>
+						
 					</tr>
-					<tr>
-						<td rowspan="2">平台活动抓取</td>
-						<td rowspan="2">运营中心</td>
-						<td>营销活动</td>
-						<td>
-							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
-						</td>
-						<td>
-							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
-						</td>
-						<td>
-							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
-						</td>
-						<td class="mtstate">已完成</td>
-						<td>
-							<button class="mt_sale_activity">启动</button>
-						</td>
-					</tr>
-					
 				</tbody>
 			</table>
 		</div>
@@ -422,6 +253,160 @@
 				</tbody>
 			</table>
 		</div>
+		
+		
+		<!--美团外卖-->
+		<div class="tableDetail meituan">
+			<table border="1">
+				<!--表头-->
+				<thead>
+					<tr>
+						<!--colspan 相当于合并水平方向的单元格  合并几个就写几-->
+						<th colspan="8">美团外卖</th>
+					</tr>
+					<tr class="menu">
+						<th colspan = "3">数据名称</th>
+						<th>设置抓取开始时间</th>
+						<th>设置抓取结束时间</th>
+						<th>抓取用户</th>
+						<th>抓取状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<!--表内容-->
+				<tbody>
+					<!--tr 代表行-->
+					<tr>
+						<td>订单数据</td>
+						<td>订单数据</td>
+						<td>报表下载</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_report_forms">启动</button>
+						</td>
+						
+					</tr>
+					<tr>
+						<!--rowspan 相当于合并垂直方向的单元格  合并几个就写几-->
+						<td rowspan="3">营业数据</td>
+						<td rowspan="3">运营中心</td>
+						<td>营业统计</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_crawler_sale">启动</button>
+						</td>
+					</tr>
+					<tr>
+						<td>流量分析</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_crawler_flow">启动</button>
+						</td>
+					</tr>
+					<tr>
+						<td>热门商品</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_goods_sale">启动</button>
+						</td>
+					</tr>
+					<tr>
+						<td>财务管理</td>
+						<td>运营中心</td>
+						<td>订单对账</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_order_checking">启动</button>
+						</td>
+					</tr>
+					<tr>
+						<td>评价管理</td>
+						<td>运营中心</td>
+						<td>查询指定门店点评内容</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_crawler_evaluate">启动</button>
+						</td>
+					</tr>
+					<tr>
+						<td rowspan="2">平台活动抓取</td>
+						<td rowspan="2">运营中心</td>
+						<td>营销活动</td>
+						<td>
+							<input type="date" class="startDateTime" placeholder="请输入开始时间"/>
+						</td>
+						<td>
+							<input type="date" class="endDateTime" placeholder="请输入结束时间"/>
+						</td>
+						<td>
+							<input type="text" class="merchantUserName" placeholder="输入用户名，默认全部"/>
+						</td>
+						<td class="mtstate">已完成</td>
+						<td>
+							<button class="mt_sale_activity">启动</button>
+						</td>
+					</tr>
+					
+				</tbody>
+			</table>
+		</div>
+		
+		
+		
 		
 		<script src="js/jquery2.0.js"></script>
 		<script src="js/bootstrap.min.js"></script>
