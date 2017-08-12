@@ -16,6 +16,8 @@ public class MTBill {
     private String desc;
     //支付方式
     private String payType;
+    //订单序列号
+    private String appSeq;
     //订单号
     private String appNo;
     //下单时间
@@ -30,6 +32,8 @@ public class MTBill {
     private String shipType;
     //配送状态
     private String shipStatus;
+    //结算状态
+    private String settleStatus;
     //账单日
     private Date payDay;
     //归属账期
