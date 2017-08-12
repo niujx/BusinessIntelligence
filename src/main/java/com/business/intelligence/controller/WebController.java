@@ -63,35 +63,35 @@ public class WebController {
 
     @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
-    public List<CrawlerStatus> getAllStatus(@RequestParam String crawlerName) {
+    public List<CrawlerStatus> getAllStatus() {
         List<BDCrawlerStatus> bd = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","BD_%");
-        List<MTCrawlerStatus> mt = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","MT_%");
-        List<ELMCrawlerStatus> elm = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","ELM_%");
+        List<BDCrawlerStatus> mt = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","MT_%");
+        List<BDCrawlerStatus> elm = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","ELM_%");
 
         List<CrawlerStatus> crawlerStatuses = new ArrayList<>();
 
-        Iterator bdit = bd.iterator();
+        Iterator<BDCrawlerStatus> bdit = bd.iterator();
 
         while(bdit.hasNext()){
             CrawlerStatus status = new CrawlerStatus();
-            status.setBd((BDCrawlerStatus) bdit.next());
+            status.setBd(bdit.next());
             crawlerStatuses.add(status);
         }
 
 
-        Iterator mtit = mt.iterator();
+        Iterator<BDCrawlerStatus>mtit = mt.iterator();
 
         while(mtit.hasNext()){
             CrawlerStatus status = new CrawlerStatus();
-            status.setMt((MTCrawlerStatus) mtit.next());
+            status.setMt(mtit.next());
             crawlerStatuses.add(status);
         }
 
-        Iterator elmit = elm.iterator();
+        Iterator<BDCrawlerStatus> elmit = elm.iterator();
 
         while(elmit.hasNext()){
             CrawlerStatus status = new CrawlerStatus();
-            status.setElm((ELMCrawlerStatus) elmit.next());
+            status.setElm(elmit.next());
             crawlerStatuses.add(status);
         }
 

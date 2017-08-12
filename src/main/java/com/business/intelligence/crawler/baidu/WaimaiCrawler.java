@@ -66,7 +66,7 @@ public class WaimaiCrawler {
     /**
      * 计数器
      */
-    private int index=0;
+    private int index = 0;
 
     public WaimaiCrawler() {
         if (client == null) {
@@ -137,7 +137,7 @@ public class WaimaiCrawler {
             endTime = DateUtils.formatDate(DateUtils.someMonthAgo(1), "yyyy-MM-dd");
         }
         //更新爬取状态为进行中
-        int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+        int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_CRAWLER);
         if (ii == 1) {
             log.info("更新爬取状态成功");
         } else {
@@ -147,12 +147,15 @@ public class WaimaiCrawler {
         dowShophotsaledish(startTime, endTime);
         dowAllcashtradelist(startTime, endTime);
         dowWthdrawlist(startTime, endTime);
-        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
-        if (f == 1) {
-            log.info("更新爬取状态成功");
-        } else {
-            log.info("更新爬取状态失败");
+        if (index == 3) {
+            int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
+            if (f == 1) {
+                log.info("更新爬取状态成功");
+            } else {
+                log.info("更新爬取状态失败");
+            }
         }
+
     }
 
     /**
@@ -383,19 +386,21 @@ public class WaimaiCrawler {
                     for (HotDishes hot : hotList) {
                         bdDao.insertHotDishes(hot);
                     }
+                    index++;
                     break;
                 case "所有现金账户流水明细导出":
                     List<BookedTable> btList = Parser.btParser(list, shopId);
                     for (BookedTable bt : btList) {
                         bdDao.insertBookedTable(bt);
                     }
+                    index++;
                     break;
                 case "自动提现账户页面导出":
                     List<ShopWthdrawal> swList = Parser.swParser(list, shopId);
                     for (ShopWthdrawal sw : swList) {
                         bdDao.insertShopWthdrawal(sw);
                     }
-
+                    index++;
                     break;
                 default:
                     break;
@@ -463,6 +468,7 @@ public class WaimaiCrawler {
 
     /**
      * 存储cookie
+     *
      * @param userName
      * @param pwd
      */
@@ -473,10 +479,11 @@ public class WaimaiCrawler {
 
     /**
      * 获取本地cookie，并验证是否有效
+     *
      * @param userName 登录名
-     * @param pwd 密码
-     * @param start 开始时间
-     * @param end 结束时间
+     * @param pwd      密码
+     * @param start    开始时间
+     * @param end      结束时间
      * @return
      */
     private boolean getCookiestores(String userName, String pwd, String start, String end) {
@@ -505,7 +512,7 @@ public class WaimaiCrawler {
                 }
             }
         } catch (Exception e) {
-
+            log.error("获取本地cookie失败{}", userName, e);
         }
 
 
@@ -524,27 +531,5 @@ public class WaimaiCrawler {
         String path = HttpUtil.getCaptchaCodeImage(client, httpget);
         return CodeImage.Imgencode(path);
     }
-
-    //
-//    public static void main(String[] args) {
-//
-//
-//        WaimaiCrawler l = new WaimaiCrawler();
-////        l.getExporthistory();
-//        l.getToken();
-//        CloseableHttpClient httpRequest = HttpClients.createDefault();
-//        String url = "https://wmpass.baidu.com/wmpass/openservice/imgcaptcha?token=" + token + "&t=" + System.currentTimeMillis() + "&color=3c78d8";
-//        HttpGet httpget = new HttpGet(url);
-////        String path = HttpUtil.getCaptchaCodeImage(client, httpget);
-////        String imgCode = CodeImage.Imgencode(path);
-//        String pwd = getPassWord("wang170106");
-//        log.info("密码{}", pwd);
-//        ;
-////        Scanner scanner = new Scanner(System.in);
-////        System.out.print("请输入验证码：");
-////        String img = scanner.nextLine();
-//        log.info("图片验证码{}",imgCode);
-//        l.logins("twfhscywjd", pwd, imgCode);
-//    }
 
 }

@@ -60,7 +60,7 @@ public class WaimaiApi {
      */
     public String ouderListGet(String source, String secret, String shopId, String merchantId, String star, String end) {
         //更新爬取状态为进行中
-        int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+        int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_ORDERDETAILS);
         if (ii == 1) {
             logger.info("更新爬取状态成功");
         } else {
@@ -99,7 +99,7 @@ public class WaimaiApi {
                     //此处由于百度不支持批量查询，只能循环查询
                     orderGet(orderUpList.getOrderId(), source, secret, merchantId);
                 }
-                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
+                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_ORDERDETAILS);
                 if (f == 1) {
                     logger.info("更新爬取状态成功");
                 } else {
@@ -169,7 +169,7 @@ public class WaimaiApi {
      */
     public String commentGet(String source, String secret, String shopId, String merchantId, String star, String end) {
         //更新爬取状态为进行中
-        int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+        int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_COMMENT);
         if (ii == 1) {
             logger.info("更新爬取状态成功");
         } else {
@@ -206,7 +206,7 @@ public class WaimaiApi {
                 for (Comment ct : ctList) {
                     bdDao.insertComment(ct);
                 }
-                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
+                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_COMMENT);
                 if (f == 1) {
                     logger.info("更新爬取状态成功");
                 } else {

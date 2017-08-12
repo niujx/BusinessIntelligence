@@ -13,8 +13,8 @@ public class CrawlerStatus {
 
 
     private BDCrawlerStatus bd;
-    private MTCrawlerStatus mt;
-    private ELMCrawlerStatus elm;
+    private BDCrawlerStatus mt;
+    private BDCrawlerStatus elm;
 
 
 

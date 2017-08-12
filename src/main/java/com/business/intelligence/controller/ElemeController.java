@@ -78,7 +78,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerEvaluate", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
-    public String crawlerEvaluate(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerEvaluate(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -97,7 +97,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerActivity", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部活动", httpMethod = "GET")
-    public String crawlerActivity( @RequestParam String userName) {
+    public String crawlerActivity( @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -116,7 +116,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerBill", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部账单", httpMethod = "GET")
-    public String crawlerBill(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerBill(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -134,7 +134,7 @@ public class ElemeController {
     }
     @RequestMapping(value = "crawlerCommodity", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部商品", httpMethod = "GET")
-    public String crawlerCommodity( @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerCommodity( @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -152,7 +152,7 @@ public class ElemeController {
     }
     @RequestMapping(value = "crawlerFlow", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取流量统计", httpMethod = "GET")
-    public String crawlerFlow(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerFlow(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -170,7 +170,7 @@ public class ElemeController {
     }
     @RequestMapping(value = "crawlerSale", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取营业统计", httpMethod = "GET")
-    public String crawlerSale(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerSale(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
@@ -189,7 +189,7 @@ public class ElemeController {
 
     @RequestMapping(value = "crawlerOrder", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取所以订单", httpMethod = "GET")
-    public String crawlerOrder(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam String userName) {
+    public String crawlerOrder(@RequestParam String startTime, @RequestParam String  endTime, @RequestParam(required = false) String userName) {
         if(userName.isEmpty()){
             List<ElemeBean> allElemeBeans = getAllElemeBeans();
             for(ElemeBean eb : allElemeBeans){
