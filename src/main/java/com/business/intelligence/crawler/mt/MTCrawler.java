@@ -2,8 +2,10 @@ package com.business.intelligence.crawler.mt;
 
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.MTDao;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.mt.*;
 import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
@@ -64,7 +66,8 @@ public class MTCrawler extends BaseCrawler {
     private CookieStore cookieStore = new BasicCookieStore();
     private LoginBean loginBean;
     private AccountInfo accountInfo;
-
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
     @Autowired
     private MTDao mtDao;
 
@@ -180,6 +183,14 @@ public class MTCrawler extends BaseCrawler {
                 cookieStore = localCookie;
             }
 
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_ORDER);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
+            }
+
             String reportJson, url;
             int taskId = 0;
             int status;
@@ -247,7 +258,12 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             bizDataReport(fromDate, endDate, true);
         }
-
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_ORDER);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
 
     }
 
@@ -268,6 +284,14 @@ public class MTCrawler extends BaseCrawler {
                 login();
             } else {
                 cookieStore = localCookie;
+            }
+
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_SALE);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
             }
 
             String reportJson, url;
@@ -325,6 +349,12 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             businessStatistics(fromDate, endDate, true);
         }
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_SALE);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 //https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=30&wmPoiId=2843062&sortType=&sortValue=
 
@@ -336,6 +366,14 @@ public class MTCrawler extends BaseCrawler {
                 login();
             } else {
                 cookieStore = localCookie;
+            }
+
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_FLOW);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
             }
 
             String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, "2843062"));
@@ -359,6 +397,12 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             flowanalysis(days, true);
         }
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_FLOW);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     //https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=2017-07-31&endDate=2017-08-06&type=count
@@ -371,6 +415,15 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 cookieStore = localCookie;
             }
+
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_COMMODITY);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
+            }
+
 
             try (CloseableHttpResponse execute = client.execute(new HttpGet(String.format("https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=%s&endDate=%s&type=count", fromDate, endDate)))) {
                 Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
@@ -398,6 +451,12 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             hotSales(fromDate, endDate, true);
         }
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_COMMODITY);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
 
@@ -410,6 +469,14 @@ public class MTCrawler extends BaseCrawler {
                 login();
             } else {
                 cookieStore = localCookie;
+            }
+
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_EVALUATE);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
             }
 
             int i = 1;
@@ -451,6 +518,13 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             comment(fromDate, endDate, true);
         }
+
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_EVALUATE);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     //https://waimaieapp.meituan.com/finance/pc/api/poiSettleBill/historySettleBillList?settleBillStartDate=2017-02-07&settleBillEndDate=2017-08-06&pageSize=10&pageNo=1
@@ -463,6 +537,15 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 cookieStore = localCookie;
             }
+
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_BILL);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
+            }
+
             //https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-11-1029680.xls
             String url = String.format("https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=%s&endDate=%s", fromDate, endDate);
             String json = HttpClientUtil.executeGetWithResult(client, url);
@@ -535,6 +618,13 @@ public class MTCrawler extends BaseCrawler {
             e.printStackTrace();
             historySettleBillList(fromDate, endDate, true);
         }
+
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_BILL);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
     //https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs
@@ -549,6 +639,13 @@ public class MTCrawler extends BaseCrawler {
                 cookieStore = localCookie;
             }
 
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_ACTIVITY);
+            if(ii ==1){
+                log.info("更新爬取状态成功");
+            }else{
+                log.info("更新爬取状态失败");
+            }
 
             Map<String, Object> params = Maps.newHashMap();
             params.put("wmPoiId", accountInfo.wmPoiId);
@@ -627,6 +724,13 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_ACTIVITY);
+        if(f ==1){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
         }
     }
 

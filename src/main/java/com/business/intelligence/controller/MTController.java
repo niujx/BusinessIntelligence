@@ -68,7 +68,7 @@ public class MTController {
 
 
     @RequestMapping(value = "bizDataReport", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @ApiOperation(value = "经营分析----报表下载", httpMethod = "GET")
     public String bizDataReport(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String userName) throws InterruptedException {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
@@ -90,7 +90,7 @@ public class MTController {
 
 
     @RequestMapping(value = "businessStatistics", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @ApiOperation(value = "经营分析----营业统计", httpMethod = "GET")
     public String businessStatistics(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String userName) throws InterruptedException, ParseException {
         startTime = DateFormatUtils.format(DateUtils.parseDate(startTime, "yyyy-MM-dd"), "yyyyMMdd");
         endTime = DateFormatUtils.format(DateUtils.parseDate(endTime, "yyyy-MM-dd"), "yyyyMMdd");
@@ -113,7 +113,7 @@ public class MTController {
     }
 
 
-    @RequestMapping(value = "flowanalysis", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @RequestMapping(value = "经营分析----流量分析", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
     public String flowanalysis(@RequestParam String userName) throws InterruptedException {
         if (userName.isEmpty()) {
@@ -136,7 +136,7 @@ public class MTController {
 
 
     @RequestMapping(value = "hotSales", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @ApiOperation(value = "经营分析----热门商品", httpMethod = "GET")
     public String hotSales(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String userName) throws InterruptedException {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
@@ -179,7 +179,7 @@ public class MTController {
 
 
     @RequestMapping(value = "bill", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @ApiOperation(value = "财务管理---订单对账", httpMethod = "GET")
     public String bill(@RequestParam String startTime, @RequestParam String endTime, @RequestParam String userName) {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
@@ -200,7 +200,7 @@ public class MTController {
     }
 
     @RequestMapping(value = "acts", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @ApiOperation(value = "营销活动---活动", httpMethod = "GET")
     public String acts(@RequestParam String userName) {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
