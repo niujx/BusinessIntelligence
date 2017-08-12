@@ -5,8 +5,8 @@
 
 <mapper namespace="com.business.intelligence.model">
 
-    <select id="getStatusForPlatform" resultType="String" parameterType="String">
-        SELECT STATUS FROM TB_CRAWLER_STATUS WHERE CRAWLER_NAME LIKE #{platformName}
+    <select id="getStatusForPlatform" resultType="BDCrawlerStatus" parameterType="String">
+        SELECT CRAWLER_NAME as crawlerName, STATUS  as status FROM TB_CRAWLER_STATUS WHERE CRAWLER_NAME LIKE #{platformName}
     </select>
 
 
