@@ -2,10 +2,12 @@ package com.business.intelligence.controller;
 
 import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.model.CrawlerName;
+import com.business.intelligence.model.CrawlerStatus;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.util.List;
-
 
 /**
  * Created by zjy on 17/7/19.
@@ -59,14 +60,10 @@ public class WebController {
 
     @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
-    public List getAllStatus() {
-
-
+    public List<CrawlerStatus> getAllStatus(@RequestParam String crawlerName) {
+        CrawlerStatusDao status = new CrawlerStatusDao();
         return sqlSessionTemplate.selectList("com.business.intelligence.model.getAllStatus");
 
     }
-
-
-
 
 }

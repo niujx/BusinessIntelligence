@@ -4,7 +4,7 @@ import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
 import com.business.intelligence.dao.MTDao;
 import com.business.intelligence.model.Authenticate;
-import com.business.intelligence.model.mt.MTOrder;
+import com.business.intelligence.model.mt.*;
 import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.HttpUtil;
@@ -20,6 +20,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.Header;
@@ -32,6 +33,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -126,9 +128,14 @@ public class MTCrawler extends BaseCrawler {
                         accountInfo.setWmPoiId(parse.read("$.data.wmPoiId"));
                         accountInfo.setAccessToken(parse.read("$.data.accessToken"));
                         accountInfo.setAcctId(parse.read("$.data.acctId"));
+
+                        String s = HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com/api/poi/poiList");
+                        log.info("shop name is {}", s);
+                        parse = JsonPath.parse(s);
+                        String name = parse.read("$.data[0].poiName");
+                        accountInfo.setName(name);
+
                         log.info("create account info : {}", accountInfo);
-
-
                         //跨区单点登录地址 更新JSESSIONID
                         String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
                         HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
@@ -197,7 +204,7 @@ public class MTCrawler extends BaseCrawler {
                 if (execute.getStatusLine().getStatusCode() == 200) {
                     Reader reader = new InputStreamReader(new BOMInputStream(execute.getEntity().getContent()), "GBK");
                     CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
-                    log.info("load bizData size is {}",csvRecords.getCurrentLineNumber());
+                    log.info("load bizData size is {}", csvRecords.getCurrentLineNumber());
                     for (CSVRecord record : csvRecords) {
                         log.info("length is {}", record.size());
                         int i = 0;
@@ -249,7 +256,7 @@ public class MTCrawler extends BaseCrawler {
     private Date toDate(String dateStr) {
         if (StringUtils.isBlank(dateStr)) return null;
         try {
-            return DateUtils.parseDate(dateStr.trim(), "yyyy-MM-dd HH:mm:ss");
+            return DateUtils.parseDate(dateStr.trim(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
         } catch (ParseException e) {
             return null;
         }
@@ -282,6 +289,38 @@ public class MTCrawler extends BaseCrawler {
             }
             url = new URI(url).toString();
             log.info("csv url is {}", url);
+            while (true) {
+                try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
+                    if (execute.getStatusLine().getStatusCode() == 200) {
+                        Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
+                        Sheet sheet = hssfWorkbook.getSheetAt(0);
+
+                        if (sheet == null) {
+                            TimeUnit.SECONDS.sleep(10);
+                            log.info("sleep...");
+                            continue;
+                        }
+                        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                            Row hssfRow = sheet.getRow(rowNum);
+                            if (hssfRow != null) {
+                                int i = 0;
+                                MTBusiness mtBusiness = new MTBusiness();
+                                mtBusiness.setDate(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setTotal(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setShopSubsidy(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setMeiTuanSubsidy(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setEstimate(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setValidateOrder(hssfRow.getCell(i++).getStringCellValue());
+                                mtBusiness.setInvalidateOrder(hssfRow.getCell(i++).getStringCellValue());
+                                mtDao.insertBusiness(mtBusiness);
+                                log.info("MTBusiness info is {}", mtBusiness);
+                            }
+
+                        }
+                    }
+                }
+                break;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             businessStatistics(fromDate, endDate, true);
@@ -302,10 +341,20 @@ public class MTCrawler extends BaseCrawler {
             String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, "2843062"));
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
-            int exposureNum = parse.read("$.data.flowGeneralInfoVo.exposureNum");
-            int visitNum = parse.read("$.data.flowGeneralInfoVo.visitNum");
-            int orderNum = parse.read("$.data.flowGeneralInfoVo.orderNum");
-            log.info("exposureNum is {} ,visitNum is {} orderNum is {} ", exposureNum, visitNum, orderNum);
+
+            List<Map<String, Object>> datas = parse.read("$.data.flowGeneralChartVoList", List.class);
+            for (Map<String, Object> data : datas) {
+                log.info("date {} exposureNum is {} ,visitNum is {} orderNum is {} ", data.get("date"), data.get("exposureNum"), data.get("visitNum"), data.get("orderNum"));
+                MTAnalysis analysis = new MTAnalysis();
+                analysis.setId(accountInfo.wmPoiId + "$" + data.get("date"));
+                analysis.setDate(toDate((String) data.get("date")));
+                analysis.setExposureNum((Integer) data.get("exposureNum"));
+                analysis.setVisitNum((Integer) data.get("visitNum"));
+                analysis.setShopName(accountInfo.name);
+                analysis.setOrderNum((Integer) data.get("orderNum"));
+                mtDao.insertAnalysis(analysis);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             flowanalysis(days, true);
@@ -324,12 +373,22 @@ public class MTCrawler extends BaseCrawler {
             }
 
             try (CloseableHttpResponse execute = client.execute(new HttpGet(String.format("https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=%s&endDate=%s&type=count", fromDate, endDate)))) {
-                XSSFWorkbook hssfWorkbook = new XSSFWorkbook(execute.getEntity().getContent());
-                XSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+                Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
+                Sheet sheet = hssfWorkbook.getSheetAt(0);
                 for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
-                    XSSFRow hssfRow = sheet.getRow(rowNum);
-                    if (hssfRow != null) {
-                        log.info("cell is {}", hssfRow.getCell(0));
+                    Row row = sheet.getRow(rowNum);
+                    if (row != null) {
+                        MTHotSales hotSales = new MTHotSales();
+                        hotSales.setId(accountInfo.wmPoiId + "$" + row.getCell(0).getStringCellValue() + "$" + row.getCell(2).getStringCellValue());
+                        hotSales.setDate(toDate(row.getCell(0).getStringCellValue()));
+                        hotSales.setName(row.getCell(1).getStringCellValue());
+                        hotSales.setProductName(row.getCell(2).getStringCellValue());
+                        row.getCell(3).setCellType(Cell.CELL_TYPE_STRING);
+                        hotSales.setSellNum(NumberUtils.toInt(row.getCell(3).getStringCellValue(), 0));
+                        hotSales.setSell(row.getCell(4).getStringCellValue());
+                        hotSales.setPercentageNum(row.getCell(5).getStringCellValue());
+                        hotSales.setPercentagePrice(row.getCell(6).getStringCellValue());
+                        mtDao.insertSales(hotSales);
                     }
 
                 }
@@ -353,10 +412,40 @@ public class MTCrawler extends BaseCrawler {
                 cookieStore = localCookie;
             }
 
-            String url = String.format("http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=1", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate);
-            String json = HttpClientUtil.executeGetWithResult(client, url);
-            log.info("read json is {}", json);
-            ReadContext parse = JsonPath.parse(json);
+            int i = 1;
+            while (true) {
+                String url = String.format("http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
+                String json = HttpClientUtil.executeGetWithResult(client, url);
+                log.info("read json is {}", json);
+                ReadContext parse = JsonPath.parse(json);
+                int pageCount = parse.read("$.data.pageCount");
+                log.info("pageCount is {}", pageCount);
+                int commentSize = parse.read("$.data.comments.length()");
+                for (int index = 0; index < commentSize; index++) {
+                    MTComment mtComment = new MTComment();
+                    String indexKey = "$.data.comments[" + index + "].";
+                    String userName = parse.read(indexKey + "username");
+                    mtComment.setId(accountInfo.wmPoiId + "$" + userName);
+                    mtComment.setUserName(userName);
+                    mtComment.setComment(parse.read(indexKey + "comment"));
+                    mtComment.setCreateTime(toDate(parse.read(indexKey + "createTime")));
+                    List<String> foods = parse.read(indexKey + "orderStatus..food_name", List.class);
+                    mtComment.setFoods(StringUtils.join(foods, ","));
+                    mtComment.setOrderCommentScore(parse.read(indexKey + "order_comment_score"));
+                    mtComment.setShipScore(parse.read(indexKey + "ship_score"));
+                    mtComment.setScoreMeaning(parse.read(indexKey + "scoreMeaning"));
+                    mtComment.setPackagingScore(parse.read(indexKey + "packaging_score"));
+                    mtComment.setTasteScore(parse.read(indexKey + "taste_score"));
+                    mtComment.setName(accountInfo.name);
+                    mtComment.setShipTime(parse.read(indexKey + "ship_time"));
+                    mtDao.insertComment(mtComment);
+                    log.info("comment is {}", mtComment);
+                }
+
+                i++;
+                if (i > pageCount + 1) break;
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,24 +468,31 @@ public class MTCrawler extends BaseCrawler {
             String json = HttpClientUtil.executeGetWithResult(client, url);
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
-            int taskNo = parse.read("$.data.taskNo");
-            //{"data":{"taskNo":1001079},"code":0,"msg":"success"}
+            int code = parse.read("$.code");
+            if (code == 2005) {
+                log.info("not found taskNo is {}", json);
 
+                //   return;
+            }
+
+          //  int taskNo = parse.read("$.data.taskNo");
+            //{"data":{"taskNo":1001079},"code":0,"msg":"success"}
+            int taskNo = 1029680;
 
             String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-06-1001079.xls", format, taskNo);
+            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             log.info("excel url is {}", url);
             while (true) {
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
-                    XSSFWorkbook hssfWorkbook = new XSSFWorkbook(execute.getEntity().getContent());
-                    XSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+                    Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
+                    Sheet sheet = hssfWorkbook.getSheetAt(0);
                     if (sheet == null) {
                         TimeUnit.SECONDS.sleep(10);
                         log.info("sleep...");
                         continue;
                     }
                     for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
-                        XSSFRow hssfRow = sheet.getRow(rowNum);
+                        Row hssfRow = sheet.getRow(rowNum);
                         if (hssfRow != null) {
                             log.info("cell is {}", hssfRow.getCell(0));
                         }
@@ -409,13 +505,13 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            comment(fromDate, endDate, true);
+            historySettleBillList(fromDate, endDate, true);
         }
     }
 
     //https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs
 
-    //评价管理
+    //活动管理
     public void acts(boolean isLogin) {
         try {
             CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
@@ -430,8 +526,6 @@ public class MTCrawler extends BaseCrawler {
             params.put("wmPoiId", accountInfo.wmPoiId);
             String json = HttpClientUtil.executePostWithResult(client, "https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs", params);
             log.info("read json is {}", json);
-            ReadContext parse = JsonPath.parse(json);
-
 
             for (int i = 0; i < 2; i++) {
                 Map<String, String> params1 = Maps.newHashMap();
@@ -495,6 +589,7 @@ public class MTCrawler extends BaseCrawler {
         private Integer acctId;
         private String accessToken;
         private String brandId;
+        private String name;
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -509,13 +604,12 @@ public class MTCrawler extends BaseCrawler {
 
         //  mtCrawler.login(loginBean);
         // mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
-        // mtCrawler.businessStatistics("20170707","20170805",false);
-        // mtCrawler.flowanalysis("30",false);
-        /// mtCrawler.hotSales("2017-07-31","2017-08-06",true);
-        //mtCrawler.comment("2017-08-01", "2017-08-06", true);
-//waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=2017-07-01&endDate=2017-07-30
-        //  mtCrawler.historySettleBillList("2017-07-03", "2017-07-29", true);
-        mtCrawler.acts(true);
+        // mtCrawler.businessStatistics("20170707", "20170805", false);
+        // mtCrawler.flowanalysis("30", false);
+        //mtCrawler.hotSales("2017-07-31","2017-08-06",true);
+        // mtCrawler.comment("2017-08-01", "2017-08-06", true);
+        mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
+        // mtCrawler.acts(true);
     }
 }
 
