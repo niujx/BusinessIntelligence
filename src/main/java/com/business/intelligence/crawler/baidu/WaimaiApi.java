@@ -3,6 +3,8 @@ package com.business.intelligence.crawler.baidu;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.dao.BDDao;
+import com.business.intelligence.dao.CrawlerStatusDao;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.baidu.*;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
@@ -34,6 +36,10 @@ public class WaimaiApi {
     @Autowired
     private BDDao bdDao;
 
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
+
+
     public WaimaiApi() {
         if (client == null) {
             client = HttpClientUtil.getHttpClient(cookieStore);
@@ -52,7 +58,14 @@ public class WaimaiApi {
      * @param shopId 百度商户id
      * @return
      */
-    public String ouderListGet(String source, String secret, String shopId,String merchantId,String star,String end) {
+    public String ouderListGet(String source, String secret, String shopId, String merchantId, String star, String end) {
+        //更新爬取状态为进行中
+        int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+        if (ii == 1) {
+            logger.info("更新爬取状态成功");
+        } else {
+            logger.info("更新爬取状态失败");
+        }
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.list");
         params.put("version", 3);
@@ -63,8 +76,8 @@ public class WaimaiApi {
         params.put("secret", secret);
         Map<String, Object> map = new HashMap<>();
         map.put("shop_id", shopId);
-        map.put("start_time", DateUtils.timeStamp(star,"yyyy-MM-dd"));
-        map.put("end_time", DateUtils.timeStamp(end,"yyyy-MM-dd"));
+        map.put("start_time", DateUtils.timeStamp(star, "yyyy-MM-dd"));
+        map.put("end_time", DateUtils.timeStamp(end, "yyyy-MM-dd"));
         params.put("body", JSONObject.toJSON(map));
 
         List<String> s = new ArrayList<>();
@@ -84,7 +97,13 @@ public class WaimaiApi {
                 List<OrderUpList> orderList = array.toJavaList(OrderUpList.class);
                 for (OrderUpList orderUpList : orderList) {
                     //此处由于百度不支持批量查询，只能循环查询
-                    orderGet(orderUpList.getOrderId(), source, secret,merchantId);
+                    orderGet(orderUpList.getOrderId(), source, secret, merchantId);
+                }
+                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
+                if (f == 1) {
+                    logger.info("更新爬取状态成功");
+                } else {
+                    logger.info("更新爬取状态失败");
                 }
             }
 
@@ -102,7 +121,7 @@ public class WaimaiApi {
      * @param secret  商户秘钥
      * @return
      */
-    private String orderGet(String orderId, String source, String secret,String merchantId) {
+    private String orderGet(String orderId, String source, String secret, String merchantId) {
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.get");
         params.put("version", 3);
@@ -127,9 +146,9 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            if(StringUtils.isNotEmpty(content)){
-                List<OrderDetails> odList = Parser.odParser(content,merchantId);
-                for (OrderDetails od : odList){
+            if (StringUtils.isNotEmpty(content)) {
+                List<OrderDetails> odList = Parser.odParser(content, merchantId);
+                for (OrderDetails od : odList) {
                     bdDao.insertOrderDetails(od);
                 }
             }
@@ -148,7 +167,14 @@ public class WaimaiApi {
      * @param shopId 百度商户id
      * @return
      */
-    public String commentGet(String source, String secret, String shopId,String merchantId,String star,String end) {
+    public String commentGet(String source, String secret, String shopId, String merchantId, String star, String end) {
+        //更新爬取状态为进行中
+        int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+        if (ii == 1) {
+            logger.info("更新爬取状态成功");
+        } else {
+            logger.info("更新爬取状态失败");
+        }
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "shop.comment.get");
         params.put("version", 3);
@@ -160,8 +186,8 @@ public class WaimaiApi {
         Map<String, Object> map = new HashMap<>();
 
         map.put("shop_id", shopId);
-        map.put("start_time", DateUtils.timeStamp(star,"yyyy-MM-dd"));
-        map.put("end_time", DateUtils.timeStamp(end,"yyyy-MM-dd"));
+        map.put("start_time", DateUtils.timeStamp(star, "yyyy-MM-dd"));
+        map.put("end_time", DateUtils.timeStamp(end, "yyyy-MM-dd"));
         params.put("body", JSONObject.toJSON(map));
 
         List<String> s = new ArrayList<>();
@@ -175,10 +201,16 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            if(StringUtils.isNotEmpty(content)){
-                List<Comment> ctList = Parser.ctParser(content,merchantId);
-                for (Comment ct : ctList){
+            if (StringUtils.isNotEmpty(content)) {
+                List<Comment> ctList = Parser.ctParser(content, merchantId);
+                for (Comment ct : ctList) {
                     bdDao.insertComment(ct);
+                }
+                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
+                if (f == 1) {
+                    logger.info("更新爬取状态成功");
+                } else {
+                    logger.info("更新爬取状态失败");
                 }
             }
         } catch (IOException e) {

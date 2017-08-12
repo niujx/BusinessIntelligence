@@ -36,36 +36,39 @@ public class BaiduController {
     @RequestMapping(value = "/getOrderList/", method = RequestMethod.GET)
     @ApiOperation(value = "根据时间段获取订单信息", httpMethod = "GET", notes = "根据时间段获取订单信息")
     public Object getOrderList(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
-                               @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
-        for (User u : userList) {
-            String content = waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
-            return content;
+                               @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end, @ApiParam(required = true, name = "userName", value = "用户名") @RequestParam String userName) {
+        User u = userDao.ifExists(userName, Platform.MT.name());
+        if (u != null) {
+            waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
+            return "OrderList is ok";
         }
-        return "获取用户名密码失败";
+        String content = "没有找到 {" + userName + "} 用户的信息";
+        return content;
     }
 
     @RequestMapping(value = "/getComment/", method = RequestMethod.GET)
     @ApiOperation(value = "根据时间段获取评论信息", httpMethod = "GET", notes = "根据时间段获取评论信息")
     public Object getComment(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
-                             @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
-        for (User u : userList) {
-            String content = waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
-            return content;
+                             @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end, @ApiParam(required = true, name = "userName", value = "用户名") @RequestParam String userName) {
+        User u = userDao.ifExists(userName, Platform.MT.name());
+        if (u != null) {
+            waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star.replace("/", "-"), end.replace("/", "-"));
+            return "Comment is ok";
         }
-        return "获取用户名密码失败";
+        String content = "没有找到 {" + userName + "} 用户的信息";
+        return content;
     }
 
     @RequestMapping(value = "/getBaiduCarwler/", method = RequestMethod.GET)
     @ApiOperation(value = "根据时间段获取百度外卖商户数据", httpMethod = "GET", notes = "根据时间段获取百度外卖商户数据")
     public Object getBaiduCarwler(HttpServletRequest request, @ApiParam(required = true, name = "star", value = "起始时间") @RequestParam String star,
-                               @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end) {
-        List<User> userList = userDao.getUsersForPlatform(Platform.BD);
-        String content = "{errno:0000,errmsg:抓取进行中}";
-        for (User u : userList) {
-            content = waimaiCrawler.logins(u.getUserName(), u.getPassWord(), star.replace("/", "-"), end.replace("/", "-"), u.getMerchantId());
+                                  @ApiParam(required = true, name = "end", value = "结束时间") @RequestParam String end, @ApiParam(required = true, name = "userName", value = "用户名") @RequestParam String userName) {
+        User u = userDao.ifExists(userName, Platform.MT.name());
+        if (u != null) {
+            waimaiCrawler.logins(u.getUserName(), u.getPassWord(), star.replace("/", "-"), end.replace("/", "-"), u.getMerchantId());
+            return "BaiduCarwler is ok";
         }
+        String content = "没有找到 {" + userName + "} 用户的信息";
         return content;
     }
 }

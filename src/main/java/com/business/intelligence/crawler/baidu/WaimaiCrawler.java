@@ -3,6 +3,8 @@ package com.business.intelligence.crawler.baidu;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.dao.BDDao;
+import com.business.intelligence.dao.CrawlerStatusDao;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.baidu.BookedTable;
 import com.business.intelligence.model.baidu.BusinessData;
 import com.business.intelligence.model.baidu.HotDishes;
@@ -47,6 +49,9 @@ public class WaimaiCrawler {
 
     @Autowired
     private YmlConfig config;
+
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     @Autowired
     private BDDao bdDao;
@@ -138,7 +143,7 @@ public class WaimaiCrawler {
     private void dowShopdata(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shopdata");
-           // https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=20170803&endTime=20170809
+            // https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=20170803&endTime=20170809
             HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/shopdata?display=json&type=1&startTime=" + startTime.replace("-", "") + "&endTime=" + endTime.replace("-", "") + "&act=export");
             dwd.addHeader("referer", "https://wmcrm.baidu.com/crm?qt=shopdata");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
@@ -150,7 +155,13 @@ public class WaimaiCrawler {
             File file = new File("/Users/wangfukun/other/img/");
             File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
-
+            //更新爬取状态为进行中
+            int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+            if (ii == 1) {
+                log.info("更新爬取状态成功");
+            } else {
+                log.info("更新爬取状态失败");
+            }
             try {
                 List<String> list = CSVFileUtil.importCsv(target);
                 List<BusinessData> bdList = Parser.bdParser(list, shopId);
@@ -181,7 +192,13 @@ public class WaimaiCrawler {
             try {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
-                log.info(content);
+                //更新爬取状态为进行中
+                int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+                if (ii == 1) {
+                    log.info("更新爬取状态成功");
+                } else {
+                    log.info("更新爬取状态失败");
+                }
                 if (isErrorCode(content)) {
                     getExporthistory("热销菜品导出");
                 }
@@ -216,6 +233,13 @@ public class WaimaiCrawler {
             try {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
+                //更新爬取状态为进行中
+                int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+                if (ii == 1) {
+                    log.info("更新爬取状态成功");
+                } else {
+                    log.info("更新爬取状态失败");
+                }
                 if (isErrorCode(content)) {
                     getExporthistory("所有现金账户流水明细导出");
                 }
@@ -246,6 +270,13 @@ public class WaimaiCrawler {
             try {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
+                //更新爬取状态为进行中
+                int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
+                if (ii == 1) {
+                    log.info("更新爬取状态成功");
+                } else {
+                    log.info("更新爬取状态失败");
+                }
                 if (isErrorCode(content)) {
                     getExporthistory("自动提现账户页面导出");
                 }
@@ -346,27 +377,37 @@ public class WaimaiCrawler {
                 log.info("{0}没有需要的数据", name);
                 return;
             }
+            int f = 0;
             switch (name) {
                 case "热销菜品导出":
                     List<HotDishes> hotList = Parser.hotParser(list, shopId);
                     for (HotDishes hot : hotList) {
                         bdDao.insertHotDishes(hot);
                     }
+                    f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
+
                     break;
                 case "所有现金账户流水明细导出":
                     List<BookedTable> btList = Parser.btParser(list, shopId);
                     for (BookedTable bt : btList) {
                         bdDao.insertBookedTable(bt);
                     }
+                    f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
                     break;
                 case "自动提现账户页面导出":
                     List<ShopWthdrawal> swList = Parser.swParser(list, shopId);
                     for (ShopWthdrawal sw : swList) {
                         bdDao.insertShopWthdrawal(sw);
                     }
+                    f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
                     break;
                 default:
                     break;
+            }
+            if (f == 1) {
+                log.info("更新爬取状态成功");
+            } else {
+                log.info("更新爬取状态失败");
             }
         } catch (Exception e) {
             log.error("下载 【{0}】 csv失败", name, e);
