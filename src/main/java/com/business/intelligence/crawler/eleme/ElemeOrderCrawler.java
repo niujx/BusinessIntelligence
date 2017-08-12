@@ -1,6 +1,8 @@
 package com.business.intelligence.crawler.eleme;
 
+import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
+import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeMessage;
 import com.business.intelligence.model.ElemeModel.ElemeOrder;
@@ -34,6 +36,8 @@ public class ElemeOrderCrawler extends ElemeCrawler{
     private Date endCrawlerDate = crawlerDate;
     @Autowired
     private ElemeDao elemeDao;
+    @Autowired
+    private CrawlerStatusDao crawlerStatusDao;
 
     private static final String COUNTURL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.countOrder";
     private static final String URL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.queryOrder";
@@ -65,12 +69,21 @@ public class ElemeOrderCrawler extends ElemeCrawler{
     }
 
     public void doRun(ElemeBean elemeBean,String startTime,String endTime) {
+        //更新爬取状态为进行中
+        int i = crawlerStatusDao.updateStatusING(CrawlerName.ELM_CRAWLER_ORDER);
+        if(i ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
+        //开始转换前台转入的时间
         Date start = DateUtils.string2Date(startTime);
         Date end = DateUtils.string2Date(endTime);
         if(start != null && end != null ){
             this.crawlerDate =start;
             this.endCrawlerDate = end;
         }
+        //开始爬取
         log.info("开始爬取饿了么订单，日期： {} 到 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
         ElemeMessage orderText = getOrderText(getClient(elemeBean));
         List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
@@ -78,6 +91,13 @@ public class ElemeOrderCrawler extends ElemeCrawler{
            elemeDao.insertOrder(elemeOrder);
         }
         log.info("用户名为 {} 的订单已入库完毕",username);
+        //更新爬取状态为已完成
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ORDER);
+        if(f ==0){
+            log.info("更新爬取状态成功");
+        }else{
+            log.info("更新爬取状态失败");
+        }
     }
 
 

@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class ElemeActivity {
-    //主键 id~shopId
+    //主键 id~shopId~crawlerDate
     private String pri;
+    //爬取的时间
+    private String crawlerDate;
     //网页名称：id
     private Integer id;
     //商户ID
@@ -33,19 +35,5 @@ public class ElemeActivity {
     //是否与其他优惠共享
     private String isShare;
 
-    @Override
-    public String toString() {
-        return "ElemeActivity{" +
-                "id=" + id +
-                ", shopId=" + shopId +
-                ", beginDate='" + beginDate + '\'' +
-                ", endDate='" + endDate + '\'' +
-                ", name='" + name + '\'' +
-                ", status='" + status + '\'' +
-                ", content='" + content + '\'' +
-                ", createTime='" + createTime + '\'' +
-                ", description='" + description + '\'' +
-                ", isShare='" + isShare + '\'' +
-                '}';
-    }
+
 }

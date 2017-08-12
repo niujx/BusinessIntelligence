@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Created by zjy on 17/8/11.
  */
 @Component
-public class CrawlerStatus {
+public class CrawlerStatusDao {
 
 
     @Autowired
