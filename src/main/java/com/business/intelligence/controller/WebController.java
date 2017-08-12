@@ -61,25 +61,43 @@ public class WebController {
 //        return "状态获取失败";
 //    }
 //
-
-
-
-
     @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
-    public String getAllStatus() {
+    public List<CrawlerStatus> getAllStatus() {
         List<BDCrawlerStatus> bd = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","BD_%");
         List<BDCrawlerStatus> mt = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","MT_%");
         List<BDCrawlerStatus> elm = sqlSessionTemplate.selectList("com.business.intelligence.model.getStatusForPlatform","ELM_%");
+
+        List<CrawlerStatus> crawlerStatuses = new ArrayList<>();
+
+        Iterator<BDCrawlerStatus> bdit = bd.iterator();
+
+        while(bdit.hasNext()){
+            CrawlerStatus status = new CrawlerStatus();
+            status.setBd(bdit.next());
+            crawlerStatuses.add(status);
+        }
+        Iterator<BDCrawlerStatus>mtit = mt.iterator();
+
+        while(mtit.hasNext()){
+            CrawlerStatus status = new CrawlerStatus();
+            status.setMt(mtit.next());
+            crawlerStatuses.add(status);
+        }
+
+        Iterator<BDCrawlerStatus> elmit = elm.iterator();
+
+        while(elmit.hasNext()){
+            CrawlerStatus status = new CrawlerStatus();
+            status.setElm(elmit.next());
+            crawlerStatuses.add(status);
+        }
 
         JSONObject object = new JSONObject();
 
         object.put("bd",bd);
         object.put("mt",mt);
         object.put("elm",elm);
-
-
-
         return object.toJSONString();
 
     }

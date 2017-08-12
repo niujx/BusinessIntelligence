@@ -1,5 +1,7 @@
 package com.business.intelligence.task;
 
+import com.business.intelligence.crawler.baidu.WaimaiApi;
+import com.business.intelligence.crawler.baidu.WaimaiCrawler;
 import com.business.intelligence.crawler.eleme.ElemeCrawlerAll;
 import com.business.intelligence.crawler.mt.MTCrawler;
 import com.business.intelligence.dao.UserDao;
@@ -32,6 +34,12 @@ public class CrawlerTasks {
     @Autowired
     private MTCrawler mtCrawler;
 
+    @Autowired
+    private WaimaiCrawler bdCrawler;
+
+    @Autowired
+    private WaimaiApi bdApi;
+
     @Scheduled(cron = "* * 3 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
@@ -62,6 +70,21 @@ public class CrawlerTasks {
         }
     }
 
+    @Scheduled(cron = "* * 3 30 * *")
+    public void runAllBdCrawler() {
+        List<User> users = getAllBdUser();
+        Date startDate = new Date();
+        Date endDate = DateUtils.addDays(new Date(), -30);
+
+        String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
+        String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
+        for (User u : users) {
+            bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+            bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+            bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+        }
+    }
+
     public List<Authenticate> getAllUser() {
         log.info("开始获取美团所有商户信息");
         List<Authenticate> list = new ArrayList<>();
@@ -74,5 +97,10 @@ public class CrawlerTasks {
         }
         log.info("所有美团商户信息已经加载完成");
         return list;
+    }
+
+    public List<User> getAllBdUser() {
+        List<User> users = userdao.getUsersForPlatform(Platform.BD);
+        return users;
     }
 }
