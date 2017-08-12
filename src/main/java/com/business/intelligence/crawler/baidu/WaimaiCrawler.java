@@ -151,7 +151,7 @@ public class WaimaiCrawler {
         dowAllcashtradelist(startTime, endTime);
         dowWthdrawlist(startTime, endTime);
         log.info("当前index状态：{}",index);
-        if (index == 3) {
+        if (index == 4) {
             int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
             if (f == 1) {
                 log.info("更新爬取状态成功");
@@ -193,6 +193,7 @@ public class WaimaiCrawler {
                 for (BusinessData bd : bdList) {
                     bdDao.insertBusinessData(bd);
                 }
+                index++;
                 log.info("曝光数据入库成功");
             } catch (Exception e) {
                 log.error("解析曝光数据失败", e);
@@ -322,12 +323,12 @@ public class WaimaiCrawler {
                             //热销菜品的返回内容需要重组
                             contentList = "{\"list\":" + contentList + "}";
                         }
-                        log.info(contentList);
                         JSONObject json = JSONObject.parseObject(contentList);
                         JSONArray list = json.getJSONArray("list");
                         for (int i = 0; i < list.size(); i++) {
                             JSONObject j = list.getJSONObject(i);
                             String dow = j.getString("download_url");//下载链接
+                            log.info("{0}的下载链接{1}",name,dow);
                             String create_time = j.getString("create_time");//导出时间
                             if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
                                 StringBuilder key = new StringBuilder(name).append("_").append(create_time);
