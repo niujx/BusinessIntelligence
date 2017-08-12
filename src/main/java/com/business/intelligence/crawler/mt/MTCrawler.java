@@ -34,9 +34,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -463,38 +460,68 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 cookieStore = localCookie;
             }
-
+            //https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-11-1029680.xls
             String url = String.format("https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=%s&endDate=%s", fromDate, endDate);
             String json = HttpClientUtil.executeGetWithResult(client, url);
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
             int code = parse.read("$.code");
+            String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
             if (code == 2005) {
                 log.info("not found taskNo is {}", json);
-
-                //   return;
+                return;
             }
 
-          //  int taskNo = parse.read("$.data.taskNo");
             //{"data":{"taskNo":1001079},"code":0,"msg":"success"}
-            int taskNo = 1029680;
+            int taskNo = parse.read("$.data.taskNo");
+//            date="2017-08-11";
 
             String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
+            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", date, taskNo);
             log.info("excel url is {}", url);
             while (true) {
+
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
-                    Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
-                    Sheet sheet = hssfWorkbook.getSheetAt(0);
+                    Workbook workbook = WorkbookFactory.create(execute.getEntity().getContent());
+                    Sheet sheet = workbook.getSheetAt(0);
                     if (sheet == null) {
                         TimeUnit.SECONDS.sleep(10);
                         log.info("sleep...");
                         continue;
                     }
                     for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
-                        Row hssfRow = sheet.getRow(rowNum);
-                        if (hssfRow != null) {
-                            log.info("cell is {}", hssfRow.getCell(0));
+                        Row row = sheet.getRow(rowNum);
+                        if (row != null) {
+                            MTBill mtBill = new MTBill();
+                            mtBill.setName(row.getCell(0).getStringCellValue());
+                            mtBill.setTradeType(row.getCell(1).getStringCellValue());
+                            mtBill.setDesc(row.getCell(2).getStringCellValue());
+                            mtBill.setPayType(row.getCell(3).getStringCellValue());
+                            mtBill.setAppSeq(row.getCell(4).getStringCellValue());
+                            mtBill.setAppNo(row.getCell(5).getStringCellValue());
+                            mtBill.setId(accountInfo.wmPoiId + "$" + mtBill.getAppNo());
+                            mtBill.setOrderCreateTime(toDate(row.getCell(6).getStringCellValue()));
+                            mtBill.setDoneTime(toDate(row.getCell(7).getStringCellValue()));
+                            mtBill.setRefundTime(toDate(row.getCell(8).getStringCellValue()));
+                            mtBill.setOrderStatus(row.getCell(9).getStringCellValue());
+                            mtBill.setShipType(row.getCell(10).getStringCellValue());
+                            mtBill.setShipStatus(row.getCell(11).getStringCellValue());
+                            mtBill.setSettleStatus(row.getCell(12).getStringCellValue());
+                            mtBill.setPayDay(toDate(row.getCell(13).getStringCellValue()));
+                            mtBill.setVestingDay(toDate(row.getCell(14).getStringCellValue()));
+                            mtBill.setShopPrice(row.getCell(15).getStringCellValue());
+                            mtBill.setTotalPrice(row.getCell(16).getStringCellValue());
+                            mtBill.setPromotionPrice(row.getCell(17).getStringCellValue());
+                            mtBill.setMeiTuanSubsidy(row.getCell(18).getStringCellValue());
+                            mtBill.setServiceCharge(row.getCell(19).getStringCellValue());
+                            mtBill.setShipPrice(row.getCell(20).getStringCellValue());
+                            mtBill.setOnlinePrice(row.getCell(21).getStringCellValue());
+                            mtBill.setOfflnePirce(row.getCell(22).getStringCellValue());
+                            mtBill.setRate(row.getCell(23).getStringCellValue());
+                            mtBill.setGuarantees(row.getCell(24).getStringCellValue());
+                            mtBill.setDiscount(row.getCell(25).getStringCellValue());
+                            log.info("bill info is {}", mtBill);
+                            mtDao.insertBill(mtBill);
                         }
 
                     }
@@ -608,8 +635,8 @@ public class MTCrawler extends BaseCrawler {
         // mtCrawler.flowanalysis("30", false);
         //mtCrawler.hotSales("2017-07-31","2017-08-06",true);
         // mtCrawler.comment("2017-08-01", "2017-08-06", true);
-        mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
-        // mtCrawler.acts(true);
+      //  mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
+         mtCrawler.acts(true);
     }
 }
 

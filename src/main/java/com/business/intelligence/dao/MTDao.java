@@ -44,6 +44,7 @@ public class MTDao {
             log.warn("insert error info {}", ExceptionUtils.getStackTrace(e));
         }
     }
+
     public void insertComment(MTComment comment) {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.mt.insertComment", comment);
@@ -52,9 +53,9 @@ public class MTDao {
         }
     }
 
-    public void insertBill(MTComment comment) {
+    public void insertBill(MTBill bill) {
         try {
-            sqlSessionTemplate.insert("com.business.intelligence.mt.insertBill", comment);
+            sqlSessionTemplate.insert("com.business.intelligence.mt.insertBill", bill);
         } catch (Exception e) {
             log.warn("insert error info {}", ExceptionUtils.getStackTrace(e));
         }

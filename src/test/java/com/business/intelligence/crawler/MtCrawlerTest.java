@@ -71,4 +71,16 @@ public class MtCrawlerTest extends BaseTest {
         crawler.comment("2017-08-01", "2017-08-06", true);
     }
 
+
+    @Test
+    public void bill(){
+        Authenticate authenticate = new Authenticate();
+        authenticate.setUserName("wmONEd46480");
+        authenticate.setPassword("RHpXW72879");
+        MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+        loginBean.setAuthenticate(authenticate);
+        crawler.setLoginBean(loginBean);
+        crawler.historySettleBillList("2017-07-05", "2017-08-02", true);
+    }
+
 }

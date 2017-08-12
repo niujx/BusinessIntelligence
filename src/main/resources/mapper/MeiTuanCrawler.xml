@@ -154,7 +154,10 @@
         ONLINE_PIRCE,
         OFFLINE_PRICE,
         RATE,
-        DISCOUNT) VALUES
+        GUARANTEES,
+        DISCOUNT,
+        APP_SEQ,
+        SETTLE_STATUS) VALUES
         (
         #{id,jdbcType=VARCHAR},
         #{name,jdbcType=VARCHAR},
@@ -181,6 +184,8 @@
         #{rate,jdbcType=VARCHAR},
         #{guarantees,jdbcType=VARCHAR},
         #{discount,jdbcType=VARCHAR},
+        #{appSeq,jdbcType=VARCHAR},
+        #{settleStatus,jdbcType=VARCHAR}
         )
     </insert>
 
