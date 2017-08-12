@@ -59,6 +59,7 @@ public class WaimaiApi {
      * @return
      */
     public String ouderListGet(String source, String secret, String shopId, String merchantId, String star, String end) {
+        logger.info("获取订单列表{}",merchantId);
         //更新爬取状态为进行中
         int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_ORDERDETAILS);
         if (ii == 1) {
@@ -122,6 +123,7 @@ public class WaimaiApi {
      * @return
      */
     private String orderGet(String orderId, String source, String secret, String merchantId) {
+        logger.info("获取订单详情{}",orderId);
         Map<String, Object> params = new HashMap<>();
         params.put("cmd", "order.get");
         params.put("version", 3);
@@ -150,6 +152,7 @@ public class WaimaiApi {
                 List<OrderDetails> odList = Parser.odParser(content, merchantId);
                 for (OrderDetails od : odList) {
                     bdDao.insertOrderDetails(od);
+                    logger.info("订单详情入库成功{}",orderId);
                 }
             }
 
@@ -168,6 +171,7 @@ public class WaimaiApi {
      * @return
      */
     public String commentGet(String source, String secret, String shopId, String merchantId, String star, String end) {
+        logger.info("获取用户评论列表{}",merchantId);
         //更新爬取状态为进行中
         int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_COMMENT);
         if (ii == 1) {
@@ -205,6 +209,7 @@ public class WaimaiApi {
                 List<Comment> ctList = Parser.ctParser(content, merchantId);
                 for (Comment ct : ctList) {
                     bdDao.insertComment(ct);
+                    logger.info("用户评论入库成功{}",merchantId);
                 }
                 int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_COMMENT);
                 if (f == 1) {

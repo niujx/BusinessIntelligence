@@ -84,6 +84,7 @@ public class WaimaiCrawler {
      * @param shopId   商户id
      */
     public String logins(String userName, String passWord, String start, String end, String shopId) {
+        log.info("开始登录。。。。。{}",userName);
         this.shopId = shopId;
         boolean tag = getCookiestores(userName, passWord, start, end);
         if (tag) {
@@ -117,6 +118,7 @@ public class WaimaiCrawler {
                 rget = HttpClientUtil.get(shouye);
                 content = HttpClientUtil.executeGetWithResult(client, rget);
                 if (content.contains("百度商户")) {
+                    log.info("登录成功。。。。{}",userName);
                     loadBills(start, end);
                     setCookieStores(userName, passWord);
                 }
@@ -132,6 +134,7 @@ public class WaimaiCrawler {
      * 统一下载
      */
     private void loadBills(String startTime, String endTime) {
+        log.info("准备请求下载页面开始。。。。。");
         if (StringUtils.isEmpty(startTime) && StringUtils.isEmpty(endTime)) {
             startTime = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
             endTime = DateUtils.formatDate(DateUtils.someMonthAgo(1), "yyyy-MM-dd");
@@ -147,6 +150,7 @@ public class WaimaiCrawler {
         dowShophotsaledish(startTime, endTime);
         dowAllcashtradelist(startTime, endTime);
         dowWthdrawlist(startTime, endTime);
+        log.info("当前index状态：{}",index);
         if (index == 3) {
             int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
             if (f == 1) {
@@ -182,13 +186,14 @@ public class WaimaiCrawler {
             }
             File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
             FileUtils.copyInputStreamToFile(in, target);
-
+            log.info("曝光数据下载成功");
             try {
                 List<String> list = CSVFileUtil.importCsv(target);
                 List<BusinessData> bdList = Parser.bdParser(list, shopId);
                 for (BusinessData bd : bdList) {
                     bdDao.insertBusinessData(bd);
                 }
+                log.info("曝光数据入库成功");
             } catch (Exception e) {
                 log.error("解析曝光数据失败", e);
             }
@@ -214,6 +219,7 @@ public class WaimaiCrawler {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
                 if (isErrorCode(content)) {
+                    log.info("请求【热销菜品】成功");
                     getExporthistory("热销菜品导出");
                 }
             } catch (Exception e1) {
@@ -248,6 +254,7 @@ public class WaimaiCrawler {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
                 if (isErrorCode(content)) {
+                    log.info("请求【现金账户流水明细】成功");
                     getExporthistory("所有现金账户流水明细导出");
                 }
             } catch (Exception e1) {
@@ -278,6 +285,7 @@ public class WaimaiCrawler {
                 HttpEntity entity = response.getEntity();
                 String content = EntityUtils.toString(entity, "UTF-8");
                 if (isErrorCode(content)) {
+                    log.info("请求【自动提现账户】成功");
                     getExporthistory("自动提现账户页面导出");
                 }
             } catch (Exception e1) {
@@ -332,6 +340,7 @@ public class WaimaiCrawler {
                                 if (map.size() > 0) {
                                     //当map中有值时，并且下载链接不为空、value为false时进行下载
                                     if (StringUtils.isNotEmpty(dow) && !map.get(rowKey)) {
+                                        log.info("开始下载{}",name);
                                         dowCsv(name, dow);
                                         map.put(rowKey, true);
                                     }
@@ -405,7 +414,7 @@ public class WaimaiCrawler {
                 default:
                     break;
             }
-
+            log.info("入库成功{}",name);
         } catch (Exception e) {
             log.error("下载 【{0}】 csv失败", name, e);
         }
@@ -427,6 +436,7 @@ public class WaimaiCrawler {
                 JSONObject json = JSONObject.parseObject(content);
                 JSONObject data = json.getJSONObject("data");
                 token = data.getString("token");
+                log.info("获得登录token{}",token);
             }
         } catch (Exception e) {
             log.error("获取图片验证token出错", e);
@@ -448,6 +458,7 @@ public class WaimaiCrawler {
             if (b != null) {
                 StringBuffer stringBuffer = new StringBuffer(new BASE64Encoder().encode(b).replace("=", ""));//base64加密
                 upass = stringBuffer.reverse().toString();//加密结果倒叙
+                log.info("获取加密后的密码{}",upass);
             }
 
         } catch (Exception e) {
@@ -473,6 +484,7 @@ public class WaimaiCrawler {
      * @param pwd
      */
     private void setCookieStores(String userName, String pwd) {
+        log.info("存储本地cookie{}",userName);
         CookieStoreUtils.storeCookie(cookieStore, MD5.md5(userName + "_" + pwd) + ".cookies");
     }
 
@@ -498,6 +510,7 @@ public class WaimaiCrawler {
                 HttpGet get = HttpClientUtil.get(shouye);
                 String content = HttpClientUtil.executeGetWithResult(client, get);
                 if (content.contains("百度商户")) {
+                    log.info("本地cookie登录成功{}",userName);
                     try {
                         new Thread(new Runnable() {
                             public void run() {
