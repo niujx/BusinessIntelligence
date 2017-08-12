@@ -25,7 +25,7 @@ public enum CrawlerName {
     MT_GOODS_SALE, //热销商品
     MT_ORDER_CHECKING, //订单对账
     MT_CRAWLER_EVALUATE, //指定门店点评内容
-    MT_SHOP_ACTIVITY, //店铺活动
+    MT_SALE_ACTIVITY, //店铺活动
 
 
 }
