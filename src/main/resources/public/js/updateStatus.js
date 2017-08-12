@@ -14,9 +14,18 @@ window.onload=function(){
 			success:function(e){
 				//e 为请求成功后返回的数据
 				
-				$(".state").each(function(i,val){
-					$(val).html(e[i].status);
+				$(".elmstate").each(function(i,val){
+					$(val).html(e.eleme[i].status);
 				})
+				$(".mtstate").each(function(i,val){
+					$(val).html(e.mt[i].status);
+				})
+				$(".bdstate").each(function(i,val){
+					$(val).html(e.bd[i].status);
+				})
+				
+				
+				
 				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
