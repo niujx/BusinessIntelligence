@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +26,7 @@ import java.util.List;
 @RestController
 @Api(value = "/bi/v1/", description = "百度外卖api")
 @RequestMapping("/bi/v1/")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class BaiduController {
     private static final Logger logger = LoggerFactory.getLogger(BaiduController.class);
     @Autowired
