@@ -1,5 +1,6 @@
 package com.business.intelligence.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.CrawlerStatus;
@@ -60,7 +61,6 @@ public class WebController {
 //        return "状态获取失败";
 //    }
 //
-
     @RequestMapping(value = "getAllStatus", method = RequestMethod.GET)
     @ApiOperation(value = "获取爬虫抓取状态", httpMethod = "GET")
     public List<CrawlerStatus> getAllStatus() {
@@ -77,8 +77,6 @@ public class WebController {
             status.setBd(bdit.next());
             crawlerStatuses.add(status);
         }
-
-
         Iterator<BDCrawlerStatus>mtit = mt.iterator();
 
         while(mtit.hasNext()){
@@ -95,8 +93,12 @@ public class WebController {
             crawlerStatuses.add(status);
         }
 
+        JSONObject object = new JSONObject();
 
-        return crawlerStatuses;
+        object.put("bd",bd);
+        object.put("mt",mt);
+        object.put("elm",elm);
+        return object.toJSONString();
 
     }
 
