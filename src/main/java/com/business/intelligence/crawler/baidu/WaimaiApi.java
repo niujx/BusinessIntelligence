@@ -16,6 +16,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Service
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WaimaiApi {
 
     private static final Logger logger = LoggerFactory.getLogger(WaimaiApi.class);

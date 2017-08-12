@@ -24,7 +24,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 @EnableAsync
 @Service
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WaimaiCrawler {
 
     private static final Logger log = LoggerFactory.getLogger(WaimaiCrawler.class);
@@ -84,7 +87,7 @@ public class WaimaiCrawler {
      * @param shopId   商户id
      */
     public String logins(String userName, String passWord, String start, String end, String shopId) {
-        log.info("开始登录。。。。。{}",userName);
+        log.info("开始登录。。。。。{}", userName);
         this.shopId = shopId;
         boolean tag = getCookiestores(userName, passWord, start, end);
         if (tag) {
@@ -118,7 +121,7 @@ public class WaimaiCrawler {
                 rget = HttpClientUtil.get(shouye);
                 content = HttpClientUtil.executeGetWithResult(client, rget);
                 if (content.contains("百度商户")) {
-                    log.info("登录成功。。。。{}",userName);
+                    log.info("登录成功。。。。{}", userName);
                     loadBills(start, end);
                     setCookieStores(userName, passWord);
                 }
@@ -150,14 +153,11 @@ public class WaimaiCrawler {
         dowShophotsaledish(startTime, endTime);
         dowAllcashtradelist(startTime, endTime);
         dowWthdrawlist(startTime, endTime);
-        log.info("当前index状态：{}",index);
-        if (index == 4) {
-            int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
-            if (f == 1) {
-                log.info("更新爬取状态成功");
-            } else {
-                log.info("更新爬取状态失败");
-            }
+        int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
+        if (f == 1) {
+            log.info("更新爬取状态成功");
+        } else {
+            log.info("更新爬取状态失败");
         }
 
     }
@@ -167,7 +167,7 @@ public class WaimaiCrawler {
      *
      * @return
      */
-    @Async
+//    @Async
     private void dowShopdata(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shopdata");
@@ -208,7 +208,7 @@ public class WaimaiCrawler {
      *
      * @return
      */
-    @Async
+//    @Async
     private void dowShophotsaledish(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shophotsaledish");
@@ -239,7 +239,7 @@ public class WaimaiCrawler {
      * @param startTime
      * @param endTime
      */
-    @Async
+//    @Async
     private void dowAllcashtradelist(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm/settlement/balanceaccounttpl");
@@ -274,7 +274,7 @@ public class WaimaiCrawler {
      * @param startTime
      * @param endTime
      */
-    @Async
+//    @Async
     private void dowWthdrawlist(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=getstaterecordlist");
@@ -304,7 +304,7 @@ public class WaimaiCrawler {
      *
      * @param name 导出类型
      */
-    public synchronized void getExporthistory(String name) {
+    public void getExporthistory(String name) {
         boolean flag = true;
         String now = DateUtils.formatDate(new Date(), "yyyy-MM-dd");//记录当前日期，用于下载判断
         while (flag) {
@@ -328,7 +328,8 @@ public class WaimaiCrawler {
                         for (int i = 0; i < list.size(); i++) {
                             JSONObject j = list.getJSONObject(i);
                             String dow = j.getString("download_url");//下载链接
-                            log.info("{0}的下载链接{1}",name,dow);
+                            String tName = j.getString("name");
+                            log.info("{" + name + "}的下载链接{" + dow + "}");
                             String create_time = j.getString("create_time");//导出时间
                             if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
                                 StringBuilder key = new StringBuilder(name).append("_").append(create_time);
@@ -340,8 +341,8 @@ public class WaimaiCrawler {
                                 }
                                 if (map.size() > 0) {
                                     //当map中有值时，并且下载链接不为空、value为false时进行下载
-                                    if (StringUtils.isNotEmpty(dow) && !map.get(rowKey)) {
-                                        log.info("开始下载{}",name);
+                                    if (StringUtils.isNotEmpty(dow) && !map.get(rowKey) && name.equals(tName)) {
+                                        log.info("开始下载{}", name);
                                         dowCsv(name, dow);
                                         map.put(rowKey, true);
                                     }
@@ -370,7 +371,7 @@ public class WaimaiCrawler {
      * @param url
      */
 //    @Async
-    private synchronized void dowCsv(String name, String url) {
+    private void dowCsv(String name, String url) {
         try {
             HttpGet dwd = HttpClientUtil.get(url);
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
@@ -415,7 +416,7 @@ public class WaimaiCrawler {
                 default:
                     break;
             }
-            log.info("入库成功{}",name);
+            log.info("入库成功{}", name);
         } catch (Exception e) {
             log.error("下载 【{0}】 csv失败", name, e);
         }
@@ -437,7 +438,7 @@ public class WaimaiCrawler {
                 JSONObject json = JSONObject.parseObject(content);
                 JSONObject data = json.getJSONObject("data");
                 token = data.getString("token");
-                log.info("获得登录token{}",token);
+                log.info("获得登录token{}", token);
             }
         } catch (Exception e) {
             log.error("获取图片验证token出错", e);
@@ -459,7 +460,7 @@ public class WaimaiCrawler {
             if (b != null) {
                 StringBuffer stringBuffer = new StringBuffer(new BASE64Encoder().encode(b).replace("=", ""));//base64加密
                 upass = stringBuffer.reverse().toString();//加密结果倒叙
-                log.info("获取加密后的密码{}",upass);
+                log.info("获取加密后的密码{}", upass);
             }
 
         } catch (Exception e) {
@@ -485,7 +486,7 @@ public class WaimaiCrawler {
      * @param pwd
      */
     private void setCookieStores(String userName, String pwd) {
-        log.info("存储本地cookie{}",userName);
+        log.info("存储本地cookie{}", userName);
         CookieStoreUtils.storeCookie(cookieStore, MD5.md5(userName + "_" + pwd) + ".cookies");
     }
 
@@ -511,7 +512,7 @@ public class WaimaiCrawler {
                 HttpGet get = HttpClientUtil.get(shouye);
                 String content = HttpClientUtil.executeGetWithResult(client, get);
                 if (content.contains("百度商户")) {
-                    log.info("本地cookie登录成功{}",userName);
+                    log.info("本地cookie登录成功{}", userName);
                     try {
                         new Thread(new Runnable() {
                             public void run() {

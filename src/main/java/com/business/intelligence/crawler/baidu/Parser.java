@@ -237,6 +237,7 @@ public class Parser {
                         ct.setCreatTime(new Date());
                         ct.setUpdateTime(new Date());
                         String id = MD5.md5(shopId+"_"+ctjson.getString("comment_id")+"_"+ctjson.getString("create_time"));//商户id+评论id+评论时间Md5后生成主键id
+                        ct.setId(id);
                         ctList.add(ct);
                     }
                 }
