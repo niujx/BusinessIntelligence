@@ -1,5 +1,8 @@
 package com.business.intelligence.model;
 
+import com.business.intelligence.model.ElemeModel.ELMCrawlerStatus;
+import com.business.intelligence.model.baidu.BDCrawlerStatus;
+import com.business.intelligence.model.mt.MTCrawlerStatus;
 import lombok.Data;
 
 /**
@@ -9,6 +12,10 @@ import lombok.Data;
 public class CrawlerStatus {
 
 
-    private String crawlerName;
-    private String status;
+    private BDCrawlerStatus bd;
+    private MTCrawlerStatus mt;
+    private ELMCrawlerStatus elm;
+
+
+
 }

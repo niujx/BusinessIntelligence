@@ -21,9 +21,8 @@
 			},
 			success:function(e){
 				//e 为请求成功后返回的数据
-				console.log(e);
+				console.log("启动成功");
 				alert(e);
-//				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
