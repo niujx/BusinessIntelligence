@@ -113,8 +113,8 @@ public class MTController {
     }
 
 
-    @RequestMapping(value = "经营分析----流量分析", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ApiOperation(value = "爬取全部评论", httpMethod = "GET")
+    @RequestMapping(value = "flow", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @ApiOperation(value = "经营分析----流量分析", httpMethod = "GET")
     public String flowanalysis(@RequestParam String userName) throws InterruptedException {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
