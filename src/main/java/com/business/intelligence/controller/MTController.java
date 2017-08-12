@@ -74,13 +74,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.bizDataReport(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.bizDataReport(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.bizDataReport(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.bizDataReport(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -98,13 +100,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.businessStatistics(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.businessStatistics(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.businessStatistics(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.businessStatistics(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -120,13 +124,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.flowanalysis("30", true);
+                mtCrawler.login();
+                mtCrawler.flowanalysis("30", false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.flowanalysis("30", true);
+                mtCrawler.login();
+                mtCrawler.flowanalysis("30", false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -142,13 +148,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.hotSales(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.hotSales(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.hotSales(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.hotSales(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -163,13 +171,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.comment(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.comment(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.comment(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.comment(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -185,13 +195,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.historySettleBillList(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.historySettleBillList(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.historySettleBillList(startTime, endTime, true);
+                mtCrawler.login();
+                mtCrawler.historySettleBillList(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }
@@ -206,13 +218,15 @@ public class MTController {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.acts(true);
+                mtCrawler.login();
+                mtCrawler.acts(false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
                 mtCrawler.setAuthenticate(authenticate);
-                mtCrawler.acts(true);
+                mtCrawler.login();
+                mtCrawler.acts(false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
             }

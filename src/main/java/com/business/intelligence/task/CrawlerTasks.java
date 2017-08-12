@@ -60,13 +60,13 @@ public class CrawlerTasks {
         for (Authenticate authenticate : authenticates) {
             mtCrawler.setAuthenticate(authenticate);
             mtCrawler.login();
-            mtCrawler.bizDataReport(startTime, endTime, true);
+            mtCrawler.bizDataReport(startTime, endTime, false);
             mtCrawler.bizDataReport(startTime, endTime, false);
             mtCrawler.businessStatistics(st, et, false);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
-            mtCrawler.comment(startTime, endTime, true);
-            mtCrawler.historySettleBillList(startTime, endTime, true);
+            mtCrawler.comment(startTime, endTime, false);
+            mtCrawler.historySettleBillList(startTime, endTime, false);
         }
     }
 

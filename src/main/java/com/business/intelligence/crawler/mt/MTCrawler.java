@@ -71,6 +71,7 @@ public class MTCrawler extends BaseCrawler {
     @Autowired
     private MTDao mtDao;
 
+
     public MTCrawler() {
         client = HttpClientUtil.getHttpClient(cookieStore);
     }
@@ -255,8 +256,9 @@ public class MTCrawler extends BaseCrawler {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            bizDataReport(fromDate, endDate, true);
+            if (!isLogin) {
+                bizDataReport(fromDate, endDate, true);
+            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
         if (f == 1) {
@@ -347,7 +349,9 @@ public class MTCrawler extends BaseCrawler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            businessStatistics(fromDate, endDate, true);
+            if (!isLogin) {
+                businessStatistics(fromDate, endDate, true);
+            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_SALE);
         if (f == 1) {
@@ -395,7 +399,9 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            flowanalysis(days, true);
+            if (!isLogin) {
+                flowanalysis(days, true);
+            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_FLOW);
         if (f == 1) {
@@ -449,7 +455,9 @@ public class MTCrawler extends BaseCrawler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            hotSales(fromDate, endDate, true);
+            if (!isLogin) {
+                hotSales(fromDate, endDate, true);
+            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_GOODS_SALE);
         if (f == 1) {
@@ -516,7 +524,9 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            comment(fromDate, endDate, true);
+            if (!isLogin) {
+                comment(fromDate, endDate, true);
+            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_EVALUATE);
@@ -555,13 +565,14 @@ public class MTCrawler extends BaseCrawler {
             String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
             if (code == 2005) {
                 log.info("not found taskNo is {}", json);
-                return;
+                String exportUrls = HttpClientUtil.executeGetWithResult(client, "https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/settleBillExportList?pageNo=1&pageSize=10");
+                parse = JsonPath.parse(exportUrls);
+                url = "https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download" + parse.read("$.data.taskList[0].taskUrl");
+            } else {
+                int taskNo = parse.read("$.data.taskNo");
+                String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download/meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             }
-
-            int taskNo = parse.read("$.data.taskNo");
-            String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-
-            url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             log.info("excel url is {}", url);
             while (true) {
 
@@ -616,7 +627,9 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            historySettleBillList(fromDate, endDate, true);
+            if (!isLogin) {
+                historySettleBillList(fromDate, endDate, true);
+            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_ORDER_CHECKING);
@@ -724,6 +737,9 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
+            if (!isLogin) {
+                acts(true);
+            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_SALE_ACTIVITY);
