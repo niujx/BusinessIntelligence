@@ -94,20 +94,23 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
-            JSONObject json = JSONObject.parseObject(content);
-            JSONObject body = json.getJSONObject("body").getJSONObject("data");
-            JSONArray array = body.getJSONArray("list");
-            if (array.size() > 0) {
-                List<OrderUpList> orderList = array.toJavaList(OrderUpList.class);
-                for (OrderUpList orderUpList : orderList) {
-                    //此处由于百度不支持批量查询，只能循环查询
-                    orderGet(orderUpList.getOrderId(), source, secret, merchantId);
-                }
-                int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_ORDERDETAILS);
-                if (f == 1) {
-                    logger.info("更新爬取状态成功");
-                } else {
-                    logger.info("更新爬取状态失败");
+            if(content.contains("list")){
+                JSONObject json = JSONObject.parseObject(content);
+                JSONObject body = json.getJSONObject("body").getJSONObject("data");
+                JSONArray array = body.getJSONArray("list");
+                logger.info("获取百度上行订单列表{}",content);
+                if (array.size() > 0) {
+                    List<OrderUpList> orderList = array.toJavaList(OrderUpList.class);
+                    for (OrderUpList orderUpList : orderList) {
+                        //此处由于百度不支持批量查询，只能循环查询
+                        orderGet(orderUpList.getOrderId(), source, secret, merchantId);
+                    }
+                    int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_ORDERDETAILS);
+                    if (f == 1) {
+                        logger.info("更新爬取状态成功");
+                    } else {
+                        logger.info("更新爬取状态失败");
+                    }
                 }
             }
 
@@ -208,6 +211,7 @@ public class WaimaiApi {
         String content = null;
         try {
             content = HttpClientUtil.executePostWithResult(client, post);
+            logger.info("获取百度评论列表{}",content);
             if (StringUtils.isNotEmpty(content)) {
                 List<Comment> ctList = Parser.ctParser(content, merchantId);
                 for (Comment ct : ctList) {
