@@ -40,12 +40,12 @@ public class CrawlerTasks {
     @Autowired
     private WaimaiApi bdApi;
 
-    @Scheduled(cron = "* * 3 * * *")
+    @Scheduled(cron = "* * 16 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
     }
 
-    @Scheduled(cron = "* * 3 30 * *")
+    @Scheduled(cron = "* * 16 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
         Date startDate = new Date();
@@ -70,7 +70,7 @@ public class CrawlerTasks {
         }
     }
 
-    @Scheduled(cron = "* * 3 30 * *")
+    @Scheduled(cron = "* * 16 * * *")
     public void runAllBdCrawler() {
         List<User> users = getAllBdUser();
         Date startDate = new Date();

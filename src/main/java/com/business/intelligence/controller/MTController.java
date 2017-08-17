@@ -73,14 +73,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.bizDataReport(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.bizDataReport(startTime, endTime, false);
             } else {
@@ -99,14 +103,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.businessStatistics(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.businessStatistics(startTime, endTime, false);
             } else {
@@ -123,14 +131,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.flowanalysis("30", false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.flowanalysis("30", false);
             } else {
@@ -147,14 +159,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.hotSales(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.hotSales(startTime, endTime, false);
             } else {
@@ -170,14 +186,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.comment(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.comment(startTime, endTime, false);
             } else {
@@ -194,14 +214,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.historySettleBillList(startTime, endTime, false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.historySettleBillList(startTime, endTime, false);
             } else {
@@ -217,14 +241,18 @@ public class MTController {
         if (userName.isEmpty()) {
             List<Authenticate> authenticates = getAllUser();
             for (Authenticate authenticate : authenticates) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.acts(false);
             }
         } else {
             Authenticate authenticate = getUser(userName);
             if (authenticate != null) {
-                mtCrawler.setAuthenticate(authenticate);
+                MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
+                loginBean.setAuthenticate(authenticate);
+                mtCrawler.setLoginBean(loginBean);
                 mtCrawler.login();
                 mtCrawler.acts(false);
             } else {

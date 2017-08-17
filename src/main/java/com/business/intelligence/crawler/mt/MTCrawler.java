@@ -61,7 +61,10 @@ import static java.util.stream.Collectors.toList;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
-    private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
+
+  //  private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
+
+    private String LOGIN_URL ="https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http:%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2Fentry";
     private CloseableHttpClient client;
     private CookieStore cookieStore = new BasicCookieStore();
     private LoginBean loginBean;
@@ -71,6 +74,7 @@ public class MTCrawler extends BaseCrawler {
     @Autowired
     private MTDao mtDao;
 
+    private int retry = 0;
 
     public MTCrawler() {
         client = HttpClientUtil.getHttpClient(cookieStore);
@@ -86,24 +90,44 @@ public class MTCrawler extends BaseCrawler {
 
     }
 
+//    Accept:application/json
+//    Accept-Encoding:gzip, deflate, br
+//    Accept-Language:zh-CN,zh;q=0.8
+//    Cache-Control:no-cache
+//    Connection:keep-alive
+//    Content-Length:101
+//    Content-Type:application/x-www-form-urlencoded; charset=UTF-8
+//    Cookie:_lxsdk=15da1951728c8-044fe254bf315-1a326d54-13c680-15da1951728c8; _ga=GA1.2.474460187.1501654574; _lxsdk_s=f47707c6c51c90739aaa19db1573%7C%7C4; __mta=146603659.1501654489442.1502422328325.1502895002355.15; uuid=8c8ddecbe2e969cc8207.1501654489.0.0.0
+//    Host:epassport.meituan.com
+//    Origin:https://epassport.meituan.com
+//    Pragma:no-cache
+//    Referer:https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd
+//    User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36
+//    x-requested-with:XMLHttpRequest
+
 
     public void login() {
         List<BasicNameValuePair> params = loginBean.form().entrySet().stream().map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())).collect(toList());
         try {
+
+
+            HttpClientUtil.executeGet(client,"http://e.waimai.meituan.com/logon");
+
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
-            loginS1.setHeader("accept", "application/json");
+            loginS1.setHeader("Accept", "application/json");
             loginS1.setHeader("Accept-Encoding", "gzip, deflate, br");
             loginS1.setHeader("Accept-Language", "zh-CN,zh;q=0.8");
             loginS1.setHeader("Connection", "keep-alive");
-            loginS1.setHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+            loginS1.setHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
             loginS1.setHeader("Host", "epassport.meituan.com");
             loginS1.setHeader("Origin", "https://epassport.meituan.com");
+            loginS1.setHeader("Referer","https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd");
             loginS1.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
-            loginS1.setHeader("Cookie", "wpush_server_url=wss://wpush.meituan.com; shopCategory=food");
             loginS1.setEntity(new UrlEncodedFormEntity(params, Charset.forName(UTF_8)));
 
             CloseableHttpResponse execute = client.execute(loginS1);
-            if (execute.getStatusLine().getStatusCode() == 302) {
+            log.info("code is {}",execute.getStatusLine().getStatusCode());
+            if (execute.getStatusLine().getStatusCode() == 200) {
                 Header location = execute.getFirstHeader("Location");
                 String BSID = location.getValue().split("=")[1];
                 log.info("find BSID is {}", BSID);
@@ -160,7 +184,9 @@ public class MTCrawler extends BaseCrawler {
                 log.info("get captchaCode is {} ", captchaCode);
                 loginBean.setCaptchaVtoken(token);
                 loginBean.setCaptchaCode(captchaCode);
-                login();
+                retry++;
+                if (retry < 4)
+                    login();
             }
 
         } catch (IOException e) {
@@ -800,7 +826,7 @@ public class MTCrawler extends BaseCrawler {
         private String parkey;
         private String captchaCode;
         private String captchaVtoken;
-        private String smsVerify;
+        private String smsVerify="0";
         private String smsCode;
 
         public String cookieStoreName() {
