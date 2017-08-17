@@ -181,7 +181,11 @@ public abstract class ElemeCrawler extends BaseCrawler{
         this.username = elemeBean.getUsername();
         this.password = elemeBean.getPassword();
         this.shopId = elemeBean.getShopId();
-        this.merchantId = elemeBean.getShopPri();
+        this.merchantId = elemeBean.getShopPri() == null? "":elemeBean.getShopPri();
+        if(username == null | password == null | shopId == null){
+            log.info("用户名、密码、shopID其中有空值，程序跳过");
+            return null;
+        }
         //导入本地ksid
         String oldKsid = KSIDUtils.readKsid(getKsidName(username,password));
 //        CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));

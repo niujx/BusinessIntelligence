@@ -20918,3 +20918,321 @@ java.sql.SQLException: Io 异常: Connection reset by peer: socket write error
 2017-08-17 17:08:39.479 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - result is {"ncp":"2.0.0","id":"bce6735e-27dd-441b-982c-19b6422327b3","result":{"restaurantTrafficStatsList":[{"shopId":150142521,"shopName":"虾士主题餐厅蓝港店","statsDate":"2017-08-14","exposureTotalCount":423,"exposureTotalCountCompare":0.0,"visitorNum":37,"visitorNumCompare":0.0,"buyerNum":5,"buyerNumCompare":0.0,"visitorConversionRate":0.08747044917257683,"visitorConversionRateCompare":0.0,"buyerConversionRate":0.1351,"buyerConversionRateCompare":0.0,"trafficSourceMap":{"首页广告":0,"收藏餐厅":1,"店铺浏览历史":0,"品类入口餐厅列表":11,"搜索":0,"其他":0,"订单详情页":4,"活动页":0,"首页餐厅列表":15,"发现页广告":0},"updatedAt":"2017-08-15 05:21","pushedAt":null,"newVisitor":1,"newExposure":11,"newBuyer":0},{"shopId":150142521,"shopName":"虾士主题餐厅蓝港店","statsDate":"2017-08-15","exposureTotalCount":436,"exposureTotalCountCompare":0.0,"visitorNum":53,"visitorNumCompare":0.0,"buyerNum":4,"buyerNumCompare":0.0,"visitorConversionRate":0.12155963302752294,"visitorConversionRateCompare":0.0,"buyerConversionRate":0.0755,"buyerConversionRateCompare":0.0,"trafficSourceMap":{"首页广告":0,"收藏餐厅":0,"店铺浏览历史":0,"品类入口餐厅列表":20,"搜索":0,"其他":0,"订单详情页":3,"活动页":0,"首页餐厅列表":25,"发现页广告":0},"updatedAt":"2017-08-16 04:54","pushedAt":null,"newVisitor":1,"newExposure":8,"newBuyer":0}],"indexesStatistic":null},"error":null}
 2017-08-17 17:08:39.525 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 用户名为 bj-xsztctlgd 的流量排名已入库
 2017-08-17 17:08:39.535 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 更新爬取状态成功
+2017-08-17 17:27:37.021 [main] INFO  com.business.intelligence.Server - Starting Server on MININT-A37FLE2 with PID 9296 (D:\ideaBuildPath\BusinessIntelligence\target\classes started by Administrator in D:\ideaBuildPath\BusinessIntelligence)
+2017-08-17 17:27:37.021 [main] INFO  com.business.intelligence.Server - No active profile set, falling back to default profiles: default
+2017-08-17 17:27:37.114 [main] INFO  o.s.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext - Refreshing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@36328d33: startup date [Thu Aug 17 17:27:37 CST 2017]; root of context hierarchy
+2017-08-17 17:27:39.813 [main] WARN  org.mybatis.spring.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.business.intelligence]' package. Please check your configuration.
+2017-08-17 17:27:40.933 [main] INFO  o.s.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$b2b93b73] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-08-17 17:27:42.037 [main] INFO  org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer - Tomcat initialized with port(s): 9578 (http)
+2017-08-17 17:27:42.066 [main] INFO  org.apache.catalina.core.StandardService - Starting service Tomcat
+2017-08-17 17:27:42.068 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet Engine: Apache Tomcat/8.5.14
+2017-08-17 17:27:42.641 [localhost-startStop-1] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2017-08-17 17:27:42.641 [localhost-startStop-1] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 5527 ms
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.ServletRegistrationBean - Mapping servlet: 'dispatcherServlet' to [/]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'metricsFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'characterEncodingFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'httpPutFormContentFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'requestContextFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'webRequestLoggingFilter' to: [/*]
+2017-08-17 17:27:43.170 [localhost-startStop-1] INFO  org.springframework.boot.web.servlet.FilterRegistrationBean - Mapping filter: 'applicationContextIdFilter' to: [/*]
+2017-08-17 17:27:45.771 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/v1/getComment/],methods=[GET],produces=[text/html]}" onto public java.lang.Object com.business.intelligence.controller.BaiduController.getComment(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.774 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/v1/getOrderList/],methods=[GET],produces=[text/html]}" onto public java.lang.Object com.business.intelligence.controller.BaiduController.getOrderList(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.775 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/v1/getBaiduCarwler/],methods=[GET],produces=[text/html]}" onto public java.lang.Object com.business.intelligence.controller.BaiduController.getBaiduCarwler(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.778 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerEvaluate],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerEvaluate(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.778 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerActivity],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerActivity(java.lang.String)
+2017-08-17 17:27:45.778 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerBill],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerBill(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.779 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerCommodity],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerCommodity(java.lang.String,java.lang.String)
+2017-08-17 17:27:45.779 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerFlow],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerFlow(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.779 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerSale],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerSale(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.780 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/eleme/crawlerOrder],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.ElemeController.crawlerOrder(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.780 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/test/hello],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.HelloWorldController.hello(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/comment],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.comment(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/businessStatistics],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.businessStatistics(java.lang.String,java.lang.String,java.lang.String) throws java.lang.InterruptedException,java.text.ParseException
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/bizDataReport],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.bizDataReport(java.lang.String,java.lang.String,java.lang.String) throws java.lang.InterruptedException
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/flow],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.flowanalysis(java.lang.String) throws java.lang.InterruptedException
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/hotSales],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.hotSales(java.lang.String,java.lang.String,java.lang.String) throws java.lang.InterruptedException
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/bill],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.bill(java.lang.String,java.lang.String,java.lang.String)
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/mt/acts],methods=[GET],produces=[text/html]}" onto public java.lang.String com.business.intelligence.controller.MTController.acts(java.lang.String)
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/bi/getAllStatus],methods=[GET]}" onto public java.lang.String com.business.intelligence.controller.WebController.getAllStatus()
+2017-08-17 17:27:45.786 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/v2/api-docs],methods=[GET],produces=[application/json || application/hal+json]}" onto public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)
+2017-08-17 17:27:45.801 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/swagger-resources/configuration/security]}" onto org.springframework.http.ResponseEntity<springfox.documentation.swagger.web.SecurityConfiguration> springfox.documentation.swagger.web.ApiResourceController.securityConfiguration()
+2017-08-17 17:27:45.801 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/swagger-resources/configuration/ui]}" onto org.springframework.http.ResponseEntity<springfox.documentation.swagger.web.UiConfiguration> springfox.documentation.swagger.web.ApiResourceController.uiConfiguration()
+2017-08-17 17:27:45.801 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/swagger-resources]}" onto org.springframework.http.ResponseEntity<java.util.List<springfox.documentation.swagger.web.SwaggerResource>> springfox.documentation.swagger.web.ApiResourceController.swaggerResources()
+2017-08-17 17:27:45.801 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+2017-08-17 17:27:45.801 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+2017-08-17 17:27:46.142 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/configprops || /configprops.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.142 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/dump || /dump.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.142 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/auditevents || /auditevents.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public org.springframework.http.ResponseEntity<?> org.springframework.boot.actuate.endpoint.mvc.AuditEventsMvcEndpoint.findByPrincipalAndAfterAndType(java.lang.String,java.util.Date,java.lang.String)
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/trace || /trace.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/loggers/{name:.*}],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.LoggersMvcEndpoint.get(java.lang.String)
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/loggers/{name:.*}],methods=[POST],consumes=[application/vnd.spring-boot.actuator.v1+json || application/json],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.LoggersMvcEndpoint.set(java.lang.String,java.util.Map<java.lang.String, java.lang.String>)
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/loggers || /loggers.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/autoconfig || /autoconfig.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/beans || /beans.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/mappings || /mappings.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/health || /health.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.HealthMvcEndpoint.invoke(javax.servlet.http.HttpServletRequest,java.security.Principal)
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/env/{name:.*}],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EnvironmentMvcEndpoint.value(java.lang.String)
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/env || /env.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/info || /info.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/heapdump || /heapdump.json],methods=[GET],produces=[application/octet-stream]}" onto public void org.springframework.boot.actuate.endpoint.mvc.HeapdumpMvcEndpoint.invoke(boolean,javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse) throws java.io.IOException,javax.servlet.ServletException
+2017-08-17 17:27:46.158 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/metrics/{name:.*}],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.MetricsMvcEndpoint.value(java.lang.String)
+2017-08-17 17:27:46.173 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/metrics || /metrics.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter.invoke()
+2017-08-17 17:27:46.173 [main] INFO  org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping - Mapped "{[/logfile || /logfile.json],methods=[GET || HEAD]}" onto public void org.springframework.boot.actuate.endpoint.mvc.LogFileMvcEndpoint.invoke(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse) throws javax.servlet.ServletException,java.io.IOException
+2017-08-17 17:27:46.501 [main] INFO  o.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - Looking for @ControllerAdvice: org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@36328d33: startup date [Thu Aug 17 17:27:37 CST 2017]; root of context hierarchy
+2017-08-17 17:27:46.594 [main] INFO  org.springframework.web.servlet.handler.SimpleUrlHandlerMapping - Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2017-08-17 17:27:46.594 [main] INFO  org.springframework.web.servlet.handler.SimpleUrlHandlerMapping - Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2017-08-17 17:27:46.672 [main] INFO  org.springframework.web.servlet.handler.SimpleUrlHandlerMapping - Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2017-08-17 17:27:46.704 [main] INFO  o.s.boot.autoconfigure.web.WebMvcAutoConfiguration$WelcomePageHandlerMapping - Adding welcome page: class path resource [public/index.html]
+2017-08-17 17:27:47.455 [main] INFO  org.springframework.jmx.export.annotation.AnnotationMBeanExporter - Registering beans for JMX exposure on startup
+2017-08-17 17:27:47.455 [main] INFO  org.springframework.jmx.export.annotation.AnnotationMBeanExporter - Bean with name 'dataSource' has been autodetected for JMX exposure
+2017-08-17 17:27:47.470 [main] INFO  org.springframework.jmx.export.annotation.AnnotationMBeanExporter - Located MBean 'dataSource': registering with JMX server as MBean [com.alibaba.druid.pool:name=dataSource,type=DruidDataSource]
+2017-08-17 17:27:47.470 [main] INFO  org.springframework.context.support.DefaultLifecycleProcessor - Starting beans in phase 0
+2017-08-17 17:27:47.580 [main] INFO  org.springframework.context.support.DefaultLifecycleProcessor - Starting beans in phase 2147483647
+2017-08-17 17:27:47.580 [main] INFO  springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper - Context refreshed
+2017-08-17 17:27:47.611 [main] INFO  springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper - Found 1 custom documentation plugin(s)
+2017-08-17 17:27:47.626 [main] INFO  springfox.documentation.spring.web.scanners.ApiListingReferenceScanner - Scanning for api listing references
+2017-08-17 17:27:48.146 [main] INFO  org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer - Tomcat started on port(s): 9578 (http)
+2017-08-17 17:27:48.161 [main] INFO  com.business.intelligence.Server - Started Server in 11.718 seconds (JVM running for 12.723)
+2017-08-17 17:28:31.490 [http-nio-9578-exec-1] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring FrameworkServlet 'dispatcherServlet'
+2017-08-17 17:28:31.490 [http-nio-9578-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - FrameworkServlet 'dispatcherServlet': initialization started
+2017-08-17 17:28:31.529 [http-nio-9578-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - FrameworkServlet 'dispatcherServlet': initialization completed in 39 ms
+2017-08-17 17:28:31.577 [http-nio-9578-exec-1] INFO  com.business.intelligence.controller.ElemeController - 开始获取 bj-xsztctlgd 的信息
+2017-08-17 17:28:31.653 [http-nio-9578-exec-1] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set
+2017-08-17 17:28:35.461 [http-nio-9578-exec-1] INFO  com.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2017-08-17 17:28:35.632 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 更新爬取状态成功
+2017-08-17 17:28:56.572 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeCrawler - ksid name is elemeKsid_bj-xsztctlgd_a15938008289
+2017-08-17 17:28:58.024 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeCrawler - 测试ksid： MDQ2NWM0MzQtNGY5ZC00ZjQxLWI3OGZWY5Nj 是否有效
+2017-08-17 17:29:02.347 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeCrawler - 测试ksid的结果： {"ncp":"2.0.0","id":"9368dd8a-a6e9-4e6c-855c-3d2e29ff3498","result":[],"error":null}
+2017-08-17 17:29:03.858 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeCrawler - 无需登录
+2017-08-17 17:29:03.859 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 开始爬取饿了么流量排名，日期： 2017-08-14 至 2017-08-15 ，URL： https://app-api.shop.ele.me/stats/invoke/?method=trafficStats.getTrafficStatsV2 ，用户名： bj-xsztctlgd
+2017-08-17 17:29:03.859 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - ksid id MDQ2NWM0MzQtNGY5ZC00ZjQxLWI3OGZWY5Nj
+2017-08-17 17:29:03.934 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - result is {"ncp":"2.0.0","id":"bce6735e-27dd-441b-982c-19b6422327b3","result":{"restaurantTrafficStatsList":[{"shopId":150142521,"shopName":"虾士主题餐厅蓝港店","statsDate":"2017-08-14","exposureTotalCount":423,"exposureTotalCountCompare":0.0,"visitorNum":37,"visitorNumCompare":0.0,"buyerNum":5,"buyerNumCompare":0.0,"visitorConversionRate":0.08747044917257683,"visitorConversionRateCompare":0.0,"buyerConversionRate":0.1351,"buyerConversionRateCompare":0.0,"trafficSourceMap":{"首页广告":0,"收藏餐厅":1,"店铺浏览历史":0,"品类入口餐厅列表":11,"搜索":0,"其他":0,"订单详情页":4,"活动页":0,"首页餐厅列表":15,"发现页广告":0},"updatedAt":"2017-08-15 05:21","pushedAt":null,"newVisitor":1,"newExposure":11,"newBuyer":0},{"shopId":150142521,"shopName":"虾士主题餐厅蓝港店","statsDate":"2017-08-15","exposureTotalCount":436,"exposureTotalCountCompare":0.0,"visitorNum":53,"visitorNumCompare":0.0,"buyerNum":4,"buyerNumCompare":0.0,"visitorConversionRate":0.12155963302752294,"visitorConversionRateCompare":0.0,"buyerConversionRate":0.0755,"buyerConversionRateCompare":0.0,"trafficSourceMap":{"首页广告":0,"收藏餐厅":0,"店铺浏览历史":0,"品类入口餐厅列表":20,"搜索":0,"其他":0,"订单详情页":3,"活动页":0,"首页餐厅列表":25,"发现页广告":0},"updatedAt":"2017-08-16 04:54","pushedAt":null,"newVisitor":1,"newExposure":8,"newBuyer":0}],"indexesStatistic":null},"error":null}
+2017-08-17 17:29:03.979 [http-nio-9578-exec-1] INFO  org.springframework.beans.factory.xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [org/springframework/jdbc/support/sql-error-codes.xml]
+2017-08-17 17:29:04.039 [http-nio-9578-exec-1] INFO  org.springframework.jdbc.support.SQLErrorCodesFactory - SQLErrorCodes loaded: [DB2, Derby, H2, HSQL, Informix, MS-SQL, MySQL, Oracle, PostgreSQL, Sybase, Hana]
+2017-08-17 17:29:04.046 [http-nio-9578-exec-1] ERROR com.business.intelligence.dao.ElemeDao - org.springframework.dao.DuplicateKeyException: 
+### Error updating database.  Cause: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+### The error may involve com.business.intelligence.insertFlow-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO "HYF"."BIL_ELEME_FLOW"             (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM,MERCHANTID)         VALUES             (?,?,?,?,?,?,?)
+### Cause: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+; SQL []; ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+; nested exception is java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:239)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:73)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:446)
+	at com.sun.proxy.$Proxy69.insert(Unknown Source)
+	at org.mybatis.spring.SqlSessionTemplate.insert(SqlSessionTemplate.java:278)
+	at com.business.intelligence.dao.ElemeDao.insertFlow(ElemeDao.java:55)
+	at com.business.intelligence.crawler.eleme.ElemeFlowCrawler.doRun(ElemeFlowCrawler.java:67)
+	at com.business.intelligence.controller.ElemeController.crawlerFlow(ElemeController.java:166)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:133)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:97)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:827)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:738)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:897)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:970)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:861)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:846)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.web.filter.ApplicationContextHeaderFilter.doFilterInternal(ApplicationContextHeaderFilter.java:55)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.trace.WebRequestTraceFilter.doFilterInternal(WebRequestTraceFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HttpPutFormContentFilter.doFilterInternal(HttpPutFormContentFilter.java:105)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:81)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:197)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.autoconfigure.MetricsFilter.doFilterInternal(MetricsFilter.java:106)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+	at oracle.jdbc.driver.DatabaseError.throwSqlException(DatabaseError.java:112)
+	at oracle.jdbc.driver.T4CTTIoer.processError(T4CTTIoer.java:331)
+	at oracle.jdbc.driver.T4CTTIoer.processError(T4CTTIoer.java:288)
+	at oracle.jdbc.driver.T4C8Oall.receive(T4C8Oall.java:745)
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:216)
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForRows(T4CPreparedStatement.java:966)
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1170)
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3339)
+	at oracle.jdbc.driver.OraclePreparedStatement.execute(OraclePreparedStatement.java:3445)
+	at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:493)
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.update(PreparedStatementHandler.java:46)
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.update(RoutingStatementHandler.java:74)
+	at org.apache.ibatis.executor.SimpleExecutor.doUpdate(SimpleExecutor.java:50)
+	at org.apache.ibatis.executor.BaseExecutor.update(BaseExecutor.java:117)
+	at org.apache.ibatis.executor.CachingExecutor.update(CachingExecutor.java:76)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.update(DefaultSqlSession.java:198)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.insert(DefaultSqlSession.java:185)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:433)
+	... 71 more
+
+2017-08-17 17:29:04.110 [http-nio-9578-exec-1] ERROR com.business.intelligence.dao.ElemeDao - org.springframework.dao.DuplicateKeyException: 
+### Error updating database.  Cause: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+### The error may involve com.business.intelligence.insertFlow-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO "HYF"."BIL_ELEME_FLOW"             (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM,MERCHANTID)         VALUES             (?,?,?,?,?,?,?)
+### Cause: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+; SQL []; ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+; nested exception is java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:239)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:73)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:446)
+	at com.sun.proxy.$Proxy69.insert(Unknown Source)
+	at org.mybatis.spring.SqlSessionTemplate.insert(SqlSessionTemplate.java:278)
+	at com.business.intelligence.dao.ElemeDao.insertFlow(ElemeDao.java:55)
+	at com.business.intelligence.crawler.eleme.ElemeFlowCrawler.doRun(ElemeFlowCrawler.java:67)
+	at com.business.intelligence.controller.ElemeController.crawlerFlow(ElemeController.java:166)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:133)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:97)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:827)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:738)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:897)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:970)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:861)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:846)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.web.filter.ApplicationContextHeaderFilter.doFilterInternal(ApplicationContextHeaderFilter.java:55)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.trace.WebRequestTraceFilter.doFilterInternal(WebRequestTraceFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HttpPutFormContentFilter.doFilterInternal(HttpPutFormContentFilter.java:105)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:81)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:197)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.autoconfigure.MetricsFilter.doFilterInternal(MetricsFilter.java:106)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.sql.SQLException: ORA-00001: 违反唯一约束条件 (HYF.BIL_ELEME_FLOW_PK)
+
+	at oracle.jdbc.driver.DatabaseError.throwSqlException(DatabaseError.java:112)
+	at oracle.jdbc.driver.T4CTTIoer.processError(T4CTTIoer.java:331)
+	at oracle.jdbc.driver.T4CTTIoer.processError(T4CTTIoer.java:288)
+	at oracle.jdbc.driver.T4C8Oall.receive(T4C8Oall.java:745)
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:216)
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForRows(T4CPreparedStatement.java:966)
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1170)
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3339)
+	at oracle.jdbc.driver.OraclePreparedStatement.execute(OraclePreparedStatement.java:3445)
+	at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:493)
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.update(PreparedStatementHandler.java:46)
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.update(RoutingStatementHandler.java:74)
+	at org.apache.ibatis.executor.SimpleExecutor.doUpdate(SimpleExecutor.java:50)
+	at org.apache.ibatis.executor.BaseExecutor.update(BaseExecutor.java:117)
+	at org.apache.ibatis.executor.CachingExecutor.update(CachingExecutor.java:76)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.update(DefaultSqlSession.java:198)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.insert(DefaultSqlSession.java:185)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:433)
+	... 71 more
+
+2017-08-17 17:29:04.132 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 用户名为 bj-xsztctlgd 的流量排名已入库
+2017-08-17 17:29:04.151 [http-nio-9578-exec-1] INFO  com.business.intelligence.crawler.eleme.ElemeFlowCrawler - 更新爬取状态成功
