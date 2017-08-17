@@ -55,13 +55,16 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             this.endCrawlerDate = end;
         }
         //开始爬取
-        log.info("开始爬取饿了么经营统计，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
-        List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient(elemeBean));
-        List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
-        for(ElemeSale elemeSale : elemeSaleBeans){
-            elemeDao.insertSale(elemeSale);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么经营统计，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
+            List<LinkedHashMap<String, Object>> saleList= getSaleText(client);
+            List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
+            for(ElemeSale elemeSale : elemeSaleBeans){
+                elemeDao.insertSale(elemeSale);
+            }
+            log.info("用户名为 {} 的经营统计已入库完毕",username);
         }
-        log.info("用户名为 {} 的经营统计已入库完毕",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_SALE);
         if(f ==1){
@@ -137,6 +140,9 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             elemeSale.setAveragePrice((Double)map.getOrDefault("averagePrice",0));
             elemeSale.setInvalidOrderCount((Integer)map.getOrDefault("invalidOrderCount",0));
             elemeSale.setLossSaleAmount((Double)map.getOrDefault("lossSaleAmount",0));
+            if(merchantId != null){
+                elemeSale.setMerchantId(merchantId);
+            }
             list.add(elemeSale);
         }
         return list;

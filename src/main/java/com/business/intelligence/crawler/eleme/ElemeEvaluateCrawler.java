@@ -59,15 +59,18 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             this.endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(end,1);
         }
         //开始爬取
-        log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
-        String evaluateText = getEvaluateText(getClient(elemeBean));
-        List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
-        List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
-        List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
-        for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
-            elemeDao.insertEvaluate(elemeEvaluate);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
+            String evaluateText = getEvaluateText(client);
+            List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
+            List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
+            List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
+            for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
+                elemeDao.insertEvaluate(elemeEvaluate);
+            }
+            log.info("用户名为 {} 的顾客评价已入库完毕",username);
         }
-        log.info("用户名为 {} 的顾客评价已入库完毕",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_EVALUATE);
         if(f ==1){
@@ -166,7 +169,10 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
             elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
             elemeEvaluate.setGoods("本条为订单评论");
-            list.add(elemeEvaluate);
+            elemeEvaluate.setMerchantId(merchantId);
+            if(merchantId != null){
+                list.add(elemeEvaluate);
+            }
         }
         for(LinkedHashMap<String,Object> map : foodList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
@@ -176,6 +182,9 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("foodRatingContent","无评论")));
             elemeEvaluate.setQuality(notNull((String)map.getOrDefault("quality","无")));
             elemeEvaluate.setGoods(notNull((String)map.getOrDefault("foodName","无")));
+            if(merchantId != null){
+                elemeEvaluate.setMerchantId(merchantId);
+            }
             list.add(elemeEvaluate);
         }
         return list;

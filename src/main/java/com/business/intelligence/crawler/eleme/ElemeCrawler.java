@@ -6,6 +6,7 @@ import com.business.intelligence.util.CookieStoreUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.KSIDUtils;
 import com.business.intelligence.util.WebUtils;
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CookieStore;
@@ -19,6 +20,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import javax.xml.ws.WebEndpoint;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +43,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
     protected String username;
     protected String password;
     protected String shopId;
+    protected String merchantId;
     private static final String LOGINURL = "https://app-api.shop.ele.me/arena/invoke/?method=LoginService.loginByUsername";
 
     //爬取数据需要的
@@ -49,7 +52,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
 //    private static final String LOGOUTURL = "https://melody.shop.ele.me/app/shop/150148671/stats/business";
     //测试Cookie的url
     private static final String URL="https://app-api.shop.ele.me/shop/invoke/?method=shopLiveVideo.getShopVideoDevices";
-    private static final String INDEX = "https://melody.shop.ele.me";
+    private static final String INDEX = "https://melody.shop.ele.me/login";
     //测试ksid的url
     private static final String KSIDURL = "https://app-api.shop.ele.me/marketing/invoke/?method=applyActivityManage.getApplyActivity";
 
@@ -57,7 +60,13 @@ public abstract class ElemeCrawler extends BaseCrawler{
     /**
      * 登录
      */
-    protected CloseableHttpClient login() {
+    protected String login() {
+        HttpGet httpGetfirst = new HttpGet(INDEX);
+        try {
+            client.execute(httpGetfirst);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         CloseableHttpResponse httpResponse = null;
         String content = null;
         HttpPost httppost = new HttpPost(LOGINURL);
@@ -82,18 +91,33 @@ public abstract class ElemeCrawler extends BaseCrawler{
             content = EntityUtils.toString(entity, "UTF-8");
             if (entity != null) {
                 log.info(content);
-                ksId = (String)WebUtils.getOneByJsonPath(content, "$.result.successData.ksid");
-                log.info("登陆成功");
+//                try{
+//                    String errorMessage =(String) WebUtils.getOneByJsonPath(content, "$.result.failureData.errorMessage");
+//                    if(errorMessage.equals("图片验证码不能为空")){
+//                        //补充图片验证码登录
+//
+//                    }
+//                }catch (PathNotFoundException em){
+//                    log.info("无需验证码");
+//                }
+                try{
+                    ksId = (String)WebUtils.getOneByJsonPath(content, "$.result.successData.ksid");
+                    log.info("登陆成功");
+                }catch(PathNotFoundException e){
+                    log.info("登录失败，请检查用户名、密码、shopID是否正确");
+                    return null;
+                }
             }
-
-            HttpGet httpGet = new HttpGet(INDEX);
-            client.execute(httpGet);
-            //保存ksid
-            log.info("开始保存 {} 的ksid",username);
-            KSIDUtils.storeKSID(ksId,getKsidName(username,password));
-            //保存Cookie
-            log.info("开始保存 {} 的cookie",username);
-            CookieStoreUtils.storeCookie(cookieStore,getCookieName(username,password));
+            if(ksId != null){
+                HttpGet httpGet = new HttpGet(INDEX);
+                client.execute(httpGet);
+                //保存ksid
+                log.info("开始保存 {} 的ksid",username);
+                KSIDUtils.storeKSID(ksId,getKsidName(username,password));
+                //保存Cookie
+                log.info("开始保存 {} 的cookie",username);
+                CookieStoreUtils.storeCookie(cookieStore,getCookieName(username,password));
+            }
         }catch (IOException e){
             e.printStackTrace();
             try {
@@ -111,7 +135,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
             }
         }
 
-        return client;
+        return ksId;
 
     }
 
@@ -157,17 +181,21 @@ public abstract class ElemeCrawler extends BaseCrawler{
         this.username = elemeBean.getUsername();
         this.password = elemeBean.getPassword();
         this.shopId = elemeBean.getShopId();
+        this.merchantId = elemeBean.getShopPri();
         //导入本地ksid
         String oldKsid = KSIDUtils.readKsid(getKsidName(username,password));
-        CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
-        if (oldcookieStore == null) {
-            log.info("no cookie , so login");
-            login();
-        }else {
-            client = HttpClientUtil.getHttpClient(oldcookieStore);
+//        CookieStore oldcookieStore = CookieStoreUtils.readStore(getCookieName(username,password));
+//        if (oldcookieStore == null) {
+//            log.info("no cookie , so login");
+//            login();
+//        }else {
+//            client = HttpClientUtil.getHttpClient(oldcookieStore);
             if(oldKsid == null ){
                 log.info("no ksid,so login");
-                login();
+                String login = login();
+                if(login == null){
+                    return null;
+                }
             }else{
                 LinkedHashMap testResult = ksidIsOk(client, oldKsid);
                 if(testResult == null ){
@@ -178,7 +206,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
                     login();
                 }
             }
-        }
+//        }
 
         return client;
     }
@@ -250,7 +278,6 @@ public abstract class ElemeCrawler extends BaseCrawler{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
         return null;
     }

@@ -40,25 +40,8 @@ public class ElemeSale {
     private Integer invalidOrderCount;
     //预计损失
     private Double lossSaleAmount;
+    //商户表主键
+    private String merchantId;
 
 
-    @Override
-    public String toString() {
-        return "ElemeSale{" +
-                "orderDate='" + orderDate + '\'' +
-                ", shop='" + shop + '\'' +
-                ", totalOrderAmount=" + totalOrderAmount +
-                ", foodAmount=" + foodAmount +
-                ", boxAmount=" + boxAmount +
-                ", deliverAmount=" + deliverAmount +
-                ", onlinePaymentAmount=" + onlinePaymentAmount +
-                ", offlinePaymentAmount=" + offlinePaymentAmount +
-                ", restaurantDiscount=" + restaurantDiscount +
-                ", elemeDiscount=" + elemeDiscount +
-                ", validOrderCount=" + validOrderCount +
-                ", averagePrice=" + averagePrice +
-                ", invalidOrderCount=" + invalidOrderCount +
-                ", lossSaleAmount=" + lossSaleAmount +
-                '}';
-    }
 }

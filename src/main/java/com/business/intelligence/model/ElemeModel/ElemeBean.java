@@ -15,4 +15,6 @@ public class ElemeBean {
     private String password;
     //商铺id
     private String shopId;
+    //商户表主键
+    private String shopPri;
 }

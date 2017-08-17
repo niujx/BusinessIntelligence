@@ -58,13 +58,16 @@ public class ElemeFlowCrawler extends ElemeCrawler{
             this.endCrawlerDate = end;
         }
         //开始爬取
-        log.info("开始爬取饿了么流量排名，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
-        List<LinkedHashMap<String, Object>> flowList = getFlowText(getClient(elemeBean));
-        List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
-        for(ElemeFlow elemeFlow : elemeFlowBeans){
-            elemeDao.insertFlow(elemeFlow);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么流量排名，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            List<LinkedHashMap<String, Object>> flowList = getFlowText(client);
+            List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
+            for(ElemeFlow elemeFlow : elemeFlowBeans){
+                elemeDao.insertFlow(elemeFlow);
+            }
+            log.info("用户名为 {} 的流量排名已入库",username);
         }
-        log.info("用户名为 {} 的流量排名已入库",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_FLOW);
         if(f ==1){
@@ -132,6 +135,9 @@ public class ElemeFlowCrawler extends ElemeCrawler{
             elemeFlow.setExposureTotalCount((Integer)map.getOrDefault("exposureTotalCount",0));
             elemeFlow.setVisitorNum((Integer)map.getOrDefault("visitorNum",0));
             elemeFlow.setBuyerNum((Integer)map.getOrDefault("buyerNum",0));
+            if(merchantId != null){
+                elemeFlow.setMerchantId(merchantId);
+            }
             list.add(elemeFlow);
         }
         return list;

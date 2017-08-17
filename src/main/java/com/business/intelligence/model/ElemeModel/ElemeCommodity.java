@@ -26,17 +26,8 @@ public class ElemeCommodity {
     private Integer salesVolume;
     //销量占比
     private String salesVolumeRate;
+    //商户表主键
+    private String merchantId;
 
-    @Override
-    public String toString() {
-        return "ElemeCommodity{" +
-                "messageDate='" + messageDate + '\'' +
-                ", shopId=" + shopId +
-                ", foodName='" + foodName + '\'' +
-                ", salesAmount=" + salesAmount +
-                ", salesAmountRate=" + salesAmountRate +
-                ", salesVolumeRate=" + salesVolumeRate +
-                ", salesVolume=" + salesVolume +
-                '}';
-    }
+
 }

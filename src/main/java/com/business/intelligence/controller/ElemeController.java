@@ -54,6 +54,7 @@ public class ElemeController {
             elemeBean.setUsername(elmUser.getUserName());
             elemeBean.setPassword(elmUser.getPassWord());
             elemeBean.setShopId(elmUser.getShopId());
+            elemeBean.setShopPri(elmUser.getMerchantId());
             return elemeBean;
         }
     }
@@ -70,6 +71,7 @@ public class ElemeController {
             elemeBean.setUsername(elmUser.getUserName());
             elemeBean.setPassword(elmUser.getPassWord());
             elemeBean.setShopId(elmUser.getShopId());
+            elemeBean.setShopPri(elmUser.getMerchantId());
             list.add(elemeBean);
         }
         log.info("所有饿了么商户信息已经加载完成");

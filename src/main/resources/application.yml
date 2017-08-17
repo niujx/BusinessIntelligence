@@ -21,8 +21,8 @@ mybatis:
     mapper-locations:
        - mapper/*
 
-imgPath: e:\crawler\download\img\
-csvPath: e:\crawler\download\csv\
+imgPath: download/img/
+csvPath: download/csv/
 
 
 

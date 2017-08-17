@@ -63,13 +63,17 @@ public class ElemeBillCrawler extends ElemeCrawler{
             this.endCrawlerDate = end;
         }
         //开始爬取
-        log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
-        List<LinkedHashMap<String, Object>> billText = getBillText(getClient(elemeBean));
-        List<ElemeBill> billList = getElemeBillBeans(billText);
-        for(ElemeBill elemeBill : billList){
-            elemeDao.insertBill(elemeBill);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            List<LinkedHashMap<String, Object>> billText = getBillText(client);
+            List<ElemeBill> billList = getElemeBillBeans(billText);
+            for(ElemeBill elemeBill : billList){
+                elemeDao.insertBill(elemeBill);
+            }
+            log.info("用户名为 {} 的账单记录已入库完毕",username);
+
         }
-        log.info("用户名为 {} 的账单记录已入库完毕",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_BILL);
         if(f ==1){
@@ -155,6 +159,9 @@ public class ElemeBillCrawler extends ElemeCrawler{
             elemeBill.setPayAmount(notNull((String)map.getOrDefault("payAmount","无")));
             elemeBill.setPaymentDate(DateUtils.long2Date((Long)map.getOrDefault("paymentDate",null)));
             elemeBill.setShopId(Long.valueOf(shopId));
+            if(merchantId != null){
+                elemeBill.setMerchantId(merchantId);
+            }
             list.add(elemeBill);
         }
         return list;

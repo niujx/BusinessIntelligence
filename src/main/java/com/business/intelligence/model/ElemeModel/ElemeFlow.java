@@ -22,17 +22,7 @@ public class ElemeFlow {
     private Integer visitorNum;
     //下单数
     private Integer buyerNum;
-
-    @Override
-    public String toString() {
-        return "ElemeFlow{" +
-                "flowId='" + flowId + '\'' +
-                ", crawlerDate='" + crawlerDate + '\'' +
-                ", shopName='" + shopName + '\'' +
-                ", exposureTotalCount=" + exposureTotalCount +
-                ", visitorNum=" + visitorNum +
-                ", buyerNum=" + buyerNum +
-                '}';
-    }
+    //商户表主键
+    private String merchantId;
 
 }
