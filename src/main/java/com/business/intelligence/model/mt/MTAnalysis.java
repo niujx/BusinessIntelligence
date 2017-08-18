@@ -3,6 +3,7 @@ package com.business.intelligence.model.mt;
 import lombok.Data;
 
 import java.util.Date;
+//营业统计流量分析
 @Data
 public class MTAnalysis {
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 
+//经营分析报表
 @Data
 public class MTOrder {
 
