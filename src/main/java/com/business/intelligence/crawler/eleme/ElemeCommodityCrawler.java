@@ -60,13 +60,16 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             this.beginCrawlerDate = org.apache.commons.lang3.time.DateUtils.addMonths(end,-1);
         }
         //开始爬取
-        log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
-        List<LinkedHashMap<String, Object>> commodityText = getCommodityText(getClient(elemeBean));
-        List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
-        for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
-            elemeDao.insertCommodity(elemeCommodity);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
+            List<LinkedHashMap<String, Object>> commodityText = getCommodityText(client);
+            List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
+            for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
+                elemeDao.insertCommodity(elemeCommodity);
+            }
+            log.info("用户名为 {} 的商品分析已入库完毕",username);
         }
-        log.info("用户名为 {} 的商品分析已入库完毕",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_COMMODITY);
         if(f ==1){
@@ -159,6 +162,9 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             elemeCommodity.setSalesVolume((Integer)map.getOrDefault("salesVolume",0));
             String volumeRate = String.valueOf((Integer)map.getOrDefault("salesVolume",0)*1.0/totalSalesVolume*100)+"00";
             elemeCommodity.setSalesVolumeRate(volumeRate.substring(0,volumeRate.indexOf(".")+3)+"%");
+            if(merchantId != null){
+                elemeCommodity.setMerchantId(merchantId);
+            }
             list.add(elemeCommodity);
         }
         return list;

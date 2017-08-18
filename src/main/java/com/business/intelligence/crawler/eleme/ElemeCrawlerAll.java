@@ -47,6 +47,7 @@ public class ElemeCrawlerAll {
             elemeBean.setUsername(elmUser.getUserName());
             elemeBean.setPassword(elmUser.getPassWord());
             elemeBean.setShopId(elmUser.getShopId());
+            elemeBean.setShopPri(elmUser.getMerchantId());
             list.add(elemeBean);
         }
         log.info("所有饿了么商户信息已经加载完成");

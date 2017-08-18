@@ -84,13 +84,16 @@ public class ElemeOrderCrawler extends ElemeCrawler{
             this.endCrawlerDate = end;
         }
         //开始爬取
-        log.info("开始爬取饿了么订单，日期： {} 到 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
-        ElemeMessage orderText = getOrderText(getClient(elemeBean));
-        List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
-        for(ElemeOrder elemeOrder : elemeOrderBeans){
-           elemeDao.insertOrder(elemeOrder);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么订单，日期： {} 到 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            ElemeMessage orderText = getOrderText(client);
+            List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
+            for(ElemeOrder elemeOrder : elemeOrderBeans){
+                elemeDao.insertOrder(elemeOrder);
+            }
+            log.info("用户名为 {} 的订单已入库完毕",username);
         }
-        log.info("用户名为 {} 的订单已入库完毕",username);
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ORDER);
         if(f ==1){
@@ -217,6 +220,9 @@ public class ElemeOrderCrawler extends ElemeCrawler{
             }
             elemeOrder.setInvoiceType(INVOICETYPE.getOrDefault(map.getOrDefault("invoiceType",""),"无"));
             elemeOrder.setTaxpayerId(notNull((String)map.getOrDefault("taxpayerId","无")));
+            if(merchantId != null){
+                elemeOrder.setMerchantId(merchantId);
+            }
             list.add(elemeOrder);
         }
         return list;

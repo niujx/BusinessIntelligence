@@ -28,6 +28,8 @@ public class ElemeBill {
     private String paymentDate;
     //商铺ID
     private Long shopId;
+    //商户表主键
+    private String merchantId;
 
 
 }

@@ -9,7 +9,7 @@ import java.io.*;
 
 public class CookieStoreUtils {
 
-    private static String storePath = "e:\\cralwer\\download\\cookieStore";
+    private static String storePath = "cookieStore";
 
     public static void storeCookie(CookieStore cookieStore, String fileName) {
         File file = new File(storePath);

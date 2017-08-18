@@ -87,49 +87,8 @@ public class ElemeOrder {
     private String invoiceType;
     //纳税人识别号
     private String taxpayerId;
+    //商户表主键
+    private String merchantId;
 
 
-    @Override
-    public String toString() {
-        return "ElemeOrder{" +
-                "orderId=" + orderId +
-                ", shopId=" + shopId +
-                ", address='" + address + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                ", activeAt='" + activeAt + '\'' +
-                ", deliverFee=" + deliverFee +
-                ", deliverTime='" + deliverTime + '\'' +
-                ", description='" + description + '\'' +
-                ", groups='" + groups + '\'' +
-                ", invoice='" + invoice + '\'' +
-                ", book=" + book +
-                ", onlinePaid=" + onlinePaid +
-                ", phoneList='" + phoneList + '\'' +
-                ", openId='" + openId + '\'' +
-                ", shopName='" + shopName + '\'' +
-                ", daySn=" + daySn +
-                ", status='" + status + '\'' +
-                ", refundStatus='" + refundStatus + '\'' +
-                ", userId=" + userId +
-                ", totalPrice=" + totalPrice +
-                ", originalPrice=" + originalPrice +
-                ", consignee='" + consignee + '\'' +
-                ", deliveryGeo='" + deliveryGeo + '\'' +
-                ", deliveryPoiAddress='" + deliveryPoiAddress + '\'' +
-                ", invoiced=" + invoiced +
-                ", income=" + income +
-                ", serviceRate=" + serviceRate +
-                ", serviceFee=" + serviceFee +
-                ", hongbao=" + hongbao +
-                ", packageFee=" + packageFee +
-                ", activityTotal=" + activityTotal +
-                ", shopPart=" + shopPart +
-                ", elemePart=" + elemePart +
-                ", downgraded=" + downgraded +
-                ", secretPhoneExpireTime='" + secretPhoneExpireTime + '\'' +
-                ", orderActivities='" + orderActivities + '\'' +
-                ", invoiceType='" + invoiceType + '\'' +
-                ", taxpayerId='" + taxpayerId + '\'' +
-                '}';
-    }
 }

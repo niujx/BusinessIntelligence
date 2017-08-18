@@ -22,16 +22,7 @@ public class ElemeEvaluate {
     private String quality;
     //商品名称
     private String goods;
+    //商户表主键
+    private String merchantId;
 
-    @Override
-    public String toString() {
-        return "ElemeEvaluate{" +
-                "id=" + id +
-                ", shopId=" + shopId +
-                ", crawlerDate='" + crawlerDate + '\'' +
-                ", evaValue='" + evaValue + '\'' +
-                ", quality='" + quality + '\'' +
-                ", goods='" + goods + '\'' +
-                '}';
-    }
 }

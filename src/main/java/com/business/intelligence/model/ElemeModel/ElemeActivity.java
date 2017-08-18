@@ -34,6 +34,8 @@ public class ElemeActivity {
     private String description;
     //是否与其他优惠共享
     private String isShare;
+    //商户表主键
+    private String merchantId;
 
 
 }

@@ -52,13 +52,16 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             log.info("更新爬取状态失败");
         }
         //开始爬取
-        log.info("开始爬取饿了么商店活动，URL： {} ，用户名： {}",URL,username);
-        List<LinkedHashMap<String, Object>> activityText = getActivityText(getClient(elemeBean));
-        List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
-        for(ElemeActivity elemeActivity : elemeActivityBeans){
-            elemeDao.insertActivity(elemeActivity);
+        CloseableHttpClient client = getClient(elemeBean);
+        if(client != null){
+            log.info("开始爬取饿了么商店活动，URL： {} ，用户名： {}",URL,username);
+            List<LinkedHashMap<String, Object>> activityText = getActivityText(client);
+            List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
+            for(ElemeActivity elemeActivity : elemeActivityBeans){
+                elemeDao.insertActivity(elemeActivity);
+            }
+            log.info("用户名为 {} 的商店活动已入库完毕",username);
         }
-        log.info("用户名为 {} 的商店活动已入库完毕",username);
         //更新爬取状态为完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ACTIVITY);
         if(f ==1){
@@ -154,6 +157,9 @@ public class ElemeActivityCrawler extends ElemeCrawler {
                    content = "无";
             }
             elemeActivity.setContent(content);
+            if(merchantId != null){
+                elemeActivity.setMerchantId(merchantId);
+            }
             list.add(elemeActivity);
         }
         return list;
