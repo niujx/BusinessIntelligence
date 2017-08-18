@@ -61,5 +61,7 @@ public class MTBill {
     //分成折扣
     private String discount;
 
+    private String merchantId;
+
 
 }

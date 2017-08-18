@@ -70,4 +70,6 @@ public class MTOrder {
     private Date orderDoneTime;
     //订单取消原因
     private String orderCancelInfo;
+
+    private String merchantId;
 }

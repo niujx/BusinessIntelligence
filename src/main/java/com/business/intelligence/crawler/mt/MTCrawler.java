@@ -62,7 +62,6 @@ import static java.util.stream.Collectors.toList;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
 
-    //  private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
     private String LOGIN_URL = "https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http://e.waimai.meituan.com/v2/epassport/entry";
     private CloseableHttpClient client;
     private CookieStore cookieStore = new BasicCookieStore();
@@ -91,10 +90,6 @@ public class MTCrawler extends BaseCrawler {
 
     public void login() {
         try {
-
-
-            CloseableHttpResponse index = client.execute(new HttpGet("http://e.waimai.meituan.com/logon"));
-
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
             loginS1.setHeader("Pragma", "no-cache");
             loginS1.setHeader("Accept", "application/json");
@@ -127,34 +122,38 @@ public class MTCrawler extends BaseCrawler {
                     uuidDev = uuid.get();
                     log.info("uuid is {}", uuidDev);
                 }
-                HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
-                loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", bsid), new BasicNameValuePair("device_uuid", uuidDev))));
-                CloseableHttpResponse execute1 = client.execute(loginS2);
-                String loginMessage = EntityUtils.toString(execute1.getEntity());
-                log.info("{}", loginMessage);
-                ReadContext parse = JsonPath.parse(loginMessage);
-                String success = parse.read("$.msg");
-                if ("Success".equals(success)) {
-                    log.info("login success");
-                    accountInfo = new AccountInfo();
-                    accountInfo.setWmPoiId(parse.read("$.data.wmPoiId"));
-                    accountInfo.setAccessToken(parse.read("$.data.accessToken"));
-                    accountInfo.setAcctId(parse.read("$.data.acctId"));
+                for(int i=0;i<2;i++) {
+                    HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
+                    loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", bsid), new BasicNameValuePair("device_uuid", uuidDev)
+                            , new BasicNameValuePair("service", ""))));
+                    CloseableHttpResponse execute1 = client.execute(loginS2);
+                    String loginMessage = EntityUtils.toString(execute1.getEntity());
+                    log.info("{}", loginMessage);
+                    ReadContext parse = JsonPath.parse(loginMessage);
+                    String success = parse.read("$.msg");
+                    if ("Success".equals(success)) {
+                        log.info("login success");
+                        accountInfo = new AccountInfo();
+                        accountInfo.setWmPoiId(parse.read("$.data.wmPoiId"));
+                        accountInfo.setAccessToken(parse.read("$.data.accessToken"));
+                        accountInfo.setAcctId(parse.read("$.data.acctId"));
 
-                    String s = HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com/api/poi/poiList");
-                    log.info("shop name is {}", s);
-                    parse = JsonPath.parse(s);
-                    String name = parse.read("$.data[0].poiName");
-                    accountInfo.setName(name);
+                        String s = HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com/api/poi/poiList");
+                        log.info("shop name is {}", s);
+                        parse = JsonPath.parse(s);
+                        String name = parse.read("$.data[0].poiName");
+                        accountInfo.setName(name);
 
-                    log.info("create account info : {}", accountInfo);
-                    //跨区单点登录地址 更新JSESSIONID
-                    String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
-                    HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
-                    //保存COOKIE 到指定文件
+                        log.info("create account info : {}", accountInfo);
+                        //跨区单点登录地址 更新JSESSIONID
+                        String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
+                        HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
+                        //保存COOKIE 到指定文件
 
-                    HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
-                    CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
+                        HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
+                        CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
+                        break;
+                    }
                 }
             } else {
                 //输入验证码重新登录
@@ -228,43 +227,46 @@ public class MTCrawler extends BaseCrawler {
                         log.info("length is {}", record.size());
                         int i = 0;
                         MTOrder order = new MTOrder();
-                        order.setAppNo(record.get(i++));
-                        order.setOrderTime(toDate(record.get(i++)));
-                        order.setHourLong(toDate(record.get(i++)));
-                        order.setName(record.get(i++));
-                        order.setId(accountInfo.wmPoiId + "$" + record.get(i++) + "$" + order.getAppNo());
-                        order.setCity(record.get(i++));
-                        order.setType(record.get(i++));
-                        order.setStatus(record.get(i++));
-                        order.setDisStatus(record.get(i++));
-                        order.setIsSchedule(record.get(i++));
-                        order.setPostDiscount(record.get(i++));
-                        order.setTotalPrice(record.get(i++));
-                        order.setMtPrice(record.get(i++));
-                        order.setMerchantPrice(record.get(i++));
-                        order.setDishInfo(record.get(i++));
-                        order.setDeliveryfee(record.get(i++));
-                        order.setIsDiscount(record.get(i++));
-                        order.setPreferential(record.get(i++));
-                        order.setIsPress(record.get(i++));
-                        order.setReplyStatus(record.get(i++));
-                        order.setMerchantReplay(record.get(i++));
-                        order.setComplaintTime(toDate(record.get(i++)));
-                        order.setComplaintInfo(record.get(i++));
-                        order.setAppraiseTime(toDate(record.get(i++)));
-                        order.setDeliveryTime(toDate(record.get(i++)));
-                        order.setStar(record.get(i++));
-                        order.setAppraiseInfo(record.get(i++));
-                        order.setFoodBoxPrice(record.get(i++));
-                        order.setFoodBoxQuantity(record.get(i++));
-                        order.setOrderDoneTime(toDate(record.get(i++)));
-                        order.setOrderCancelInfo(record.get(i++));
+                        order.setAppNo(record.get(0));
+                        order.setOrderTime(toDate(record.get(1)));
+                        order.setHourLong(toDate(record.get(2)));
+                        order.setName(record.get(3));
+                        order.setId(accountInfo.wmPoiId + "$" + record.get(4) + "$" + order.getAppNo());
+                        order.setCity(record.get(5));
+                        order.setType(record.get(6));
+                        order.setStatus(record.get(7));
+                        order.setDisStatus(record.get(8));
+                        order.setIsSchedule(record.get(9));
+                       // order.setPostDiscount(record.get(i++));
+                        order.setTotalPrice(record.get(10));
+                        order.setPostDiscount(record.get(11));
+                        order.setMtPrice(record.get(12));
+                        order.setMerchantPrice(record.get(13));
+                        order.setDishInfo(record.get(14));
+                        order.setDeliveryfee(record.get(15));
+                        order.setIsDiscount(record.get(16));
+                        order.setPreferential(record.get(17));
+                        order.setIsPress(record.get(18));
+                        order.setReplyStatus(record.get(19));
+                        order.setMerchantReplay(record.get(20));
+                        order.setComplaintTime(toDate(record.get(21)));
+                     //   order.setComplaintInfo(record.get(i++));
+                       // order.setAppraiseTime(toDate(record.get(i++)));
+                      ///  order.setDeliveryTime(toDate(record.get(i++)));
+                      //  order.setStar(record.get(i++));
+                     //   order.setAppraiseInfo(record.get(i++));
+                        order.setFoodBoxPrice(record.get(22));
+                        order.setFoodBoxQuantity(record.get(23));
+                        order.setOrderDoneTime(toDate(record.get(24)));
+                        order.setOrderCancelInfo(record.get(25));
+                        order.setMerchantId(loginBean.getMerchantId());
                         mtDao.insertOrder(order);
-                        log.info("order info is {}", order);
+                        log.info("order info is {} ", order);
                     }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (!isLogin) {
                 bizDataReport(fromDate, endDate, true);
             }
@@ -347,6 +349,7 @@ public class MTCrawler extends BaseCrawler {
                                 mtBusiness.setInvalidateOrder(hssfRow.getCell(i++).getStringCellValue());
                                 mtBusiness.setId(accountInfo.wmPoiId + "$" + mtBusiness.getDate());
                                 mtBusiness.setShopName(accountInfo.name);
+                                mtBusiness.setMerchantId(loginBean.getMerchantId());
                                 mtDao.insertBusiness(mtBusiness);
                                 log.info("MTBusiness info is {}", mtBusiness);
                             }
@@ -403,6 +406,7 @@ public class MTCrawler extends BaseCrawler {
                 analysis.setVisitNum((Integer) data.get("visitNum"));
                 analysis.setShopName(accountInfo.name);
                 analysis.setOrderNum((Integer) data.get("orderNum"));
+                analysis.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAnalysis(analysis);
             }
 
@@ -456,6 +460,7 @@ public class MTCrawler extends BaseCrawler {
                         hotSales.setSell(row.getCell(4).getStringCellValue());
                         hotSales.setPercentageNum(row.getCell(5).getStringCellValue());
                         hotSales.setPercentagePrice(row.getCell(6).getStringCellValue());
+                        hotSales.setMerchantId(loginBean.getMerchantId());
                         mtDao.insertSales(hotSales);
                     }
 
@@ -498,7 +503,7 @@ public class MTCrawler extends BaseCrawler {
 
             int i = 1;
             while (true) {
-                String url = String.format("http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
+                String url = String.format("http://e.waimai.meituan.com/v2/customer/comment/r/list?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
                 String json = HttpClientUtil.executeGetWithResult(client, url);
                 log.info("read json is {}", json);
                 ReadContext parse = JsonPath.parse(json);
@@ -522,6 +527,7 @@ public class MTCrawler extends BaseCrawler {
                     mtComment.setTasteScore(parse.read(indexKey + "taste_score"));
                     mtComment.setName(accountInfo.name);
                     mtComment.setShipTime(parse.read(indexKey + "ship_time"));
+                    mtComment.setMerchantId(loginBean.getMerchantId());
                     mtDao.insertComment(mtComment);
                     log.info("comment is {}", mtComment);
                 }
@@ -624,6 +630,7 @@ public class MTCrawler extends BaseCrawler {
                             mtBill.setRate(row.getCell(23).getStringCellValue());
                             mtBill.setGuarantees(row.getCell(24).getStringCellValue());
                             mtBill.setDiscount(row.getCell(25).getStringCellValue());
+                            mtBill.setMerchantId(loginBean.getMerchantId());
                             log.info("bill info is {}", mtBill);
                             mtDao.insertBill(mtBill);
                         }
@@ -685,6 +692,7 @@ public class MTCrawler extends BaseCrawler {
                 mtAct.setStartTime(toDate(parse.read(key + "startTime")));
                 mtAct.setEndTime(toDate(parse.read(key + "endTime")));
                 mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtAct.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAct(mtAct);
             }
 
@@ -700,6 +708,7 @@ public class MTCrawler extends BaseCrawler {
                 mtAct.setStartTime(toDate(parse.read(key + "startTime")));
                 mtAct.setEndTime(toDate(parse.read(key + "endTime")));
                 mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtAct.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAct(mtAct);
             }
 
@@ -739,6 +748,7 @@ public class MTCrawler extends BaseCrawler {
                     String activityRule = parse.read(key + "activityRule");
                     String activityIntroduction = parse.read(key + "activityIntroduction");
                     mtAct.setContext(html2Text(activityType) + "||" + html2Text(activityRule) + "||" + html2Text(activityIntroduction));
+                    mtAct.setMerchantId(loginBean.getMerchantId());
                     mtDao.insertAct(mtAct);
                 }
 
@@ -812,6 +822,10 @@ public class MTCrawler extends BaseCrawler {
         private Integer smsVerify = 0;
         private String smsCode = "";
 
+        public String getMerchantId() {
+            return authenticate.getMerchantId();
+        }
+
         public String cookieStoreName() {
             return MD5.md5(authenticate.getUserName() + "_" + authenticate.getPassword()) + ".cookies";
         }
@@ -853,7 +867,7 @@ public class MTCrawler extends BaseCrawler {
         loginBean.setAuthenticate(authenticate);
         MTCrawler mtCrawler = new MTCrawler();
         mtCrawler.setLoginBean(loginBean);
-       // mtCrawler.login();
+        // mtCrawler.login();
         //  mtCrawler.login(loginBean);
         mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
         // mtCrawler.businessStatistics("20170707", "20170805", false);

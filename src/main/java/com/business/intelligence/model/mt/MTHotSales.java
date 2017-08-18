@@ -23,4 +23,6 @@ public class MTHotSales {
     //销售额百分比
     private String percentagePrice;
 
+    private String merchantId;
+
 }

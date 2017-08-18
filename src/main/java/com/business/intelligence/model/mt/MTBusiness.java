@@ -26,4 +26,6 @@ public class MTBusiness {
 
     private String shopName;
 
+    private String merchantId;
+
 }

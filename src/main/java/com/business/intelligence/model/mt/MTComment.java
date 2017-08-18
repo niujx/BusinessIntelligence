@@ -33,4 +33,6 @@ public class MTComment {
     //商户名称
     private String name;
 
+    private String merchantId;
+
 }

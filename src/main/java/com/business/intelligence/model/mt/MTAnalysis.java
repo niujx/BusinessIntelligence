@@ -19,4 +19,6 @@ public class MTAnalysis {
     private Integer orderNum;
     //商品名称
     private String shopName;
+
+    private String merchantId;
 }
