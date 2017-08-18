@@ -3,3 +3,6 @@
 target
 *.iml
 .cookies
+logs
+ElemeKsidStore
+cookieStore
