@@ -55,10 +55,10 @@ public class ElemeSaleCrawler extends ElemeCrawler {
             this.endCrawlerDate = end;
         }
         //开始爬取
-        CloseableHttpClient client = getClient(elemeBean);
-        if(client != null){
+        CloseableHttpClient getClient = getClient(elemeBean);
+        if(getClient != null){
             log.info("开始爬取饿了么经营统计，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
-            List<LinkedHashMap<String, Object>> saleList= getSaleText(client);
+            List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient);
             List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
             for(ElemeSale elemeSale : elemeSaleBeans){
                 elemeDao.insertSale(elemeSale);
@@ -105,9 +105,9 @@ public class ElemeSaleCrawler extends ElemeCrawler {
                 if (execute != null){
                     execute.close();
                 }
-                if(client != null){
-                    client.close();
-                }
+//                if(client != null){
+//                    client.close();
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

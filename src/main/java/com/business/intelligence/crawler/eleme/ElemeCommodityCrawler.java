@@ -119,9 +119,9 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
                 if (execute != null){
                     execute.close();
                 }
-                if(client != null){
-                    client.close();
-                }
+//                if(client != null){
+//                    client.close();
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
