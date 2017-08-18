@@ -58,55 +58,55 @@ public class BaiduController {
         return users;
     }
 
-    @RequestMapping(value = "/getOrderList/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @RequestMapping(value = "getOrderList", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取订单信息", httpMethod = "GET", notes = "根据时间段获取订单信息")
-    public Object getOrderList(@RequestParam String star, @RequestParam String end, @RequestParam String userName) {
+    public Object getOrderList(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
             for (User u : listUser) {
-                waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star, end);
+                waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
                 return "OrderList is ok";
             }
         } else {
             User u = getUser(userName);
-            waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star, end);
+            waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             return "OrderList is ok";
         }
         String content = "没有找到 {" + userName + "} 用户的信息";
         return content;
     }
 
-    @RequestMapping(value = "/getComment/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @RequestMapping(value = "getComment", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取评论信息", httpMethod = "GET", notes = "根据时间段获取评论信息")
-    public Object getComment(@RequestParam String star, @RequestParam String end, @RequestParam String userName) {
+    public Object getComment(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
             for (User u : listUser) {
-                waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star, end);
+                waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
                 return "Comment is ok";
             }
         } else {
             User u = getUser(userName);
-            waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), star, end);
+            waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             return "Comment is ok";
         }
         String content = "没有找到 {" + userName + "} 用户的信息";
         return content;
     }
 
-    @RequestMapping(value = "/getBaiduCarwler/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    @RequestMapping(value = "getBaiduCarwler", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取百度外卖商户数据", httpMethod = "GET", notes = "根据时间段获取百度外卖商户数据")
-    public Object getBaiduCarwler(@RequestParam String star, @RequestParam String end, @RequestParam String userName) {
+    public Object getBaiduCarwler(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
 
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
             for (User u : listUser) {
-                waimaiCrawler.logins(u.getUserName(), u.getPassWord(), star, end, u.getMerchantId());
+                waimaiCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
                 return "BaiduCarwler is ok";
             }
         } else {
             User u = getUser(userName);
-            waimaiCrawler.logins(u.getUserName(), u.getPassWord(), star, end, u.getMerchantId());
+            waimaiCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
             return "BaiduCarwler is ok";
         }
         String content = "没有找到 {" + userName + "} 用户的信息";
