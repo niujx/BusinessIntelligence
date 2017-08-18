@@ -1,5 +1,7 @@
 package com.business.intelligence.crawler.mt;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
 import com.business.intelligence.dao.CrawlerStatusDao;
@@ -25,12 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.http.Header;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -45,7 +47,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static com.business.intelligence.util.HttpClientUtil.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -62,9 +62,8 @@ import static java.util.stream.Collectors.toList;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
 
-  //  private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
-
-    private String LOGIN_URL ="https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http:%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2Fentry";
+    //  private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
+    private String LOGIN_URL = "https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http://e.waimai.meituan.com/v2/epassport/entry";
     private CloseableHttpClient client;
     private CookieStore cookieStore = new BasicCookieStore();
     private LoginBean loginBean;
@@ -90,89 +89,73 @@ public class MTCrawler extends BaseCrawler {
 
     }
 
-//    Accept:application/json
-//    Accept-Encoding:gzip, deflate, br
-//    Accept-Language:zh-CN,zh;q=0.8
-//    Cache-Control:no-cache
-//    Connection:keep-alive
-//    Content-Length:101
-//    Content-Type:application/x-www-form-urlencoded; charset=UTF-8
-//    Cookie:_lxsdk=15da1951728c8-044fe254bf315-1a326d54-13c680-15da1951728c8; _ga=GA1.2.474460187.1501654574; _lxsdk_s=f47707c6c51c90739aaa19db1573%7C%7C4; __mta=146603659.1501654489442.1502422328325.1502895002355.15; uuid=8c8ddecbe2e969cc8207.1501654489.0.0.0
-//    Host:epassport.meituan.com
-//    Origin:https://epassport.meituan.com
-//    Pragma:no-cache
-//    Referer:https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd
-//    User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36
-//    x-requested-with:XMLHttpRequest
-
-
     public void login() {
-        List<BasicNameValuePair> params = loginBean.form().entrySet().stream().map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())).collect(toList());
         try {
 
 
-            HttpClientUtil.executeGet(client,"http://e.waimai.meituan.com/logon");
+            CloseableHttpResponse index = client.execute(new HttpGet("http://e.waimai.meituan.com/logon"));
 
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
+            loginS1.setHeader("Pragma", "no-cache");
             loginS1.setHeader("Accept", "application/json");
             loginS1.setHeader("Accept-Encoding", "gzip, deflate, br");
             loginS1.setHeader("Accept-Language", "zh-CN,zh;q=0.8");
             loginS1.setHeader("Connection", "keep-alive");
-            loginS1.setHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+            loginS1.setHeader("Content-type", "application/json");
             loginS1.setHeader("Host", "epassport.meituan.com");
             loginS1.setHeader("Origin", "https://epassport.meituan.com");
-            loginS1.setHeader("Referer","https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd");
-            loginS1.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
-            loginS1.setEntity(new UrlEncodedFormEntity(params, Charset.forName(UTF_8)));
+            loginS1.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+            //'Cache-Control: no-cache' -H 'x-requested-with: XMLHttpRequest'  -H 'Connection: keep-alive'
+            loginS1.setHeader("x-requested-with", "XMLHttpRequest");
+            loginS1.setHeader("Cache-Control", "no-cache");
+            loginS1.setHeader("Connection", "keep-alive");
+            log.info("login json is {}", loginBean.json());
+            loginS1.setEntity(new StringEntity(loginBean.json()));
 
             CloseableHttpResponse execute = client.execute(loginS1);
-            log.info("code is {}",execute.getStatusLine().getStatusCode());
-            if (execute.getStatusLine().getStatusCode() == 200) {
-                Header location = execute.getFirstHeader("Location");
-                String BSID = location.getValue().split("=")[1];
-                log.info("find BSID is {}", BSID);
-                //重试2个 第一次获取设备ID 第二次登录成功
-                for (int i = 0; i < 2; i++) {
-                    Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
-                    String uuidDev = null;
-                    //获取设备ID
-                    if (uuid.isPresent()) {
-                        uuidDev = uuid.get();
-                        log.info("uuid is {}", uuidDev);
-                    }
-                    //  HttpPost loginS2 = new HttpPost("https://waimaie.meituan.com/v2/epassport/logon");
-                    HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
-                    loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", BSID), new BasicNameValuePair("device_uuid", uuidDev))));
-                    CloseableHttpResponse execute1 = client.execute(loginS2);
-                    String loginMessage = EntityUtils.toString(execute1.getEntity());
-                    log.info("{}", loginMessage);
-                    ReadContext parse = JsonPath.parse(loginMessage);
-                    String success = parse.read("$.msg");
-                    if ("Success".equals(success)) {
-                        log.info("login success");
-                        accountInfo = new AccountInfo();
-                        accountInfo.setWmPoiId(parse.read("$.data.wmPoiId"));
-                        accountInfo.setAccessToken(parse.read("$.data.accessToken"));
-                        accountInfo.setAcctId(parse.read("$.data.acctId"));
-
-                        String s = HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com/api/poi/poiList");
-                        log.info("shop name is {}", s);
-                        parse = JsonPath.parse(s);
-                        String name = parse.read("$.data[0].poiName");
-                        accountInfo.setName(name);
-
-                        log.info("create account info : {}", accountInfo);
-                        //跨区单点登录地址 更新JSESSIONID
-                        String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
-                        HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
-                        //保存COOKIE 到指定文件
-
-                        HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
-                        CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
-                        break;
-                    }
+            log.info("code is {}", execute.getStatusLine().getStatusCode());
+            String loginJson = EntityUtils.toString(execute.getEntity());
+            ReadContext loginJsonParser = JsonPath.parse(loginJson);
+            log.info("{}", loginJson);
+            Integer message = loginJsonParser.read("$.status.code");
+            String bsid = loginJsonParser.read("$.bsid");
+            if (execute.getStatusLine().getStatusCode() == 200 && message == 0) {
+                Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
+                String uuidDev = null;
+                //获取设备ID
+                if (uuid.isPresent()) {
+                    uuidDev = uuid.get();
+                    log.info("uuid is {}", uuidDev);
                 }
+                HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
+                loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", bsid), new BasicNameValuePair("device_uuid", uuidDev))));
+                CloseableHttpResponse execute1 = client.execute(loginS2);
+                String loginMessage = EntityUtils.toString(execute1.getEntity());
+                log.info("{}", loginMessage);
+                ReadContext parse = JsonPath.parse(loginMessage);
+                String success = parse.read("$.msg");
+                if ("Success".equals(success)) {
+                    log.info("login success");
+                    accountInfo = new AccountInfo();
+                    accountInfo.setWmPoiId(parse.read("$.data.wmPoiId"));
+                    accountInfo.setAccessToken(parse.read("$.data.accessToken"));
+                    accountInfo.setAcctId(parse.read("$.data.acctId"));
 
+                    String s = HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com/api/poi/poiList");
+                    log.info("shop name is {}", s);
+                    parse = JsonPath.parse(s);
+                    String name = parse.read("$.data[0].poiName");
+                    accountInfo.setName(name);
+
+                    log.info("create account info : {}", accountInfo);
+                    //跨区单点登录地址 更新JSESSIONID
+                    String waimaieappLogin = "https://waimaieapp.meituan.com/bizdata/?_source=PC&token=" + accountInfo.getAccessToken() + "&acctId=" + accountInfo.getAcctId() + "&wmPoiId=" + accountInfo.getWmPoiId();
+                    HttpClientUtil.executeGetWithResult(client, waimaieappLogin);
+                    //保存COOKIE 到指定文件
+
+                    HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
+                    CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
+                }
             } else {
                 //输入验证码重新登录
                 String captchaJson = EntityUtils.toString(execute.getEntity());
@@ -823,19 +806,19 @@ public class MTCrawler extends BaseCrawler {
     @Data
     public static class LoginBean {
         private Authenticate authenticate;
-        private String parkey;
-        private String captchaCode;
-        private String captchaVtoken;
-        private String smsVerify="0";
-        private String smsCode;
+        private String parkey = "";
+        private String captchaCode = "";
+        private String captchaVtoken = "";
+        private Integer smsVerify = 0;
+        private String smsCode = "";
 
         public String cookieStoreName() {
             return MD5.md5(authenticate.getUserName() + "_" + authenticate.getPassword()) + ".cookies";
         }
 
 
-        public Map<String, String> form() {
-            Map<String, String> values = Maps.newHashMap();
+        public Map<String, Object> form() {
+            Map<String, Object> values = Maps.newHashMap();
             values.put("login", authenticate.getUserName());
             values.put("password", authenticate.getPassword());
             values.put("park_key", parkey);
@@ -844,6 +827,10 @@ public class MTCrawler extends BaseCrawler {
             values.put("sms_verify", smsVerify);
             values.put("sms_code", smsCode);
             return values;
+        }
+
+        public String json() {
+            return JSON.toJSONString(form(), SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNonStringKeyAsString);
         }
 
     }
@@ -864,18 +851,17 @@ public class MTCrawler extends BaseCrawler {
         authenticate.setPassword("RHpXW72879");
         LoginBean loginBean = new LoginBean();
         loginBean.setAuthenticate(authenticate);
-
         MTCrawler mtCrawler = new MTCrawler();
         mtCrawler.setLoginBean(loginBean);
-
+       // mtCrawler.login();
         //  mtCrawler.login(loginBean);
-        // mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
+        mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
         // mtCrawler.businessStatistics("20170707", "20170805", false);
         // mtCrawler.flowanalysis("30", false);
         //mtCrawler.hotSales("2017-07-31","2017-08-06",true);
         // mtCrawler.comment("2017-08-01", "2017-08-06", true);
         //  mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
-        mtCrawler.acts(true);
+        //mtCrawler.acts(true);
     }
 }
 
