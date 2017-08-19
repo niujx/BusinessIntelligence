@@ -122,9 +122,9 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
                 if (execute != null){
                     execute.close();
                 }
-                if(client != null){
-                    client.close();
-                }
+//                if(client != null){
+//                    client.close();
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -163,7 +163,13 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         List<ElemeEvaluate> list = new ArrayList<>();
         for(LinkedHashMap<String,Object> map : orderList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
-            elemeEvaluate.setId(map.getOrDefault("ratingId",null) == null ? null : (Long)map.getOrDefault("ratingId",null));
+            Long longId;
+            try{
+                longId = (Long)map.getOrDefault("ratingId",null);
+            }catch(ClassCastException e){
+                longId = (Integer)map.getOrDefault("ratingId",null)*1l;
+            }
+            elemeEvaluate.setId(longId);
             elemeEvaluate.setShopId(Long.valueOf(shopId));
             elemeEvaluate.setCrawlerDate(DateUtils.date2String(crawlerDate));
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
