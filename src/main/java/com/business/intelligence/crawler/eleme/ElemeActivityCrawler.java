@@ -61,28 +61,16 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             List<LinkedHashMap<String, Object>> activityTextByExpired = getActivityTextByExpired(client);
             List<LinkedHashMap<String, Object>> activityTextByPending = getActivityTextByPending(client);
             List<ElemeActivity> elemeActivityBeans = getElemeActivityBeans(activityText);
-            List<ElemeActivity> elemeActivityBeans1 = getElemeActivityBeans(activityTextByActivated);
-            List<ElemeActivity> elemeActivityBeans2 = getElemeActivityBeans(activityTextByExpired);
-            List<ElemeActivity> elemeActivityBeans3 = getElemeActivityBeans(activityTextByPending);
-            if(elemeActivityBeans != null){
-                for(ElemeActivity elemeActivity : elemeActivityBeans){
-                    elemeDao.insertActivity(elemeActivity);
-                }
-            }
-            if(elemeActivityBeans1 != null){
-                for(ElemeActivity elemeActivity : elemeActivityBeans1){
-                    elemeDao.insertActivity(elemeActivity);
-                }
-            }
-            if(elemeActivityBeans2 != null){
-                for(ElemeActivity elemeActivity : elemeActivityBeans2){
-                    elemeDao.insertActivity(elemeActivity);
-                }
-            }
-            if(elemeActivityBeans3 != null){
-                for(ElemeActivity elemeActivity : elemeActivityBeans3){
-                    elemeDao.insertActivity(elemeActivity);
-                }
+            List<ElemeActivity> elemeActivityBeansA = getElemeActivityBeansByStatus(activityTextByActivated);
+            List<ElemeActivity> elemeActivityBeansE = getElemeActivityBeansByStatus(activityTextByExpired);
+            List<ElemeActivity> elemeActivityBeansP = getElemeActivityBeansByStatus(activityTextByPending);
+            List<ElemeActivity> list = new ArrayList<>();
+            list.addAll(elemeActivityBeans);
+            list.addAll(elemeActivityBeansA);
+            list.addAll(elemeActivityBeansE);
+            list.addAll(elemeActivityBeansP);
+            for(ElemeActivity elemeActivity : list){
+                elemeDao.insertActivity(elemeActivity);
             }
             log.info("用户名为 {} 的商店活动已入库完毕",username);
         }
@@ -283,25 +271,149 @@ public class ElemeActivityCrawler extends ElemeCrawler {
             }
             //活动内容
             String content = "";
-            switch ((String) map.getOrDefault("iconText","")){
-                case "折":
-                   content = getZhe((Integer)contentMap.get("minCategory"),(Integer)contentMap.get("maxCategory"),(Double)contentMap.get("originalLeastPrice"),(Double)contentMap.get("originalMostPrice"),(Double)contentMap.get("discount"));
-                   break;
-                case "减":
-                   for(LinkedHashMap<String, Object> items : (List<LinkedHashMap<String, Object>>)contentMap.get("items")){
-                       content = content+getJian(items.get("condition"),items.get("discount"),(Double)items.get("subsidy"),items.get("onlinePaymentDiscount"),(Double)items.get("onlinePaymentSubsidy"));
-                   }
-                   break;
-                case "赠":
-                    for(LinkedHashMap<String, Object> gift: (List<LinkedHashMap<String, Object>>)contentMap.get("giftContents")){
-                        content = content+getZeng((Integer)gift.get("condition"),(String)((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("name"),(Integer) ((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("quantity"));
+            try{
+                if(contentMap != null){
+                    switch ((String) map.getOrDefault("iconText","")){
+                        case "浩":
+                            content = notNull((String)map.getOrDefault("title",""));
+                            break;
+                        case "特":
+                            content = "指定商品特价优惠";
+                            break;
+                        case "新":
+                            List<LinkedHashMap<String, Object>> itemsList = (List<LinkedHashMap<String, Object>>) contentMap.get("items");
+                            if(itemsList != null){
+                                for(LinkedHashMap<String, Object> itemMap : itemsList){
+                                    content =content + "新用户立减"+itemMap.getOrDefault("reduction","")+"  ";
+                                }
+                                content.trim();
+                            }else{
+                                content = "未知";
+                            }
+                            break;
+                        case "折":
+                            if(contentMap.get("minCategory") != null){
+                                content = getZhe((Integer)contentMap.get("minCategory"),(Integer)contentMap.get("maxCategory"),(Double)contentMap.get("originalLeastPrice"),(Double)contentMap.get("originalMostPrice"),(Double)contentMap.get("discount"));
+                            }
+                            break;
+                        case "减":
+                            for(LinkedHashMap<String, Object> items : (List<LinkedHashMap<String, Object>>)contentMap.getOrDefault("items",new ArrayList<>())){
+                                if(items.get("condition") != null){
+                                    content = content+getJian(items.get("condition"),items.get("discount"),(Double)items.get("subsidy"),items.get("onlinePaymentDiscount"),(Double)items.get("onlinePaymentSubsidy"));
+                                }
+                            }
+                            break;
+                        case "赠":
+                            for(LinkedHashMap<String, Object> gift: (List<LinkedHashMap<String, Object>>)contentMap.getOrDefault("giftContents",new ArrayList<>())){
+                                if(gift.get("condition") != null){
+                                    content = content+getZeng((Integer)gift.get("condition"),(String)((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("name"),(Integer) ((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("quantity"));
+                                }
+                            }
+                            break;
+                        case "惠":
+                            if(contentMap.get("minCategory") != null){
+                                content = getHui((Integer) contentMap.get("minCategory"),(Integer) contentMap.get("maxCategory"),(Double) contentMap.get("originalLeastPrice"),(Double) contentMap.get("originalMostPrice"),(Double)contentMap.get("lockPrice"));
+                            }
+                            break;
+                        default:
+                            content = "无";
                     }
-                   break;
-                case "惠":
-                    content = getHui((Integer) contentMap.get("minCategory"),(Integer) contentMap.get("maxCategory"),(Double) contentMap.get("originalLeastPrice"),(Double) contentMap.get("originalMostPrice"),(Double)contentMap.get("lockPrice"));
-                    break;
-                default:
-                   content = "无";
+                }else{
+                    content = "未知";
+                }
+            }catch(Exception e){
+                log.info("转换");
+            }
+            elemeActivity.setContent(content);
+            if(merchantId != null){
+                elemeActivity.setMerchantId(merchantId);
+            }
+            list.add(elemeActivity);
+        }
+        return list;
+    }
+
+    /**
+     * 封装进行中的活动信息
+     * @param activityList
+     * @return
+     */
+    public List<ElemeActivity> getElemeActivityBeansByStatus(List<LinkedHashMap<String, Object>> activityList){
+        List<ElemeActivity> list = new ArrayList<>();
+        for(LinkedHashMap<String,Object> map : activityList){
+            LinkedHashMap<String, Object> contentMap = (LinkedHashMap)map.get("content");
+            ElemeActivity  elemeActivity= new ElemeActivity();
+            String crawlerDateString = DateUtils.date2String(crawlerDate);
+            elemeActivity.setPri(map.get("id")+"~"+shopId+"~"+crawlerDateString);
+            elemeActivity.setCrawlerDate(crawlerDateString);
+            elemeActivity.setId((Integer) map.get("id"));
+            elemeActivity.setShopId(Long.valueOf(shopId));
+            elemeActivity.setBeginDate(notNull((String)map.getOrDefault("beginDate","")));
+            elemeActivity.setEndDate(notNull((String)map.getOrDefault("endDate","")));
+            elemeActivity.setName(notNull((String)map.getOrDefault("title","")));
+            elemeActivity.setStatus(notNull((String)map.getOrDefault("status","未知")));
+            elemeActivity.setCreateTime(notNull((String)map.getOrDefault("createdAt","")));
+            elemeActivity.setDescription(notNull((String)map.getOrDefault("description","无")));
+            elemeActivity.setIsShare("未知");
+//            if(contentMap == null || contentMap.size() != 6){
+//                elemeActivity.setIsShare("未知");
+//            }else{
+//                elemeActivity.setIsShare(ISSHARE.get((Boolean)contentMap.getOrDefault("shareWithOtherActivities",null) == null ? false :(Boolean)contentMap.getOrDefault("shareWithOtherActivities",null)));
+//            }
+            //活动内容
+            String content = "";
+            try{
+                if(contentMap != null){
+                    switch ((String) map.getOrDefault("iconText","")){
+                        case "浩":
+                            content = notNull((String)map.getOrDefault("title",""));
+                            break;
+                        case "特":
+                            content = "指定商品特价优惠";
+                            break;
+                        case "新":
+                            List<LinkedHashMap<String, Object>> itemsList = (List<LinkedHashMap<String, Object>>) contentMap.get("items");
+                            if(itemsList != null){
+                                for(LinkedHashMap<String, Object> itemMap : itemsList){
+                                    content =content + "新用户立减"+itemMap.getOrDefault("reduction","")+"  ";
+                                }
+                                content.trim();
+                            }else{
+                                content = "未知";
+                            }
+                            break;
+                        case "折":
+                            if(contentMap.get("minCategory") != null){
+                                content = getZhe((Integer)contentMap.get("minCategory"),(Integer)contentMap.get("maxCategory"),(Double)contentMap.get("originalLeastPrice"),(Double)contentMap.get("originalMostPrice"),(Double)contentMap.get("discount"));
+                            }
+                            break;
+                        case "减":
+                            for(LinkedHashMap<String, Object> items : (List<LinkedHashMap<String, Object>>)contentMap.getOrDefault("items",new ArrayList<>())){
+                                if(items.get("condition") != null){
+                                    content = content+getJian(items.get("condition"),items.get("discount"),(Double)items.get("subsidy"),items.get("onlinePaymentDiscount"),(Double)items.get("onlinePaymentSubsidy"));
+                                }
+                            }
+                            break;
+                        case "赠":
+                            for(LinkedHashMap<String, Object> gift: (List<LinkedHashMap<String, Object>>)contentMap.getOrDefault("giftContents",new ArrayList<>())){
+                                if(gift.get("condition") != null){
+                                    content = content+getZeng((Integer)gift.get("condition"),(String)((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("name"),(Integer) ((LinkedHashMap<String, Object>)gift.get("giftActivityBenefit")).get("quantity"));
+                                }
+                            }
+                            break;
+                        case "惠":
+                            if(contentMap.get("minCategory") != null){
+                                content = getHui((Integer) contentMap.get("minCategory"),(Integer) contentMap.get("maxCategory"),(Double) contentMap.get("originalLeastPrice"),(Double) contentMap.get("originalMostPrice"),(Double)contentMap.get("lockPrice"));
+                            }
+                            break;
+                        default:
+                            content = "无";
+                    }
+                }else{
+                    content = "未知";
+                }
+            }catch(Exception e){
+                log.info("转换");
             }
             elemeActivity.setContent(content);
             if(merchantId != null){
@@ -410,4 +522,6 @@ public class ElemeActivityCrawler extends ElemeCrawler {
     public void doRun() {
 
     }
+
+
 }
