@@ -12,4 +12,5 @@ public class Authenticate {
 
     private String userName;
     private String password;
+    private String merchantId;
 }

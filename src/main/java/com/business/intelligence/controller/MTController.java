@@ -48,6 +48,7 @@ public class MTController {
             Authenticate authenticate = new Authenticate();
             authenticate.setUserName(user.getUserName());
             authenticate.setPassword(user.getPassWord());
+            authenticate.setMerchantId(user.getMerchantId());
             return authenticate;
         }
     }
@@ -60,6 +61,7 @@ public class MTController {
             Authenticate authenticate = new Authenticate();
             authenticate.setUserName(user.getUserName());
             authenticate.setPassword(user.getPassWord());
+            authenticate.setMerchantId(user.getMerchantId());
             list.add(authenticate);
         }
         log.info("所有美团商户信息已经加载完成");

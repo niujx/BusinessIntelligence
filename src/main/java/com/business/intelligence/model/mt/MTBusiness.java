@@ -3,7 +3,7 @@ package com.business.intelligence.model.mt;
 import lombok.Data;
 
 import javax.naming.ldap.PagedResultsControl;
-
+//营业统计
 @Data
 public class MTBusiness {
 
@@ -25,5 +25,7 @@ public class MTBusiness {
     private String id;
 
     private String shopName;
+
+    private String merchantId;
 
 }

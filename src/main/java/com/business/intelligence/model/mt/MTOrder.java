@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 
+//经营分析报表
 @Data
 public class MTOrder {
 
@@ -69,4 +70,6 @@ public class MTOrder {
     private Date orderDoneTime;
     //订单取消原因
     private String orderCancelInfo;
+
+    private String merchantId;
 }

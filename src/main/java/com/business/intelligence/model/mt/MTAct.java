@@ -23,5 +23,7 @@ public class MTAct {
     //活动内容
     private String context;
 
+    private String merchantId;
+
 
 }

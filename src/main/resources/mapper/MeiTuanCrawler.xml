@@ -8,7 +8,7 @@
         (APP_NO,ORDER_TIME,HOUR_LONG,NAME,ID,CITY,TYPE,STATUS,DIS_STATUS,IS_SCHEDULE,TOTAL_PRICE,POST_DISCOUNT,
         MT_PRICE,MERCHANT_PRICE,DISH_INFO,DELIVERY_FEE,IS_DISCOUNT,PREFERENTIAL,IS_PRESS,REPLAY_STATUS,MERCHANT_REPLAY,
         COMPLAINT_TIME,COMPLAINT_INFO,APPRAISE_TIME,DELIVERY_TIME,STAR,APPRAISE_INFO,FOOD_BOX_PRICE,FOOD_BOX_QUANTITY
-        ,ORDER_DONE_TIME,ORDER_CANCEL_INFO)
+        ,ORDER_DONE_TIME,ORDER_CANCEL_INFO,MERCHANT_ID)
         VALUES
         (#{appNo,jdbcType=VARCHAR},
         #{orderTime,jdbcType=DATE},
@@ -40,7 +40,8 @@
         #{foodBoxPrice,jdbcType=VARCHAR},
         #{foodBoxQuantity,jdbcType=VARCHAR},
         #{orderDoneTime,jdbcType=DATE},
-        #{orderCancelInfo,jdbcType=VARCHAR})
+        #{orderCancelInfo,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR})
     </insert>
 
 
@@ -48,7 +49,7 @@
         INSERT INTO BIL_MT_BUSINESS
         (DATE_,TOTAL,SHOP_SUBIDY,
         MEITUAN_SUBIDY,ESTIMATE,
-        VALIDATE_ORDER,INVALIDATE_ORDER,SHOP_NAME,ID)
+        VALIDATE_ORDER,INVALIDATE_ORDER,SHOP_NAME,ID,MERCHANT_ID)
         VALUES(
         #{date,jdbcType=VARCHAR},
         #{total,jdbcType=VARCHAR},
@@ -58,7 +59,8 @@
         #{validateOrder,jdbcType=VARCHAR},
         #{invalidateOrder,jdbcType=VARCHAR},
         #{shopName,jdbcType=VARCHAR},
-        #{id,jdbcType=VARCHAR}
+        #{id,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -69,13 +71,14 @@
         EXPOSURE_NUM,
         VISIT_NUM,
         ORDER_NUM,
-        SHOP_NAME) VALUES (
+        SHOP_NAME,MERCHANT_ID) VALUES (
         #{id,jdbcType=VARCHAR},
         #{date,jdbcType=DATE},
         #{exposureNum,jdbcType=INTEGER},
         #{visitNum,jdbcType=INTEGER},
         #{orderNum,jdbcType=INTEGER},
-        #{shopName,jdbcType=VARCHAR})
+        #{shopName,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR})
     </insert>
 
     <insert id="insertSales" parameterType="MTHotSales">
@@ -86,7 +89,8 @@
         PRODUCT_NAME,
         SELL_NUM,
         PERCENTAGE_NUM,
-        PERCENTAGE_PRICE
+        PERCENTAGE_PRICE,
+        MERCHANT_ID
         ) VALUES (
         #{id,jdbcType=VARCHAR},
         #{date,jdbcType=DATE},
@@ -94,7 +98,8 @@
         #{productName,jdbcType=VARCHAR},
         #{sellNum,jdbcType=INTEGER},
         #{percentageNum,jdbcType=VARCHAR},
-        #{percentagePrice,jdbcType=VARCHAR}
+        #{percentagePrice,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -112,7 +117,8 @@
         SHIP_SCORE,
         PACKAGING_SCORE,
         ORDER_COMMENT_SCORE,
-        E_COMMENT
+        E_COMMENT,
+        MERCHANT_ID
         ) VALUES (
         #{id,jdbcType=VARCHAR},
         #{userName,jdbcType=VARCHAR},
@@ -126,7 +132,8 @@
         #{shipScore,jdbcType=INTEGER},
         #{packagingScore,jdbcType=INTEGER},
         #{orderCommentScore,jdbcType=INTEGER},
-        #{eComment,jdbcType=VARCHAR}
+        #{eComment,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -159,7 +166,8 @@
         GUARANTEES,
         DISCOUNT,
         APP_SEQ,
-        SETTLE_STATUS) VALUES
+        SETTLE_STATUS,
+        MERCHANT_ID) VALUES
         (
         #{id,jdbcType=VARCHAR},
         #{name,jdbcType=VARCHAR},
@@ -187,7 +195,8 @@
         #{guarantees,jdbcType=VARCHAR},
         #{discount,jdbcType=VARCHAR},
         #{appSeq,jdbcType=VARCHAR},
-        #{settleStatus,jdbcType=VARCHAR}
+        #{settleStatus,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -200,7 +209,7 @@
         TYPE,
         ACT_NAME,
         IS_END,
-        CONTEXT)
+        CONTEXT,MERCHANT_ID)
         VALUES(
         #{id,jdbcType=VARCHAR},
         #{name,jdbcType=VARCHAR},
@@ -209,7 +218,8 @@
         #{type,jdbcType=VARCHAR},
         #{actName,jdbcType=VARCHAR},
         #{isEnd,jdbcType=VARCHAR},
-        #{context,jdbcType=VARCHAR}
+        #{context,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=VARCHAR}
         )
     </insert>
 </mapper>

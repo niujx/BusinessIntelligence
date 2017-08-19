@@ -1,5 +1,7 @@
 package com.business.intelligence.crawler.mt;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.crawler.baidu.CodeImage;
 import com.business.intelligence.dao.CrawlerStatusDao;
@@ -25,12 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.http.Header;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -45,7 +47,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static com.business.intelligence.util.HttpClientUtil.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -62,9 +62,7 @@ import static java.util.stream.Collectors.toList;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MTCrawler extends BaseCrawler {
 
-  //  private String LOGIN_URL = "https://epassport.meituan.com/account/loginv2?service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&part_type=0&bg_source=3";
-
-    private String LOGIN_URL ="https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http:%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2Fentry";
+    private String LOGIN_URL = "https://epassport.meituan.com/api/account/login?service=waimai&bg_source=3&loginContinue=http://e.waimai.meituan.com/v2/epassport/entry";
     private CloseableHttpClient client;
     private CookieStore cookieStore = new BasicCookieStore();
     private LoginBean loginBean;
@@ -90,59 +88,44 @@ public class MTCrawler extends BaseCrawler {
 
     }
 
-//    Accept:application/json
-//    Accept-Encoding:gzip, deflate, br
-//    Accept-Language:zh-CN,zh;q=0.8
-//    Cache-Control:no-cache
-//    Connection:keep-alive
-//    Content-Length:101
-//    Content-Type:application/x-www-form-urlencoded; charset=UTF-8
-//    Cookie:_lxsdk=15da1951728c8-044fe254bf315-1a326d54-13c680-15da1951728c8; _ga=GA1.2.474460187.1501654574; _lxsdk_s=f47707c6c51c90739aaa19db1573%7C%7C4; __mta=146603659.1501654489442.1502422328325.1502895002355.15; uuid=8c8ddecbe2e969cc8207.1501654489.0.0.0
-//    Host:epassport.meituan.com
-//    Origin:https://epassport.meituan.com
-//    Pragma:no-cache
-//    Referer:https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd
-//    User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36
-//    x-requested-with:XMLHttpRequest
-
-
     public void login() {
-        List<BasicNameValuePair> params = loginBean.form().entrySet().stream().map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())).collect(toList());
         try {
-
-
-            HttpClientUtil.executeGet(client,"http://e.waimai.meituan.com/logon");
-
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
+            loginS1.setHeader("Pragma", "no-cache");
             loginS1.setHeader("Accept", "application/json");
             loginS1.setHeader("Accept-Encoding", "gzip, deflate, br");
             loginS1.setHeader("Accept-Language", "zh-CN,zh;q=0.8");
             loginS1.setHeader("Connection", "keep-alive");
-            loginS1.setHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+            loginS1.setHeader("Content-type", "application/json");
             loginS1.setHeader("Host", "epassport.meituan.com");
             loginS1.setHeader("Origin", "https://epassport.meituan.com");
-            loginS1.setHeader("Referer","https://epassport.meituan.com/account/unitivelogin?bg_source=3&service=waimai&continue=http://e.waimai.meituan.com/v2/epassport/entry&left_bottom_link=%2Faccount%2Funitivesignup%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FsignUp&right_bottom_link=%2Faccount%2Funitiverecover%3Fbg_source%3D3%26service%3Dwaimai%26continue%3Dhttp%3A%2F%2Fe.waimai.meituan.com%2Fv2%2Fepassport%2FchangePwd");
-            loginS1.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
-            loginS1.setEntity(new UrlEncodedFormEntity(params, Charset.forName(UTF_8)));
+            loginS1.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+            //'Cache-Control: no-cache' -H 'x-requested-with: XMLHttpRequest'  -H 'Connection: keep-alive'
+            loginS1.setHeader("x-requested-with", "XMLHttpRequest");
+            loginS1.setHeader("Cache-Control", "no-cache");
+            loginS1.setHeader("Connection", "keep-alive");
+            log.info("login json is {}", loginBean.json());
+            loginS1.setEntity(new StringEntity(loginBean.json()));
 
             CloseableHttpResponse execute = client.execute(loginS1);
-            log.info("code is {}",execute.getStatusLine().getStatusCode());
-            if (execute.getStatusLine().getStatusCode() == 200) {
-                Header location = execute.getFirstHeader("Location");
-                String BSID = location.getValue().split("=")[1];
-                log.info("find BSID is {}", BSID);
-                //重试2个 第一次获取设备ID 第二次登录成功
-                for (int i = 0; i < 2; i++) {
-                    Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
-                    String uuidDev = null;
-                    //获取设备ID
-                    if (uuid.isPresent()) {
-                        uuidDev = uuid.get();
-                        log.info("uuid is {}", uuidDev);
-                    }
-                    //  HttpPost loginS2 = new HttpPost("https://waimaie.meituan.com/v2/epassport/logon");
+            log.info("code is {}", execute.getStatusLine().getStatusCode());
+            String loginJson = EntityUtils.toString(execute.getEntity());
+            ReadContext loginJsonParser = JsonPath.parse(loginJson);
+            log.info("{}", loginJson);
+            Integer message = loginJsonParser.read("$.status.code");
+            String bsid = loginJsonParser.read("$.bsid");
+            if (execute.getStatusLine().getStatusCode() == 200 && message == 0) {
+                Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
+                String uuidDev = null;
+                //获取设备ID
+                if (uuid.isPresent()) {
+                    uuidDev = uuid.get();
+                    log.info("uuid is {}", uuidDev);
+                }
+                for(int i=0;i<2;i++) {
                     HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
-                    loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", BSID), new BasicNameValuePair("device_uuid", uuidDev))));
+                    loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", bsid), new BasicNameValuePair("device_uuid", uuidDev)
+                            , new BasicNameValuePair("service", ""))));
                     CloseableHttpResponse execute1 = client.execute(loginS2);
                     String loginMessage = EntityUtils.toString(execute1.getEntity());
                     log.info("{}", loginMessage);
@@ -172,7 +155,6 @@ public class MTCrawler extends BaseCrawler {
                         break;
                     }
                 }
-
             } else {
                 //输入验证码重新登录
                 String captchaJson = EntityUtils.toString(execute.getEntity());
@@ -245,43 +227,46 @@ public class MTCrawler extends BaseCrawler {
                         log.info("length is {}", record.size());
                         int i = 0;
                         MTOrder order = new MTOrder();
-                        order.setAppNo(record.get(i++));
-                        order.setOrderTime(toDate(record.get(i++)));
-                        order.setHourLong(toDate(record.get(i++)));
-                        order.setName(record.get(i++));
-                        order.setId(accountInfo.wmPoiId + "$" + record.get(i++) + "$" + order.getAppNo());
-                        order.setCity(record.get(i++));
-                        order.setType(record.get(i++));
-                        order.setStatus(record.get(i++));
-                        order.setDisStatus(record.get(i++));
-                        order.setIsSchedule(record.get(i++));
-                        order.setPostDiscount(record.get(i++));
-                        order.setTotalPrice(record.get(i++));
-                        order.setMtPrice(record.get(i++));
-                        order.setMerchantPrice(record.get(i++));
-                        order.setDishInfo(record.get(i++));
-                        order.setDeliveryfee(record.get(i++));
-                        order.setIsDiscount(record.get(i++));
-                        order.setPreferential(record.get(i++));
-                        order.setIsPress(record.get(i++));
-                        order.setReplyStatus(record.get(i++));
-                        order.setMerchantReplay(record.get(i++));
-                        order.setComplaintTime(toDate(record.get(i++)));
-                        order.setComplaintInfo(record.get(i++));
-                        order.setAppraiseTime(toDate(record.get(i++)));
-                        order.setDeliveryTime(toDate(record.get(i++)));
-                        order.setStar(record.get(i++));
-                        order.setAppraiseInfo(record.get(i++));
-                        order.setFoodBoxPrice(record.get(i++));
-                        order.setFoodBoxQuantity(record.get(i++));
-                        order.setOrderDoneTime(toDate(record.get(i++)));
-                        order.setOrderCancelInfo(record.get(i++));
+                        order.setAppNo(record.get(0));
+                        order.setOrderTime(toDate(record.get(1)));
+                        order.setHourLong(toDate(record.get(2)));
+                        order.setName(record.get(3));
+                        order.setId(accountInfo.wmPoiId + "$" + record.get(4) + "$" + order.getAppNo());
+                        order.setCity(record.get(5));
+                        order.setType(record.get(6));
+                        order.setStatus(record.get(7));
+                        order.setDisStatus(record.get(8));
+                        order.setIsSchedule(record.get(9));
+                       // order.setPostDiscount(record.get(i++));
+                        order.setTotalPrice(record.get(10));
+                        order.setPostDiscount(record.get(11));
+                        order.setMtPrice(record.get(12));
+                        order.setMerchantPrice(record.get(13));
+                        order.setDishInfo(record.get(14));
+                        order.setDeliveryfee(record.get(15));
+                        order.setIsDiscount(record.get(16));
+                        order.setPreferential(record.get(17));
+                        order.setIsPress(record.get(18));
+                        order.setReplyStatus(record.get(19));
+                        order.setMerchantReplay(record.get(20));
+                        order.setComplaintTime(toDate(record.get(21)));
+                     //   order.setComplaintInfo(record.get(i++));
+                       // order.setAppraiseTime(toDate(record.get(i++)));
+                      ///  order.setDeliveryTime(toDate(record.get(i++)));
+                      //  order.setStar(record.get(i++));
+                     //   order.setAppraiseInfo(record.get(i++));
+                        order.setFoodBoxPrice(record.get(22));
+                        order.setFoodBoxQuantity(record.get(23));
+                        order.setOrderDoneTime(toDate(record.get(24)));
+                        order.setOrderCancelInfo(record.get(25));
+                        order.setMerchantId(loginBean.getMerchantId());
                         mtDao.insertOrder(order);
-                        log.info("order info is {}", order);
+                        log.info("order info is {} ", order);
                     }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (!isLogin) {
                 bizDataReport(fromDate, endDate, true);
             }
@@ -364,6 +349,7 @@ public class MTCrawler extends BaseCrawler {
                                 mtBusiness.setInvalidateOrder(hssfRow.getCell(i++).getStringCellValue());
                                 mtBusiness.setId(accountInfo.wmPoiId + "$" + mtBusiness.getDate());
                                 mtBusiness.setShopName(accountInfo.name);
+                                mtBusiness.setMerchantId(loginBean.getMerchantId());
                                 mtDao.insertBusiness(mtBusiness);
                                 log.info("MTBusiness info is {}", mtBusiness);
                             }
@@ -420,6 +406,7 @@ public class MTCrawler extends BaseCrawler {
                 analysis.setVisitNum((Integer) data.get("visitNum"));
                 analysis.setShopName(accountInfo.name);
                 analysis.setOrderNum((Integer) data.get("orderNum"));
+                analysis.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAnalysis(analysis);
             }
 
@@ -473,6 +460,7 @@ public class MTCrawler extends BaseCrawler {
                         hotSales.setSell(row.getCell(4).getStringCellValue());
                         hotSales.setPercentageNum(row.getCell(5).getStringCellValue());
                         hotSales.setPercentagePrice(row.getCell(6).getStringCellValue());
+                        hotSales.setMerchantId(loginBean.getMerchantId());
                         mtDao.insertSales(hotSales);
                     }
 
@@ -515,7 +503,7 @@ public class MTCrawler extends BaseCrawler {
 
             int i = 1;
             while (true) {
-                String url = String.format("http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
+                String url = String.format("http://e.waimai.meituan.com/v2/customer/comment/r/list?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
                 String json = HttpClientUtil.executeGetWithResult(client, url);
                 log.info("read json is {}", json);
                 ReadContext parse = JsonPath.parse(json);
@@ -539,6 +527,7 @@ public class MTCrawler extends BaseCrawler {
                     mtComment.setTasteScore(parse.read(indexKey + "taste_score"));
                     mtComment.setName(accountInfo.name);
                     mtComment.setShipTime(parse.read(indexKey + "ship_time"));
+                    mtComment.setMerchantId(loginBean.getMerchantId());
                     mtDao.insertComment(mtComment);
                     log.info("comment is {}", mtComment);
                 }
@@ -641,6 +630,7 @@ public class MTCrawler extends BaseCrawler {
                             mtBill.setRate(row.getCell(23).getStringCellValue());
                             mtBill.setGuarantees(row.getCell(24).getStringCellValue());
                             mtBill.setDiscount(row.getCell(25).getStringCellValue());
+                            mtBill.setMerchantId(loginBean.getMerchantId());
                             log.info("bill info is {}", mtBill);
                             mtDao.insertBill(mtBill);
                         }
@@ -702,6 +692,7 @@ public class MTCrawler extends BaseCrawler {
                 mtAct.setStartTime(toDate(parse.read(key + "startTime")));
                 mtAct.setEndTime(toDate(parse.read(key + "endTime")));
                 mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtAct.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAct(mtAct);
             }
 
@@ -717,6 +708,7 @@ public class MTCrawler extends BaseCrawler {
                 mtAct.setStartTime(toDate(parse.read(key + "startTime")));
                 mtAct.setEndTime(toDate(parse.read(key + "endTime")));
                 mtAct.setContext(parse.read(key + "poiPolicy"));
+                mtAct.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAct(mtAct);
             }
 
@@ -756,6 +748,7 @@ public class MTCrawler extends BaseCrawler {
                     String activityRule = parse.read(key + "activityRule");
                     String activityIntroduction = parse.read(key + "activityIntroduction");
                     mtAct.setContext(html2Text(activityType) + "||" + html2Text(activityRule) + "||" + html2Text(activityIntroduction));
+                    mtAct.setMerchantId(loginBean.getMerchantId());
                     mtDao.insertAct(mtAct);
                 }
 
@@ -823,19 +816,23 @@ public class MTCrawler extends BaseCrawler {
     @Data
     public static class LoginBean {
         private Authenticate authenticate;
-        private String parkey;
-        private String captchaCode;
-        private String captchaVtoken;
-        private String smsVerify="0";
-        private String smsCode;
+        private String parkey = "";
+        private String captchaCode = "";
+        private String captchaVtoken = "";
+        private Integer smsVerify = 0;
+        private String smsCode = "";
+
+        public String getMerchantId() {
+            return authenticate.getMerchantId();
+        }
 
         public String cookieStoreName() {
             return MD5.md5(authenticate.getUserName() + "_" + authenticate.getPassword()) + ".cookies";
         }
 
 
-        public Map<String, String> form() {
-            Map<String, String> values = Maps.newHashMap();
+        public Map<String, Object> form() {
+            Map<String, Object> values = Maps.newHashMap();
             values.put("login", authenticate.getUserName());
             values.put("password", authenticate.getPassword());
             values.put("park_key", parkey);
@@ -844,6 +841,10 @@ public class MTCrawler extends BaseCrawler {
             values.put("sms_verify", smsVerify);
             values.put("sms_code", smsCode);
             return values;
+        }
+
+        public String json() {
+            return JSON.toJSONString(form(), SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNonStringKeyAsString);
         }
 
     }
@@ -864,18 +865,17 @@ public class MTCrawler extends BaseCrawler {
         authenticate.setPassword("RHpXW72879");
         LoginBean loginBean = new LoginBean();
         loginBean.setAuthenticate(authenticate);
-
         MTCrawler mtCrawler = new MTCrawler();
         mtCrawler.setLoginBean(loginBean);
-
+        // mtCrawler.login();
         //  mtCrawler.login(loginBean);
-        // mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
+        mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
         // mtCrawler.businessStatistics("20170707", "20170805", false);
         // mtCrawler.flowanalysis("30", false);
         //mtCrawler.hotSales("2017-07-31","2017-08-06",true);
         // mtCrawler.comment("2017-08-01", "2017-08-06", true);
         //  mtCrawler.historySettleBillList("2017-07-05", "2017-08-02", true);
-        mtCrawler.acts(true);
+        //mtCrawler.acts(true);
     }
 }
 

@@ -3,6 +3,7 @@ package com.business.intelligence.model.mt;
 import lombok.Data;
 
 import java.util.Date;
+//营业统计流量分析
 @Data
 public class MTAnalysis {
 
@@ -18,4 +19,6 @@ public class MTAnalysis {
     private Integer orderNum;
     //商品名称
     private String shopName;
+
+    private String merchantId;
 }
