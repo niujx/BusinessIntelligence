@@ -311,7 +311,7 @@ public class MTCrawler extends BaseCrawler {
             int taskId = 0;
             int status;
             while (true) {
-                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", "2843062", fromDate, endDate, taskId == 0 ? "" : taskId));
+                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
                 taskId = parse.read("$.data.taskId");
@@ -392,7 +392,7 @@ public class MTCrawler extends BaseCrawler {
                 log.info("更新爬取状态失败");
             }
 
-            String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, "2843062"));
+            String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, accountInfo.wmPoiId));
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
 
