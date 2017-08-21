@@ -471,7 +471,7 @@ public class HttpUtil {
         try {
             CloseableHttpResponse response = client.execute(get);
 //            File codeFile = new File(config.getImgPath()+"baidu/", System.currentTimeMillis() + ".jpg");
-            File codeFile = new File("/Users/wangfukun/other/img", System.currentTimeMillis() + ".jpg");
+            File codeFile = new File("download/img/", System.currentTimeMillis() + ".jpg");
             String path = codeFile.getPath();
             logger.info("图片验证码存储地址："+path);
             FileUtils.copyInputStreamToFile(response.getEntity().getContent(), codeFile);
