@@ -108,11 +108,14 @@ public class MTCrawler extends BaseCrawler {
             loginS1.setEntity(new StringEntity(loginBean.json()));
 
             CloseableHttpResponse execute = client.execute(loginS1);
-            log.info("code is {}", execute.getStatusLine().getStatusCode());
             String loginJson = EntityUtils.toString(execute.getEntity());
             ReadContext loginJsonParser = JsonPath.parse(loginJson);
             log.info("{}", loginJson);
             Integer message = loginJsonParser.read("$.status.code");
+            if (message == 2002) {
+                log.info("需要短信验证码");
+             return;
+            }
             if (execute.getStatusLine().getStatusCode() == 200 && message == 0) {
                 String bsid = loginJsonParser.read("$.bsid");
                 Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
@@ -122,7 +125,7 @@ public class MTCrawler extends BaseCrawler {
                     uuidDev = uuid.get();
                     log.info("uuid is {}", uuidDev);
                 }
-                for(int i=0;i<2;i++) {
+                for (int i = 0; i < 2; i++) {
                     HttpPost loginS2 = new HttpPost("http://e.waimai.meituan.com/v2/epassport/logon");
                     loginS2.setEntity(new UrlEncodedFormEntity(Lists.newArrayList(new BasicNameValuePair("BSID", bsid), new BasicNameValuePair("device_uuid", uuidDev)
                             , new BasicNameValuePair("service", ""))));
@@ -159,15 +162,15 @@ public class MTCrawler extends BaseCrawler {
                 //{"status":{"code":2001,"message":"请输入图片验证码"},"loginToken":null,"needChangePassword":null,"captchaToken":"04e439ca56de48c59733412a610b151b","maskMobile":null,"continue":"http://e.waimai.meituan.com/v2/epassport/entry"}
                 //输入验证码重新登录
                 String token = loginJsonParser.read("$.captchaToken");
-                                     //https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=1503192324135&request_code=04e439ca56de48c59733412a610b151b
-                String captchaImage = "https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=" +System.currentTimeMillis() + "&request_code=" + token;
+                //https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=1503192324135&request_code=04e439ca56de48c59733412a610b151b
+                String captchaImage = "https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=" + System.currentTimeMillis() + "&request_code=" + token;
                 String path = HttpUtil.getCaptchaCodeImage(client, new HttpGet(captchaImage));
                 String captchaCode = CodeImage.Imgencode(path);
                 log.info("get captchaCode is {} ", captchaCode);
                 loginBean.setCaptchaVtoken(token);
                 loginBean.setCaptchaCode(captchaCode);
                 retry++;
-                if (retry < 4)
+                if (retry < 2)
                     login();
             }
 
@@ -186,10 +189,12 @@ public class MTCrawler extends BaseCrawler {
     public void bizDataReport(String fromDate, String endDate, Boolean isLogin) throws InterruptedException {
         try {
             CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            AccountInfo localaccountInfo = (AccountInfo) CookieStoreUtils.readStore(loginBean.cookieStoreName() + "$loginbean");
             if (localCookie == null || isLogin) {
                 login();
             } else {
                 cookieStore = localCookie;
+                accountInfo = localaccountInfo;
             }
 
             //更新爬取状态为进行中
@@ -237,7 +242,7 @@ public class MTCrawler extends BaseCrawler {
                         order.setStatus(record.get(7));
                         order.setDisStatus(record.get(8));
                         order.setIsSchedule(record.get(9));
-                       // order.setPostDiscount(record.get(i++));
+                        // order.setPostDiscount(record.get(i++));
                         order.setTotalPrice(record.get(10));
                         order.setPostDiscount(record.get(11));
                         order.setMtPrice(record.get(12));
@@ -250,11 +255,11 @@ public class MTCrawler extends BaseCrawler {
                         order.setReplyStatus(record.get(19));
                         order.setMerchantReplay(record.get(20));
                         order.setComplaintTime(toDate(record.get(21)));
-                     //   order.setComplaintInfo(record.get(i++));
-                       // order.setAppraiseTime(toDate(record.get(i++)));
-                      ///  order.setDeliveryTime(toDate(record.get(i++)));
-                      //  order.setStar(record.get(i++));
-                     //   order.setAppraiseInfo(record.get(i++));
+                        //   order.setComplaintInfo(record.get(i++));
+                        // order.setAppraiseTime(toDate(record.get(i++)));
+                        ///  order.setDeliveryTime(toDate(record.get(i++)));
+                        //  order.setStar(record.get(i++));
+                        //   order.setAppraiseInfo(record.get(i++));
                         order.setFoodBoxPrice(record.get(22));
                         order.setFoodBoxQuantity(record.get(23));
                         order.setOrderDoneTime(toDate(record.get(24)));
@@ -869,7 +874,7 @@ public class MTCrawler extends BaseCrawler {
         mtCrawler.setLoginBean(loginBean);
         mtCrawler.login();
         //  mtCrawler.login(loginBean);
-      //  mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
+        //  mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
         // mtCrawler.businessStatistics("20170707", "20170805", false);
         // mtCrawler.flowanalysis("30", false);
         //mtCrawler.hotSales("2017-07-31","2017-08-06",true);

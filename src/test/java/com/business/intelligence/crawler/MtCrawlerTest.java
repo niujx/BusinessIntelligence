@@ -26,18 +26,17 @@ public class MtCrawlerTest extends BaseTest {
         crawler.bizDataReport("2017-07-20", "2017-08-07", true);
     }
 
-
-
+    //wmxsty11599   2017/7/15   2017/8/15
     @Test
     public void testBusiness() throws InterruptedException {
         Authenticate authenticate = new Authenticate();
-        authenticate.setUserName("wmONEd46480");
-        authenticate.setPassword("RHpXW72879");
+        authenticate.setUserName("wmxsty11599");
+        authenticate.setPassword("0315758");
         authenticate.setMerchantId("TEST-ID");
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.businessStatistics("20170707", "20170805", true);
+        crawler.businessStatistics("20170715", "20170815", false);
     }
 
     @Test
