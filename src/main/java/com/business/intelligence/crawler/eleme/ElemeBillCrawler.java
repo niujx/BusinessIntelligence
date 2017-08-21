@@ -106,11 +106,14 @@ public class ElemeBillCrawler extends ElemeCrawler{
             log.info("token result is {}",result);
             String token = (String)WebUtils.getOneByJsonPath(result, "$.result");
             log.info("{} 爬取账单的 token 是 {}",username,token);
+            long beginTime = crawlerDate.getTime();
+            long endTime = endCrawlerDate.getTime();
+            String limit = String.valueOf((endTime-beginTime)/1000/60/60/24);
             //利用得到的token进行get请求
             Map<String,String> params = new HashMap<>();
-            params.put("beginDate",String.valueOf(crawlerDate.getTime()));
-            params.put("endDate",String.valueOf(endCrawlerDate.getTime()));
-            params.put("limit","10");
+            params.put("beginDate",String.valueOf(beginTime));
+            params.put("endDate",String.valueOf(endTime));
+            params.put("limit",limit);
             params.put("loginRestaurantId",shopId);
             params.put("offset","0");
             params.put("restaurantId",shopId);
