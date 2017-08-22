@@ -24,5 +24,8 @@ public class ElemeEvaluate {
     private String goods;
     //商户表主键
     private String merchantId;
-
+    //评论时间
+    private String ratingAt;
+    //是否评论
+    private String replied;
 }

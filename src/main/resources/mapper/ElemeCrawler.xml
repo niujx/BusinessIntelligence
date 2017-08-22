@@ -6,14 +6,14 @@
 <mapper namespace="com.business.intelligence">
     <insert id="insertEvaluate" keyProperty="id" parameterType="ElemeEvaluate">
         INSERT INTO "HYF"."BIL_ELEME_EVALUATE"
-            (ID, SHOP_ID, CRAWLER_DATE, EVA_VALUE, QUALITY, GOODS,MERCHANTID)
+            (ID, SHOP_ID, CRAWLER_DATE, EVA_VALUE, QUALITY, GOODS,MERCHANTID,RATING_AT,REPLIED)
         VALUES
-            (#{id},#{shopId},#{crawlerDate},#{evaValue},#{quality},#{goods},#{merchantId})
+            (#{id},#{shopId},#{crawlerDate},#{evaValue},#{quality},#{goods},#{merchantId},#{ratingAt},#{replied})
     </insert>
 
     <insert id="insertActivity" keyProperty="pri" parameterType="ElemeActivity">
         INSERT INTO "HYF"."BIL_ELEME_ACTIVITY"
-            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE,MERCHANTID)
+            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE,MERCHANTID,RATING_AT,REPLIED)
         VALUES
             (#{pri},#{crawlerDate},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare},#{merchantId})
     </insert>
