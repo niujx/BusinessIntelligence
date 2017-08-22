@@ -1,6 +1,6 @@
 (function($){
 	
-	var address = "http://123.206.22.165:9578/bi/eleme/";
+	var address = "bi/eleme/";
 	/**************************饿了么*******************************/
 	//点击订单数据启动按钮时
 	$(".eleme .crawlerOrder").on('click',function(){
@@ -26,8 +26,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -57,8 +57,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -89,8 +89,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -122,8 +122,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -156,8 +156,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -187,8 +187,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -220,8 +220,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})

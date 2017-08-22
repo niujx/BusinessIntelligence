@@ -1,6 +1,6 @@
 (function($){
 	
-	var address = "http://123.206.22.165:9578/bi/v1/";
+	var address = "bi/v1/";
 
 	/**************************百度外卖*******************************/
 	//点击订单数据启动按钮时
@@ -27,8 +27,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -58,8 +58,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -89,8 +89,8 @@
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert("请求失败");
-				console.log("请求失败");//控制台输出请求失败
+				alert(e);
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
