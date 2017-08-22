@@ -175,10 +175,13 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("ratingContent","无评论")));
             elemeEvaluate.setQuality(String.valueOf(map.getOrDefault("ratingStar","无")));
             elemeEvaluate.setGoods("本条为订单评论");
-            elemeEvaluate.setMerchantId(merchantId);
+            elemeEvaluate.setRatingAt(String.valueOf(map.getOrDefault("ratingAt","未知")));
+            Boolean b = (Boolean)map.get("replied");
+            elemeEvaluate.setReplied(b == true ? "已回复":"未回复");
             if(merchantId != null){
-                list.add(elemeEvaluate);
+                elemeEvaluate.setMerchantId(merchantId);
             }
+            list.add(elemeEvaluate);
         }
         for(LinkedHashMap<String,Object> map : foodList){
             ElemeEvaluate elemeEvaluate = new ElemeEvaluate();
@@ -188,6 +191,13 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             elemeEvaluate.setEvaValue(notNull((String)map.getOrDefault("foodRatingContent","无评论")));
             elemeEvaluate.setQuality(notNull((String)map.getOrDefault("quality","无")));
             elemeEvaluate.setGoods(notNull((String)map.getOrDefault("foodName","无")));
+            elemeEvaluate.setRatingAt("无");
+            Boolean b = (Boolean)map.get("replied");
+            if(b ==null){
+                elemeEvaluate.setReplied("未知");
+            }else {
+                elemeEvaluate.setReplied(b == true ? "已回复":"未回复");
+            }
             if(merchantId != null){
                 elemeEvaluate.setMerchantId(merchantId);
             }
