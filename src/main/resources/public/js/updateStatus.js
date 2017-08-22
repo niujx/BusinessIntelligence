@@ -1,6 +1,6 @@
 (function($){
 	
-		var address = "http://localhost:9578/bi/";
+		var address = "bi/";
 	
 window.onload=function(){
 
@@ -31,8 +31,7 @@ window.onload=function(){
 			},
 			error:function(e){
 				//请求失败时的函数
-				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	

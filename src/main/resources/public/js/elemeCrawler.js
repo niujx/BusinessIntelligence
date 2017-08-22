@@ -1,6 +1,6 @@
 (function($){
 	
-	var address = "http://localhost:9578/bi/eleme/";
+	var address = "bi/eleme/";
 	/**************************饿了么*******************************/
 	//点击订单数据启动按钮时
 	$(".eleme .crawlerOrder").on('click',function(){
@@ -22,12 +22,12 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log("启动成功");
-				alert(e);
+				alert("请求成功");
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -52,13 +52,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -84,13 +84,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -117,13 +117,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -151,13 +151,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -182,13 +182,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
@@ -215,13 +215,13 @@
 			success:function(e){
 				//e 为请求成功后返回的数据
 				console.log(e);
-				alert(e);
+				alert("请求成功");
 //				$(this).parents("tr").find(".getTime").text();//text(括号里放返回的日期)
 			},
 			error:function(e){
 				//请求失败时的函数
 				alert(e);
-				console.log("请求失败");//控制台输出请求失败
+				console.log(e);//控制台输出请求失败
 			}
 		})
 	})
