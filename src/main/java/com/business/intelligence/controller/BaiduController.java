@@ -1,14 +1,13 @@
 package com.business.intelligence.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.crawler.baidu.WaimaiApi;
 import com.business.intelligence.crawler.baidu.WaimaiCrawler;
 import com.business.intelligence.dao.UserDao;
-import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.Platform;
 import com.business.intelligence.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -55,62 +54,89 @@ public class BaiduController {
      */
     public List<User> getAllUser() {
         List<User> users = userDao.getUsersForPlatform(Platform.BD);
+        logger.info("获取全部百度用户成功,共计 " + users.size() + " 个用户，用户信息： " + JSONObject.toJSONString(users));
         return users;
     }
 
     @RequestMapping(value = "getOrderList", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取订单信息", httpMethod = "GET", notes = "根据时间段获取订单信息")
     public Object getOrderList(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
+        String content = "没有找到 {" + userName + "} 用户的信息";
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
+            int index = listUser.size();
             for (User u : listUser) {
-                waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-                return "OrderList is ok";
+                try {
+                    logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                    logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
+                    waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                    content = "BaiduOrder is ok";
+                } catch (Exception e) {
+                    logger.error("百度订单获取异常", e);
+                }
             }
         } else {
             User u = getUser(userName);
+            logger.info("当前查询用户{}", JSONObject.toJSONString(u));
             waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             return "OrderList is ok";
         }
-        String content = "没有找到 {" + userName + "} 用户的信息";
         return content;
     }
 
     @RequestMapping(value = "getComment", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取评论信息", httpMethod = "GET", notes = "根据时间段获取评论信息")
     public Object getComment(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
+        String content = "没有找到 {" + userName + "} 用户的信息";
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
+            int index = listUser.size();
             for (User u : listUser) {
-                waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-                return "Comment is ok";
+                try {
+                    logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                    logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
+                    waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                    content = "BaiduComment is ok";
+                } catch (Exception e) {
+                    logger.error("百度评论获取异常", e);
+                }
             }
         } else {
             User u = getUser(userName);
+            logger.info("当前查询用户{}", JSONObject.toJSONString(u));
             waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             return "Comment is ok";
         }
-        String content = "没有找到 {" + userName + "} 用户的信息";
+
         return content;
     }
 
     @RequestMapping(value = "getBaiduCarwler", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ApiOperation(value = "根据时间段获取百度外卖商户数据", httpMethod = "GET", notes = "根据时间段获取百度外卖商户数据")
     public Object getBaiduCarwler(@RequestParam String startTime, @RequestParam String endTime, @RequestParam(required = false) String userName) {
-
+        String content = "没有找到 {" + userName + "} 用户的信息";
         if (userName.isEmpty()) {
             List<User> listUser = getAllUser();
+            int index = listUser.size();
             for (User u : listUser) {
-                waimaiCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
-                return "BaiduCarwler is ok";
+                try {
+                    logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                    logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
+                    waimaiCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+                    content = "BaiduCarwler is ok";
+                } catch (Exception e) {
+                    logger.error("百度爬虫抓取异常", e);
+                }
             }
         } else {
             User u = getUser(userName);
+            logger.info("当前查询用户{}", JSONObject.toJSONString(u));
             waimaiCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
             return "BaiduCarwler is ok";
         }
-        String content = "没有找到 {" + userName + "} 用户的信息";
+
         return content;
     }
+
 }
 
