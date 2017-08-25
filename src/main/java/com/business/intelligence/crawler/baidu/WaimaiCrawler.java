@@ -145,9 +145,9 @@ public class WaimaiCrawler {
         //更新爬取状态为进行中
         int ii = crawlerStatusDao.updateStatusING(CrawlerName.BD_CRAWLER);
         if (ii == 1) {
-            log.info("更新爬取状态成功");
+            log.info(CrawlerName.BD_CRAWLER + " 状态更新成功，状态为：进行中");
         } else {
-            log.info("更新爬取状态失败");
+            log.info(CrawlerName.BD_CRAWLER + " <进行中>状态更新失败");
         }
         dowShopdata(startTime, endTime);
         dowShophotsaledish(startTime, endTime);
@@ -155,9 +155,9 @@ public class WaimaiCrawler {
         dowWthdrawlist(startTime, endTime);
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
         if (f == 1) {
-            log.info("更新爬取状态成功");
+            log.info(CrawlerName.BD_CRAWLER + " 状态更新成功，状态为：已入库");
         } else {
-            log.info("更新爬取状态失败");
+            log.info(CrawlerName.BD_CRAWLER + " <已入库> 更新状态失败");
         }
 
     }
