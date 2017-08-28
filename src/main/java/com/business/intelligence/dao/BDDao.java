@@ -24,7 +24,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertHotDishes", hotDishes);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(hotDishes), e);
+            log.error("百度热销菜品入库数据已存在{}", JSONObject.toJSONString(hotDishes));
         }
     }
 
@@ -37,7 +37,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertBookedTable", bookedTable);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(bookedTable), e);
+            log.error("百度现金账户流水明细入库数据已存在{}", JSONObject.toJSONString(bookedTable));
         }
     }
 
@@ -50,7 +50,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertBusinessData", businessData);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(businessData), e);
+            log.error("百度曝光入库数据已存在{}", JSONObject.toJSONString(businessData));
         }
     }
 
@@ -63,7 +63,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertShopWthdrawal", shopWthdrawal);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(shopWthdrawal), e);
+            log.error("百度提现账户入库数据已存在{}", JSONObject.toJSONString(shopWthdrawal));
         }
     }
 
@@ -76,7 +76,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertComment", comment);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(comment), e);
+            log.error("百度评论入库数据已存在{}", JSONObject.toJSONString(comment));
         }
     }
 
@@ -89,7 +89,7 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertOrderDetails", orderDetails);
         } catch (Exception e) {
-            log.error("数据已存在{}", JSONObject.toJSONString(orderDetails), e);
+            log.error("百度订单详情入库数据已存在{}", JSONObject.toJSONString(orderDetails));
         }
     }
 
