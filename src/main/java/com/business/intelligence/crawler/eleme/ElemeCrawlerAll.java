@@ -57,7 +57,7 @@ public class ElemeCrawlerAll {
     public void runAllCrawler(){
         List<ElemeBean> elemeBeanList = getAllElemeBeans();
         for(ElemeBean elemeBean : elemeBeanList){
-            log.info("开始以此爬取 {} 的所有项目",elemeBean.getUsername());
+            log.info("开始依次爬取 {} 的所有项目",elemeBean.getUsername());
             elemeActivityCrawler.doRun(elemeBean);
             elemeBillCrawler.doRun(elemeBean,null,null);
             elemeCommodityCrawler.doRun(elemeBean,null);

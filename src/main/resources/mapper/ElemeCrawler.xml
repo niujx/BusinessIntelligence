@@ -13,7 +13,7 @@
 
     <insert id="insertActivity" keyProperty="pri" parameterType="ElemeActivity">
         INSERT INTO "HYF"."BIL_ELEME_ACTIVITY"
-            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE,MERCHANTID,RATING_AT,REPLIED)
+            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE,MERCHANTID)
         VALUES
             (#{pri},#{crawlerDate},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare},#{merchantId})
     </insert>
