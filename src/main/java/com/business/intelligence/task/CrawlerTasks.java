@@ -1,5 +1,6 @@
 package com.business.intelligence.task;
 
+import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.crawler.baidu.WaimaiApi;
 import com.business.intelligence.crawler.baidu.WaimaiCrawler;
 import com.business.intelligence.crawler.eleme.ElemeCrawlerAll;
@@ -12,7 +13,6 @@ import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -40,12 +40,11 @@ public class CrawlerTasks {
     @Autowired
     private WaimaiApi bdApi;
 
-//    @Scheduled(cron = "* * 13 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
     }
 
-//    @Scheduled(cron = "0 0 16 * * *")
+    //    @Scheduled(cron = "0 0 16 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
         Date startDate = new Date();
@@ -72,7 +71,7 @@ public class CrawlerTasks {
         }
     }
 
-//    @Scheduled(cron = "0 0 16 * * *")
+    //    @Scheduled(cron = "0 0 16 * * *")
     public void runAllBdCrawler() {
         List<User> users = getAllBdUser();
         Date startDate = new Date();
@@ -81,6 +80,7 @@ public class CrawlerTasks {
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
         for (User u : users) {
+            log.info("百度当前执行商户{}", JSONObject.toJSONString(u));
             bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
             bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
@@ -103,6 +103,7 @@ public class CrawlerTasks {
 
     public List<User> getAllBdUser() {
         List<User> users = userdao.getUsersForPlatform(Platform.BD);
+        log.info("百度定时任务需要执行的商户{}", JSONObject.toJSONString(users));
         return users;
     }
 }
