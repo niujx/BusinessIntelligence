@@ -13,6 +13,7 @@ import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -40,11 +41,12 @@ public class CrawlerTasks {
     @Autowired
     private WaimaiApi bdApi;
 
+    @Scheduled(cron = "0 0 13 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
     }
 
-    //    @Scheduled(cron = "0 0 16 * * *")
+    @Scheduled(cron = "0 30 13 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
         Date startDate = new Date();
@@ -71,7 +73,7 @@ public class CrawlerTasks {
         }
     }
 
-    //    @Scheduled(cron = "0 0 16 * * *")
+    @Scheduled(cron = "0 0 14 * * *")
     public void runAllBdCrawler() {
         List<User> users = getAllBdUser();
         Date startDate = new Date();
