@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.business.intelligence.model.baidu.*;
 import com.business.intelligence.util.MD5;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,187 +19,174 @@ public class Parser {
     /**
      * 热销菜品解析
      *
-     * @param list
+     * @param csvRecords
      * @param shopId
      * @return
      */
-    public static List<HotDishes> hotParser(List<String> list, String shopId) {
+    public static List<HotDishes> hotParser(CSVParser csvRecords, String shopId) {
         List<HotDishes> listHot = new ArrayList<>();
         try {
-            for (int i = 0; i < list.size(); i++) {
-
-                String content = list.get(i);
-                String[] array = content.split(",");
+            for (CSVRecord record : csvRecords) {
                 HotDishes hot = new HotDishes();
-                if (array.length == 7) {
-                    hot.setSort(Integer.valueOf(array[0].trim()));
-                    hot.setDishesName(array[1].trim());
-                    hot.setSales(Integer.valueOf(array[2].trim()));
-                    hot.setSalesAmount(Double.valueOf(array[3].trim()));
-                    hot.setPrice(Double.valueOf(array[4].trim()));
-                    hot.setSalesAccounted(Double.valueOf(array[5].trim()));
-                    hot.setSalesNumberAccounted(Double.valueOf(array[6].trim()));
-                    hot.setShopId(shopId);
-                    hot.setCreatTime(new Date());
-                    hot.setUpdateTime(new Date());
-                    String id = MD5.md5(shopId+"_"+array[1].trim());//商户id+菜品名称MD5后生成主键id
-                    hot.setId(id);
-                    listHot.add(hot);
-                }
+                hot.setSort(Integer.valueOf(record.get(0).trim()));
+                hot.setDishesName(record.get(1).trim());
+                hot.setSales(Integer.valueOf(record.get(2).trim()));
+                hot.setSalesAmount(Double.valueOf(record.get(3).trim()));
+                hot.setPrice(Double.valueOf(record.get(4).trim()));
+                hot.setSalesAccounted(Double.valueOf(record.get(5).trim()));
+                hot.setSalesNumberAccounted(Double.valueOf(record.get(6).trim()));
+                hot.setShopId(shopId);
+                hot.setCreatTime(new Date());
+                hot.setUpdateTime(new Date());
+                String id = MD5.md5(shopId + "_" + record.get(1).trim());//商户id+菜品名称MD5后生成主键id
+                hot.setId(id);
+                listHot.add(hot);
             }
         } catch (Exception e) {
             logger.error("解析热销菜品出错", e);
         }
+        logger.info("百度热销菜品下载内容：" + JSONObject.toJSONString(listHot));
         return listHot;
     }
 
     /**
      * 经营数据解析
      *
-     * @param list
+     * @param csvRecords
      * @param shopId
      * @return
      */
-    public static List<BusinessData> bdParser(List<String> list, String shopId) {
+    public static List<BusinessData> bdParser(CSVParser csvRecords, String shopId) {
         List<BusinessData> bdList = new ArrayList<>();
         try {
-            for (int i = 0; i < list.size(); i++) {
-                String content = list.get(i);
-                String[] array = content.split(",");
+            for (CSVRecord record : csvRecords) {
                 BusinessData bd = new BusinessData();
-                if (array.length == 9) {
-                    bd.setTime(array[0].trim());
-                    bd.setVisitingRs(Integer.valueOf(array[1].trim()));
-                    bd.setVisitingCs(Integer.valueOf(array[2].trim()));
-                    bd.setVisitingPer(Double.valueOf(array[3].trim()));
-                    bd.setExposureRs(Integer.valueOf(array[4].trim()));
-                    bd.setExposureCs(Integer.valueOf(array[5].trim()));
-                    bd.setOrderAmount(Integer.valueOf(array[6].trim()));
-                    bd.setOrderConvert(Double.valueOf(array[7].trim().replace("%","")));
-                    bd.setShopRanking(Double.valueOf(array[8].trim().replace("%","")));
-                    bd.setShopId(shopId);
-                    bd.setCreatTime(new Date());
-                    bd.setUpdateTime(new Date());
-                    String id = MD5.md5(shopId+"_"+array[0].trim());//商户id+日期MD5后生成主键id
-                    bd.setId(id);
-                    bdList.add(bd);
-                }
+                bd.setTime(record.get(0).trim());
+                bd.setVisitingRs(Integer.valueOf(record.get(1).trim()));
+                bd.setVisitingCs(Integer.valueOf(record.get(2).trim()));
+                bd.setVisitingPer(Double.valueOf(record.get(3).trim()));
+                bd.setExposureRs(Integer.valueOf(record.get(4).trim()));
+                bd.setExposureCs(Integer.valueOf(record.get(5).trim()));
+                bd.setOrderAmount(Integer.valueOf(record.get(6).trim()));
+                bd.setOrderConvert(Double.valueOf(record.get(7).trim().replace("%", "")));
+                bd.setShopRanking(Double.valueOf(record.get(8).replace("%", "")));
+                bd.setShopId(shopId);
+                bd.setCreatTime(new Date());
+                bd.setUpdateTime(new Date());
+                String id = MD5.md5(shopId + "_" + record.get(0).trim());//商户id+日期MD5后生成主键id
+                bd.setId(id);
+                bdList.add(bd);
             }
         } catch (Exception e) {
             logger.error("解析经营数据出错", e);
         }
+        logger.info("百度曝光数据下载内容：" + JSONObject.toJSONString(bdList));
         return bdList;
     }
 
     /**
      * 百度商户提现解析
      *
-     * @param list
+     * @param csvRecords
      * @param shopId
      * @return
      */
-    public static List<ShopWthdrawal> swParser(List<String> list, String shopId) {
+    public static List<ShopWthdrawal> swParser(CSVParser csvRecords, String shopId) {
         List<ShopWthdrawal> swList = new ArrayList<>();
         try {
-            for (int i = 0; i < list.size(); i++) {
-                String content = list.get(i);
-                String[] array = content.split(",");
+            for (CSVRecord record : csvRecords) {
                 ShopWthdrawal sw = new ShopWthdrawal();
-                if (array.length == 14) {
-                    sw.setBillDate(array[0].trim());
-                    sw.setAccountDate(array[1].trim());
-                    sw.setSerialNumber(array[2].trim());
-                    sw.setTurnSerialNumber(array[3].trim());
-                    sw.setAccountType(array[4].trim());
-                    sw.setAmount(Double.valueOf(array[5].trim()));
-                    sw.setAccountBalance(Double.valueOf(array[6].trim()));
-                    sw.setFreezeAmount(Double.valueOf(array[7].trim()));
-                    sw.setSumFreezeAmount(Double.valueOf(array[8].trim()));
-                    sw.setPaymentAccount(array[9].trim());
-                    sw.setPaymentName(array[10].trim());
-                    sw.setPaymentStatus(array[11].trim());
-                    sw.setNote(array[12].trim());
-                    sw.setApplicationDate(array[13].trim());
-                    sw.setShopId(shopId);
-                    sw.setCreatTime(new Date());
-                    sw.setUpdateTime(new Date());
-                    String id = MD5.md5(shopId+"_"+array[0].trim()+"_"+array[2].trim());//商户id+账单日期+交易流水号MD5后生成主键id
-                    sw.setId(id);
-                    swList.add(sw);
-                }
+                sw.setBillDate(record.get(0).trim());
+                sw.setAccountDate(record.get(1).trim());
+                sw.setSerialNumber(record.get(2).trim());
+                sw.setTurnSerialNumber(record.get(3).trim());
+                sw.setAccountType(record.get(4).trim());
+                sw.setAmount(Double.valueOf(record.get(5).trim()));
+                sw.setAccountBalance(Double.valueOf(record.get(6).trim()));
+                sw.setFreezeAmount(Double.valueOf(record.get(7).trim()));
+                sw.setSumFreezeAmount(Double.valueOf(record.get(8).trim()));
+                sw.setPaymentAccount(record.get(9).trim());
+                sw.setPaymentName(record.get(10).trim());
+                sw.setPaymentStatus(record.get(11).trim());
+                sw.setNote(record.get(12).trim());
+                sw.setApplicationDate(record.get(13).trim());
+                sw.setShopId(shopId);
+                sw.setCreatTime(new Date());
+                sw.setUpdateTime(new Date());
+                String id = MD5.md5(shopId + "_" + record.get(0).trim() + "_" + record.get(2).trim());//商户id+账单日期+交易流水号MD5后生成主键id
+                sw.setId(id);
+                swList.add(sw);
             }
         } catch (Exception e) {
             logger.error("解析商户提现账户出错", e);
         }
+        logger.info("百度自动提现账户页面下载内容：" + JSONObject.toJSONString(swList));
         return swList;
     }
 
     /**
      * 百度已入账解析
      *
-     * @param list
+     * @param csvRecords
      * @param shopId
      * @return
      */
-    public static List<BookedTable> btParser(List<String> list, String shopId) {
+    public static List<BookedTable> btParser(CSVParser csvRecords, String shopId) {
         List<BookedTable> btList = new ArrayList<>();
         try {
-            for (int i = 0; i < list.size(); i++) {
-                String content = list.get(i);
-                String[] array = content.split(",");
+            for (CSVRecord record : csvRecords) {
                 BookedTable bt = new BookedTable();
-                if (array.length == 40) {
-                    bt.setOrderSortNumber(Integer.valueOf(array[0].toString()));
-                    bt.setOrderNumber(array[1].toString());
-                    bt.setActualPay(array[2].toString());
-                    bt.setFinancialType(array[3].toString());
-                    bt.setSerialNumber(array[4].toString());
-                    bt.setBusinessNumbet(array[5].toString());
-                    bt.setOrderStatus(array[6].toString());
-                    bt.setOrderTime(array[7].toString());
-                    bt.setFinancialTime(array[8].toString());
-                    bt.setYsMax(Double.valueOf(array[9].toString()));
-                    bt.setYxMin(Double.valueOf(array[10].toString()));
-                    bt.setAccountBalance(Double.valueOf(array[11].toString()));
-                    bt.setNote(array[12].toString());
-                    bt.setSecondarySubject(array[13].toString());
-                    bt.setBusinessType(array[14].toString());
-                    bt.setPressure(array[15].toString());
-                    bt.setOrderType(array[16].toString());
-                    bt.setLossBears(array[17].toString());
-                    bt.setFoodEffect(Double.valueOf(array[18].toString()));
-                    bt.setBoxesEffect(Double.valueOf(array[19].toString()));
-                    bt.setSubsidieEffect(Double.valueOf(array[20].toString()));
-                    bt.setCommissionEffect(Double.valueOf(array[21].toString()));
-                    bt.setShippEffect(Double.valueOf(array[22].toString()));
-                    bt.setBdSubsidieEffect(Double.valueOf(array[23].toString()));
-                    bt.setSubsidieAgentsEffect(Double.valueOf(array[24].toString()));
-                    bt.setUserPayEffect(Double.valueOf(array[25].toString()));
-                    bt.setBillAmount(Double.valueOf(array[26].toString()));
-                    bt.setFoodDonEffect(Double.valueOf(array[27].toString()));
-                    bt.setBoxesDonEffect(Double.valueOf(array[28].toString()));
-                    bt.setSubsidieDonEffect(Double.valueOf(array[29].toString()));
-                    bt.setCommissionDonEffect(Double.valueOf(array[20].toString()));
-                    bt.setShippDonEffect(Double.valueOf(array[31].toString()));
-                    bt.setBdSubsidieDonEffect(Double.valueOf(array[32].toString()));
-                    bt.setSubsidieAgentsDonEffect(Double.valueOf(array[33].toString()));
-                    bt.setUserPayDonEffect(Double.valueOf(array[34].toString()));
-                    bt.setBillDonAmount(Double.valueOf(array[35].toString()));//
-                    bt.setSupplier(array[36].toString());
-                    bt.setLogistic(array[37].toString());
-                    bt.setAgent(array[38].toString());
-                    bt.setKnight(array[39].toString());
-                    bt.setShopId(shopId);
-                    bt.setCreatTime(new Date());
-                    bt.setUpdateTime(new Date());
-                    String id = MD5.md5(shopId+"_"+array[1].toString()+"_"+array[4].toString());//商户id+订单号+交易流水号MD5后生成主键id
-                    bt.setId(id);
-                    btList.add(bt);
-                }
+                bt.setOrderSortNumber(Integer.valueOf(record.get(0).toString()));
+                bt.setOrderNumber(record.get(1).toString());
+                bt.setActualPay(record.get(2).toString());
+                bt.setFinancialType(record.get(3).toString());
+                bt.setSerialNumber(record.get(4).toString());
+                bt.setBusinessNumbet(record.get(5).toString());
+                bt.setOrderStatus(record.get(6).toString());
+                bt.setOrderTime(record.get(7).toString());
+                bt.setFinancialTime(record.get(8).toString());
+                bt.setYsMax(Double.valueOf(record.get(9).toString()));
+                bt.setYxMin(Double.valueOf(record.get(10).toString()));
+                bt.setAccountBalance(Double.valueOf(record.get(11).toString()));
+                bt.setNote(record.get(12).toString());
+                bt.setSecondarySubject(record.get(13).toString());
+                bt.setBusinessType(record.get(14).toString());
+                bt.setPressure(record.get(15).toString());
+                bt.setOrderType(record.get(16).toString());
+                bt.setLossBears(record.get(17).toString());
+                bt.setFoodEffect(Double.valueOf(record.get(18).toString()));
+                bt.setBoxesEffect(Double.valueOf(record.get(19).toString()));
+                bt.setSubsidieEffect(Double.valueOf(record.get(20).toString()));
+                bt.setCommissionEffect(Double.valueOf(record.get(21).toString()));
+                bt.setShippEffect(Double.valueOf(record.get(22).toString()));
+                bt.setBdSubsidieEffect(Double.valueOf(record.get(23).toString()));
+                bt.setSubsidieAgentsEffect(Double.valueOf(record.get(24).toString()));
+                bt.setUserPayEffect(Double.valueOf(record.get(25).toString()));
+                bt.setBillAmount(Double.valueOf(record.get(26).toString()));
+                bt.setFoodDonEffect(Double.valueOf(record.get(27).toString()));
+                bt.setBoxesDonEffect(Double.valueOf(record.get(28).toString()));
+                bt.setSubsidieDonEffect(Double.valueOf(record.get(29).toString()));
+                bt.setCommissionDonEffect(Double.valueOf(record.get(30).toString()));
+                bt.setShippDonEffect(Double.valueOf(record.get(31).toString()));
+                bt.setBdSubsidieDonEffect(Double.valueOf(record.get(32).toString()));
+                bt.setSubsidieAgentsDonEffect(Double.valueOf(record.get(33).toString()));
+                bt.setUserPayDonEffect(Double.valueOf(record.get(34).toString()));
+                bt.setBillDonAmount(Double.valueOf(record.get(35).toString()));//
+                bt.setSupplier(record.get(36).toString());
+                bt.setLogistic(record.get(37).toString());
+                bt.setAgent(record.get(38).toString());
+                bt.setKnight(record.get(39).toString());
+                bt.setShopId(shopId);
+                bt.setCreatTime(new Date());
+                bt.setUpdateTime(new Date());
+                String id = MD5.md5(shopId + "_" + record.get(1).toString() + "_" + record.get(4).toString());//商户id+订单号+交易流水号MD5后生成主键id
+                bt.setId(id);
+                btList.add(bt);
             }
         } catch (Exception e) {
             logger.error("解析百度已入账出错", e);
         }
+        logger.info("百度现金账户流水明细下载内容：" + JSONObject.toJSONString(btList));
         return btList;
     }
 
@@ -236,15 +226,16 @@ public class Parser {
                         ct.setCostTime(ctjson.getString("cost_time"));
                         ct.setCreatTime(new Date());
                         ct.setUpdateTime(new Date());
-                        String id = MD5.md5(shopId+"_"+ctjson.getString("comment_id")+"_"+ctjson.getString("create_time"));//商户id+评论id+评论时间Md5后生成主键id
+                        String id = MD5.md5(shopId + "_" + ctjson.getString("comment_id") + "_" + ctjson.getString("create_time"));//商户id+评论id+评论时间Md5后生成主键id
                         ct.setId(id);
                         ctList.add(ct);
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error("解析商户提现账户出错", e);
+            logger.error("解析百度评论出错", e);
         }
+        logger.info("百度评论下载内容：" + JSONObject.toJSONString(ctList));
         return ctList;
     }
 
@@ -316,15 +307,16 @@ public class Parser {
                     od.setCommission(order.getString("commission"));
                     od.setCreatTime(new Date());
                     od.setUpdateTime(new Date());
-                    String id = MD5.md5(shopId+"_"+order.getString("order_id")+"_"+order.getString("order_index"));//商户id+订单id+订单当日流水号MD5后生成主键id
+                    String id = MD5.md5(shopId + "_" + order.getString("order_id") + "_" + order.getString("order_index"));//商户id+订单id+订单当日流水号MD5后生成主键id
                     od.setId(id);
                     odList.add(od);
 
                 }
             }
         } catch (Exception e) {
-            logger.error("解析商户提现账户出错", e);
+            logger.error("解析百度订单详情出错", e);
         }
+        logger.info("百度订单详情下载内容：" + JSONObject.toJSONString(odList));
         return odList;
     }
 

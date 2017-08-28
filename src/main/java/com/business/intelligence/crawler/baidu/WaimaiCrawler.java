@@ -10,7 +10,9 @@ import com.business.intelligence.model.baidu.BusinessData;
 import com.business.intelligence.model.baidu.HotDishes;
 import com.business.intelligence.model.baidu.ShopWthdrawal;
 import com.business.intelligence.util.*;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CookieStore;
@@ -19,7 +21,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,17 +28,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Encoder;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 @EnableAsync
@@ -66,10 +68,6 @@ public class WaimaiCrawler {
      * 商户id
      */
     private String shopId;
-    /**
-     * 计数器
-     */
-    private int index = 0;
 
     public WaimaiCrawler() {
         if (client == null) {
@@ -179,21 +177,22 @@ public class WaimaiCrawler {
             dwd.addHeader("Upgrade-Insecure-Requests", "1");
             dwd.addHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0");
             CloseableHttpResponse response = client.execute(dwd);
-            InputStream in = response.getEntity().getContent();
-            File file = new File(config.getCsvPath() + "baidu/");
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
-            FileUtils.copyInputStreamToFile(in, target);
+//            InputStream in = response.getEntity().getContent();
+//            File file = new File(config.getCsvPath() + "baidu/");
+//            if (!file.exists()) {
+//                file.mkdirs();
+//            }
+//            File target = new File(file.getParentFile(), "曝光数据表_" + startTime + "_" + System.currentTimeMillis() + ".csv");
+//            FileUtils.copyInputStreamToFile(in, target);
             log.info("曝光数据下载成功");
             try {
-                List<String> list = CSVFileUtil.importCsv(target);
-                List<BusinessData> bdList = Parser.bdParser(list, shopId);
+//                List<String> list = CSVFileUtil.importCsv(target);
+                Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "UTF-8");
+                CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
+                List<BusinessData> bdList = Parser.bdParser(csvRecords, shopId);
                 for (BusinessData bd : bdList) {
                     bdDao.insertBusinessData(bd);
                 }
-                index++;
                 log.info("曝光数据入库成功");
             } catch (Exception e) {
                 log.error("解析曝光数据失败", e);
@@ -331,10 +330,11 @@ public class WaimaiCrawler {
                             String tName = j.getString("name");
                             log.info("{" + name + "}的下载链接{" + dow + "}");
                             String create_time = j.getString("create_time");//导出时间
-                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
-                                StringBuilder key = new StringBuilder(name).append("_").append(create_time);
+                            String update_time = j.getString("update_time");//
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time)) {
+                                StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(update_time);
                                 String rowKey = MD5.md5(key.toString());
-                                String day = create_time.substring(0, 10);
+                                String day = update_time.substring(0, 10);
                                 //下载日期是今天并且map没有该rowkey时，说明是第一次下载，初始化map，并赋值false
                                 if (day.equals(now) && map.get(rowKey) == null) {
                                     map.put(rowKey, false);
@@ -377,41 +377,40 @@ public class WaimaiCrawler {
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
             CloseableHttpResponse response = client.execute(dwd);
-            InputStream in = response.getEntity().getContent();
+//            InputStream in = response.getEntity().getContent();
 //            File file = new File("/Users/wangfukun/other/img/"+"baidu/");
-            File file = new File(config.getCsvPath() + "baidu/");
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            File target = new File(file.getParentFile(), name + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + "_" + System.currentTimeMillis() + ".csv");
-            FileUtils.copyInputStreamToFile(in, target);
+//            File file = new File(config.getCsvPath() + "baidu/");
+//            if (!file.exists()) {
+//                file.mkdirs();
+//            }
+//            File target = new File(file.getParentFile(), name + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + "_" + System.currentTimeMillis() + ".csv");
+//            FileUtils.copyInputStreamToFile(in, target);
             //此处去解析入库
-            List<String> list = CSVFileUtil.importCsv(target);
-            if (list.size() <= 0) {
-                log.info("{0}没有需要的数据", name);
-                return;
-            }
+//            List<String> list = CSVFileUtil.importCsv(target);
+//            if (list.size() <= 0) {
+//                log.info(name + "；没有需要下载的数据");
+//                return;
+//            }
+            Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "UTF-8");
+            CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
             switch (name) {
                 case "热销菜品导出":
-                    List<HotDishes> hotList = Parser.hotParser(list, shopId);
+                    List<HotDishes> hotList = Parser.hotParser(csvRecords, shopId);
                     for (HotDishes hot : hotList) {
                         bdDao.insertHotDishes(hot);
                     }
-                    index++;
                     break;
                 case "所有现金账户流水明细导出":
-                    List<BookedTable> btList = Parser.btParser(list, shopId);
+                    List<BookedTable> btList = Parser.btParser(csvRecords, shopId);
                     for (BookedTable bt : btList) {
                         bdDao.insertBookedTable(bt);
                     }
-                    index++;
                     break;
                 case "自动提现账户页面导出":
-                    List<ShopWthdrawal> swList = Parser.swParser(list, shopId);
+                    List<ShopWthdrawal> swList = Parser.swParser(csvRecords, shopId);
                     for (ShopWthdrawal sw : swList) {
                         bdDao.insertShopWthdrawal(sw);
                     }
-                    index++;
                     break;
                 default:
                     break;
