@@ -40,7 +40,7 @@ public class CrawlerTasks {
     @Autowired
     private WaimaiApi bdApi;
 
-    @Scheduled(cron = "* * 13 * * *")
+//    @Scheduled(cron = "* * 13 * * *")
     public void doRun() {
         elemeCrawlerAll.runAllCrawler();
     }
