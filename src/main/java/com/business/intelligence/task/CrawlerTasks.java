@@ -60,7 +60,6 @@ public class CrawlerTasks {
         for (Authenticate authenticate : authenticates) {
             MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
             loginBean.setAuthenticate(authenticate);
-            mtCrawler.setAuthenticate(authenticate);
             mtCrawler.setLoginBean(loginBean);
             mtCrawler.login();
             mtCrawler.bizDataReport(startTime, endTime, false);
