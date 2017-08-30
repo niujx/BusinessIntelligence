@@ -170,60 +170,62 @@ public class ElemeOrderCrawler extends ElemeCrawler{
         List<ElemeOrder> list = new ArrayList<>();
         String json = elemeMessage.getJson();
         List<LinkedHashMap<String, Object>> elemeList = elemeMessage.getList();
-        for(int i =0;i<elemeList.size();i++){
-            LinkedHashMap<String, Object> map = elemeList.get(i);
-            ElemeOrder elemeOrder = new ElemeOrder();
-            elemeOrder.setOrderId(notNull((String)map.get("id")));
-            elemeOrder.setShopId((Integer)map.getOrDefault("shopId","0"));
-            elemeOrder.setAddress(notNull((String)map.getOrDefault("consigneeAddress","未知")));
-            elemeOrder.setCreatedAt(notNull((String)map.getOrDefault("activeTime","未知")));
-            elemeOrder.setActiveAt(notNull((String)map.getOrDefault("activeTime","未知")));
-            elemeOrder.setDeliverFee((Double)map.getOrDefault("deliveryFee",0));
-            elemeOrder.setDeliverTime(notNull((String)map.getOrDefault("bookedTime","无")));
-            elemeOrder.setDescription(notNull((String)map.getOrDefault("remark","未知")));
-            List<String> groups = getJsonText(json,"groups","paymentStatus");
-            for(int groupCount =0;groupCount<groups.size();groupCount++){
-                if(groupCount == i)
-                    elemeOrder.setGroups(groups.get(groupCount));
+        if(elemeList != null){
+            for(int i =0;i<elemeList.size();i++){
+                LinkedHashMap<String, Object> map = elemeList.get(i);
+                ElemeOrder elemeOrder = new ElemeOrder();
+                elemeOrder.setOrderId(notNull((String)map.get("id")));
+                elemeOrder.setShopId((Integer)map.getOrDefault("shopId","0"));
+                elemeOrder.setAddress(notNull((String)map.getOrDefault("consigneeAddress","未知")));
+                elemeOrder.setCreatedAt(notNull((String)map.getOrDefault("activeTime","未知")));
+                elemeOrder.setActiveAt(notNull((String)map.getOrDefault("activeTime","未知")));
+                elemeOrder.setDeliverFee((Double)map.getOrDefault("deliveryFee",0));
+                elemeOrder.setDeliverTime(notNull((String)map.getOrDefault("bookedTime","无")));
+                elemeOrder.setDescription(notNull((String)map.getOrDefault("remark","未知")));
+                List<String> groups = getJsonText(json,"groups","paymentStatus");
+                for(int groupCount =0;groupCount<groups.size();groupCount++){
+                    if(groupCount == i)
+                        elemeOrder.setGroups(groups.get(groupCount));
+                }
+                elemeOrder.setInvoice(notNull((String)map.getOrDefault("invoiceTitle","无")));
+                elemeOrder.setBook((map.get("bookedTime") != null) ? "预定" : "非预定");
+                elemeOrder.setOnlinePaid(("ONLINE".equals((String)map.getOrDefault("payment",""))) ? "在线支付" : "非在线支付");
+                Object phones = map.getOrDefault("consigneePhones", new ArrayList<>());
+                elemeOrder.setPhoneList(getTextByList((List<String>)phones));
+                elemeOrder.setOpenId(notNull((String)map.getOrDefault("openId","无")));
+                elemeOrder.setShopName(notNull((String)map.getOrDefault("shopName","未知")));
+                elemeOrder.setDaySn((Integer)map.getOrDefault("daySn",0));
+                elemeOrder.setStatus(STATUS.getOrDefault((String)map.getOrDefault("status",""),"未知"));
+                elemeOrder.setRefundStatus(REFUNDSTATUS.getOrDefault((String)map.getOrDefault("refundStatus",""),"未知"));
+                elemeOrder.setUserId((Integer)map.getOrDefault("userId",0));
+                elemeOrder.setTotalPrice((Double)map.getOrDefault("payAmount","0"));
+                elemeOrder.setOriginalPrice((Double)map.getOrDefault("goodsTotal",0));
+                elemeOrder.setConsignee(notNull((String)map.getOrDefault("consigneeName","未知")));
+                elemeOrder.setDeliveryGeo(notNull((String)map.getOrDefault("deliveryGeo","无")));
+                elemeOrder.setDeliveryPoiAddress(notNull((String)map.getOrDefault("consigneeAddress","未知")));
+                elemeOrder.setInvoiced((map.get("invoiceTitle") != null) ? "需要发票" : "不需要发票");
+                elemeOrder.setIncome((Double)map.getOrDefault("income",0));
+                elemeOrder.setServiceRate((Double)map.getOrDefault("serviceRate",0));
+                elemeOrder.setServiceFee((Double)map.getOrDefault("serviceFee",0));
+                elemeOrder.setHongbao((Double)map.getOrDefault("hongbao",0));
+                elemeOrder.setPackageFee((Double)map.getOrDefault("packageFee",0));
+                elemeOrder.setActivityTotal((Double)map.getOrDefault("activityTotal",0));
+                elemeOrder.setShopPart((Double)map.getOrDefault("merchantActivityPart",0));
+                elemeOrder.setElemePart((Double)map.getOrDefault("elemeActivityPart",0));
+                elemeOrder.setDowngraded((Boolean)map.getOrDefault("downgraded",false) ? "降级" : "非降级");
+                elemeOrder.setSecretPhoneExpireTime(notNull((String)map.getOrDefault("secretPhoneExpireTime","未知")));
+                List<String> activities = getJsonText(json,"activities","merchantActivities");
+                for(int activityCount =0;activityCount<activities.size();activityCount++){
+                    if(activityCount == i)
+                        elemeOrder.setOrderActivities(activities.get(activityCount));
+                }
+                elemeOrder.setInvoiceType(INVOICETYPE.getOrDefault(map.getOrDefault("invoiceType",""),"无"));
+                elemeOrder.setTaxpayerId(notNull((String)map.getOrDefault("taxpayerId","无")));
+                if(merchantId != null){
+                    elemeOrder.setMerchantId(merchantId);
+                }
+                list.add(elemeOrder);
             }
-            elemeOrder.setInvoice(notNull((String)map.getOrDefault("invoiceTitle","无")));
-            elemeOrder.setBook((map.get("bookedTime") != null) ? "预定" : "非预定");
-            elemeOrder.setOnlinePaid(("ONLINE".equals((String)map.getOrDefault("payment",""))) ? "在线支付" : "非在线支付");
-            Object phones = map.getOrDefault("consigneePhones", new ArrayList<>());
-            elemeOrder.setPhoneList(getTextByList((List<String>)phones));
-            elemeOrder.setOpenId(notNull((String)map.getOrDefault("openId","无")));
-            elemeOrder.setShopName(notNull((String)map.getOrDefault("shopName","未知")));
-            elemeOrder.setDaySn((Integer)map.getOrDefault("daySn",0));
-            elemeOrder.setStatus(STATUS.getOrDefault((String)map.getOrDefault("status",""),"未知"));
-            elemeOrder.setRefundStatus(REFUNDSTATUS.getOrDefault((String)map.getOrDefault("refundStatus",""),"未知"));
-            elemeOrder.setUserId((Integer)map.getOrDefault("userId",0));
-            elemeOrder.setTotalPrice((Double)map.getOrDefault("payAmount","0"));
-            elemeOrder.setOriginalPrice((Double)map.getOrDefault("goodsTotal",0));
-            elemeOrder.setConsignee(notNull((String)map.getOrDefault("consigneeName","未知")));
-            elemeOrder.setDeliveryGeo(notNull((String)map.getOrDefault("deliveryGeo","无")));
-            elemeOrder.setDeliveryPoiAddress(notNull((String)map.getOrDefault("consigneeAddress","未知")));
-            elemeOrder.setInvoiced((map.get("invoiceTitle") != null) ? "需要发票" : "不需要发票");
-            elemeOrder.setIncome((Double)map.getOrDefault("income",0));
-            elemeOrder.setServiceRate((Double)map.getOrDefault("serviceRate",0));
-            elemeOrder.setServiceFee((Double)map.getOrDefault("serviceFee",0));
-            elemeOrder.setHongbao((Double)map.getOrDefault("hongbao",0));
-            elemeOrder.setPackageFee((Double)map.getOrDefault("packageFee",0));
-            elemeOrder.setActivityTotal((Double)map.getOrDefault("activityTotal",0));
-            elemeOrder.setShopPart((Double)map.getOrDefault("merchantActivityPart",0));
-            elemeOrder.setElemePart((Double)map.getOrDefault("elemeActivityPart",0));
-            elemeOrder.setDowngraded((Boolean)map.getOrDefault("downgraded",false) ? "降级" : "非降级");
-            elemeOrder.setSecretPhoneExpireTime(notNull((String)map.getOrDefault("secretPhoneExpireTime","未知")));
-            List<String> activities = getJsonText(json,"activities","merchantActivities");
-            for(int activityCount =0;activityCount<activities.size();activityCount++){
-                if(activityCount == i)
-                    elemeOrder.setOrderActivities(activities.get(activityCount));
-            }
-            elemeOrder.setInvoiceType(INVOICETYPE.getOrDefault(map.getOrDefault("invoiceType",""),"无"));
-            elemeOrder.setTaxpayerId(notNull((String)map.getOrDefault("taxpayerId","无")));
-            if(merchantId != null){
-                elemeOrder.setMerchantId(merchantId);
-            }
-            list.add(elemeOrder);
         }
         return list;
     }

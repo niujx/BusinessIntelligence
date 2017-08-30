@@ -62,11 +62,11 @@ public abstract class ElemeCrawler extends BaseCrawler{
      */
     protected String login() {
         HttpGet httpGetfirst = new HttpGet(INDEX);
-        try {
-            client.execute(httpGetfirst);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            client.execute(httpGetfirst);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         CloseableHttpResponse httpResponse = null;
         String content = null;
         HttpPost httppost = new HttpPost(LOGINURL);
@@ -109,8 +109,8 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 }
             }
             if(ksId != null){
-                HttpGet httpGet = new HttpGet(INDEX);
-                client.execute(httpGet);
+//                HttpGet httpGet = new HttpGet(INDEX);
+//                client.execute(httpGet);
                 //保存ksid
                 log.info("开始保存 {} 的ksid",username);
                 KSIDUtils.storeKSID(ksId,getKsidName(username,password));
