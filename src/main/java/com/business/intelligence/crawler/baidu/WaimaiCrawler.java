@@ -148,9 +148,24 @@ public class WaimaiCrawler {
             log.info(CrawlerName.BD_CRAWLER + " <进行中>状态更新失败");
         }
         dowShopdata(startTime, endTime);
-        dowShophotsaledish(startTime, endTime);
-        dowAllcashtradelist(startTime, endTime);
-        dowWthdrawlist(startTime, endTime);
+        boolean flag = getExporthistory("热销菜品导出");
+        if (flag) {
+            log.info("热销菜品,今天已经有导出历史，无需重新下载");
+        } else {
+            dowShophotsaledish(startTime, endTime);
+        }
+        flag = getExporthistory("所有现金账户流水明细导出");
+        if (flag) {
+            log.info("现金账户流水明细,今天已经有导出历史，无需重新下载");
+        } else {
+            dowAllcashtradelist(startTime, endTime);
+        }
+        flag = getExporthistory("自动提现账户页面导出");
+        if (flag) {
+            log.info("自动提现账户,今天已经有导出历史，无需重新下载");
+        } else {
+            dowWthdrawlist(startTime, endTime);
+        }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
         if (f == 1) {
             log.info(CrawlerName.BD_CRAWLER + " 状态更新成功，状态为：已入库");
@@ -303,10 +318,10 @@ public class WaimaiCrawler {
      *
      * @param name 导出类型
      */
-    public void getExporthistory(String name) {
-        boolean flag = true;
+    public boolean getExporthistory(String name) {
+        boolean flag = false;
         String now = DateUtils.formatDate(new Date(), "yyyy-MM-dd");//记录当前日期，用于下载判断
-        while (flag) {
+        while (!flag) {
             String url = "https://wmcrm.baidu.com/crm?qt=exporthistory";
             if (name.equals("热销菜品导出")) {
                 //热销菜品的请求历史链接与账单的不一致
@@ -328,10 +343,15 @@ public class WaimaiCrawler {
                             JSONObject j = list.getJSONObject(i);
                             String dow = j.getString("download_url");//下载链接
                             String tName = j.getString("name");
-                            log.info("{" + name + "}的下载链接{" + dow + "}");
+                            if (StringUtils.isNotEmpty(dow) && name.equals(tName)) {
+                                log.info("{" + name + "}的下载链接{" + dow + "}");
+                            } else {
+                                log.info("{" + name + "} 导出进行中");
+                            }
+
                             String create_time = j.getString("create_time");//导出时间
                             String update_time = j.getString("update_time");//
-                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time)) {
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time) && name.equals(tName)) {
                                 StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(update_time);
                                 String rowKey = MD5.md5(key.toString());
                                 String day = update_time.substring(0, 10);
@@ -339,19 +359,23 @@ public class WaimaiCrawler {
                                 if (day.equals(now) && map.get(rowKey) == null) {
                                     map.put(rowKey, false);
                                 }
-                                if (map.size() > 0) {
+                                if (day.equals(now) && map.size() > 0) {
                                     //当map中有值时，并且下载链接不为空、value为false时进行下载
-                                    if (StringUtils.isNotEmpty(dow) && !map.get(rowKey) && name.equals(tName)) {
-                                        log.info("开始下载{}", name);
+                                    log.info(rowKey + "===================" + tName + "===================" + map.get(rowKey));
+                                    if (StringUtils.isNotEmpty(dow) && map.get(rowKey) == false && name.equals(tName)) {
+                                        log.info("开始下载、解析、入库{}", name);
                                         dowCsv(name, dow);
                                         map.put(rowKey, true);
                                     }
                                 }
-                                if (!map.containsValue(false)) {
+                                if (!map.containsValue(false) && map.size() > 0) {
                                     //当map中不存在值为false时，说明全部下载完毕
                                     map.clear();
-                                    flag = false;
+                                    flag = true;
                                     break;
+                                }
+                                if (i == (list.size() - 1)) {
+                                    return false;
                                 }
                             }
                         }
@@ -361,7 +385,7 @@ public class WaimaiCrawler {
                 log.error("请求导出进度查询页面出错", e);
             }
         }
-
+        return flag;
     }
 
     /**
@@ -377,20 +401,6 @@ public class WaimaiCrawler {
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
             CloseableHttpResponse response = client.execute(dwd);
-//            InputStream in = response.getEntity().getContent();
-//            File file = new File("/Users/wangfukun/other/img/"+"baidu/");
-//            File file = new File(config.getCsvPath() + "baidu/");
-//            if (!file.exists()) {
-//                file.mkdirs();
-//            }
-//            File target = new File(file.getParentFile(), name + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + "_" + System.currentTimeMillis() + ".csv");
-//            FileUtils.copyInputStreamToFile(in, target);
-            //此处去解析入库
-//            List<String> list = CSVFileUtil.importCsv(target);
-//            if (list.size() <= 0) {
-//                log.info(name + "；没有需要下载的数据");
-//                return;
-//            }
             Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "UTF-8");
             CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
             switch (name) {
@@ -487,6 +497,7 @@ public class WaimaiCrawler {
     private void setCookieStores(String userName, String pwd) {
         log.info("存储本地cookie{}", userName);
         CookieStoreUtils.storeCookie(cookieStore, MD5.md5(userName + "_" + pwd) + ".cookies");
+        client = HttpClientUtil.getHttpClient(new BasicCookieStore());
     }
 
 
@@ -513,14 +524,11 @@ public class WaimaiCrawler {
                 if (content.contains("百度商户")) {
                     log.info("本地cookie登录成功{}", userName);
                     try {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                loadBills(start, end);
-                                setCookieStores(userName, pwd);
-                            }
-                        }).start();
+                        loadBills(start, end);
+                        setCookieStores(userName, pwd);
+                        client = HttpClientUtil.getHttpClient(new BasicCookieStore());
                     } catch (Exception e) {
-                        log.error("异步调用失败{}", userName, e);
+                        log.error("调用失败{}", userName, e);
                     }
                     return true;
                 }
