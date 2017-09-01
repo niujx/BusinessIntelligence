@@ -148,24 +148,9 @@ public class WaimaiCrawler {
             log.info(CrawlerName.BD_CRAWLER + " <进行中>状态更新失败");
         }
         dowShopdata(startTime, endTime);
-        boolean flag = getExporthistory("热销菜品导出");
-        if (flag) {
-            log.info("热销菜品,今天已经有导出历史，无需重新下载");
-        } else {
-            dowShophotsaledish(startTime, endTime);
-        }
-        flag = getExporthistory("所有现金账户流水明细导出");
-        if (flag) {
-            log.info("现金账户流水明细,今天已经有导出历史，无需重新下载");
-        } else {
-            dowAllcashtradelist(startTime, endTime);
-        }
-        flag = getExporthistory("自动提现账户页面导出");
-        if (flag) {
-            log.info("自动提现账户,今天已经有导出历史，无需重新下载");
-        } else {
-            dowWthdrawlist(startTime, endTime);
-        }
+        dowShophotsaledish(startTime, endTime);
+        dowAllcashtradelist(startTime, endTime);
+        dowWthdrawlist(startTime, endTime);
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.BD_CRAWLER);
         if (f == 1) {
             log.info(CrawlerName.BD_CRAWLER + " 状态更新成功，状态为：已入库");
@@ -318,7 +303,7 @@ public class WaimaiCrawler {
      *
      * @param name 导出类型
      */
-    public boolean getExporthistory(String name) {
+    public void getExporthistory(String name) {
         boolean flag = false;
         String now = DateUtils.formatDate(new Date(), "yyyy-MM-dd");//记录当前日期，用于下载判断
         while (!flag) {
@@ -345,13 +330,10 @@ public class WaimaiCrawler {
                             String tName = j.getString("name");
                             if (StringUtils.isNotEmpty(dow) && name.equals(tName)) {
                                 log.info("{" + name + "}的下载链接{" + dow + "}");
-                            } else {
-                                log.info("{" + name + "} 导出进行中");
                             }
-
                             String create_time = j.getString("create_time");//导出时间
                             String update_time = j.getString("update_time");//
-                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time) && name.equals(tName)) {
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time)) {
                                 StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(update_time);
                                 String rowKey = MD5.md5(key.toString());
                                 String day = update_time.substring(0, 10);
@@ -374,10 +356,9 @@ public class WaimaiCrawler {
                                     flag = true;
                                     break;
                                 }
-                                if (i == (list.size() - 1)) {
-                                    return false;
-                                }
+
                             }
+
                         }
                     }
                 }
@@ -385,7 +366,6 @@ public class WaimaiCrawler {
                 log.error("请求导出进度查询页面出错", e);
             }
         }
-        return flag;
     }
 
     /**
