@@ -184,7 +184,7 @@ public class WaimaiApi {
         List<String> s = new ArrayList<>();
         params.keySet().stream().sorted().forEach(k -> s.add(k + "=" + params.get(k)));
         String join = StringUtils.join(s, "&");
-        logger.info("join============>" + join);
+//        logger.info("join============>" + join);
         String sign = getMD5(chinaToUnicode(join.replace("/", "\\/")));
         params.put("sign", sign);
         HttpPost post = HttpClientUtil.post("http://api.waimai.baidu.com/", params);
