@@ -262,7 +262,7 @@ public class Parser {
                     od.setLatitude(user.getString("latitude"));
                     //获取商户信息
                     JSONObject shop = data.getJSONObject("shop");
-                    od.setShopId(shop.getString("shop_id"));
+                    od.setShopId(shopId);
                     od.setBaiduShopId(shop.getString("baidu_shop_id"));
                     od.setBaiduName(shop.getString("name"));
                     //获取订单商品信息组
