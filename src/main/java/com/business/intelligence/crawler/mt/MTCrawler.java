@@ -186,7 +186,7 @@ public class MTCrawler extends BaseCrawler {
      * @param endDate
      * @param isLogin
      */
-    public void bizDataReport(String fromDate, String endDate, Boolean isLogin) throws InterruptedException {
+    public void bizDataReport(String fromDate, String endDate, Boolean isLogin)  {
         try {
             CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
             AccountInfo localaccountInfo = (AccountInfo) CookieStoreUtils.readStore(loginBean.cookieStoreName() + "$loginbean");
@@ -205,10 +205,11 @@ public class MTCrawler extends BaseCrawler {
                 log.info("更新爬取状态失败");
             }
 
-            String reportJson, url;
+            String reportJson, url = null;
             int taskId = 0;
             int status;
-            while (true) {
+            int count = 10;
+            while (count < 3) {
                 reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/report/charts/download?wmPoiIdSel=%s&fromDate=%s&toDate=%s&taskId=%s", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
@@ -218,9 +219,10 @@ public class MTCrawler extends BaseCrawler {
                     url = parse.read("$.data.url");
                     break;
                 }
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.MINUTES.sleep(5);
+                count++;
             }
-
+            if (url == null) return;
             url = new URI(url).toString();
             log.info("csv url is {}", url);
             try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
@@ -316,7 +318,7 @@ public class MTCrawler extends BaseCrawler {
             int taskId = 0;
             int status;
             int count = 0;
-            while (count < 10) {
+            while (count < 3) {
                 reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
@@ -326,21 +328,21 @@ public class MTCrawler extends BaseCrawler {
                     url = parse.read("$.data.url");
                     break;
                 }
-                TimeUnit.SECONDS.sleep(60);
+                TimeUnit.MINUTES.sleep(5);
                 count++;
             }
             if (url == null) return;
             url = new URI(url).toString();
             log.info("csv url is {}", url);
             count = 0;
-            while (count < 10) {
+            while (count < 3) {
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                     if (execute.getStatusLine().getStatusCode() == 200) {
                         Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
                         Sheet sheet = hssfWorkbook.getSheetAt(0);
 
                         if (sheet == null) {
-                            TimeUnit.SECONDS.sleep(60);
+                            TimeUnit.MINUTES.sleep(5);
                             log.info("sleep...");
                             continue;
                         }
@@ -599,14 +601,16 @@ public class MTCrawler extends BaseCrawler {
                 url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download/meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             }
             log.info("excel url is {}", url);
-            while (true) {
+            int count = 0;
+            while (count < 3) {
 
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                     Workbook workbook = WorkbookFactory.create(execute.getEntity().getContent());
                     Sheet sheet = workbook.getSheetAt(0);
                     if (sheet == null) {
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.MINUTES.sleep(5);
                         log.info("sleep...");
+                        count++;
                         continue;
                     }
                     for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {

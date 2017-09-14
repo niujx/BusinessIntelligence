@@ -67,6 +67,7 @@ public class CrawlerTasks {
             mtCrawler.businessStatistics(st, et, false);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
+            mtCrawler.acts(false);
             mtCrawler.comment(startTime, endTime, false);
             mtCrawler.historySettleBillList(startTime, endTime, false);
         }
