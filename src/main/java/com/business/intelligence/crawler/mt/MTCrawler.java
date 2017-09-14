@@ -114,7 +114,7 @@ public class MTCrawler extends BaseCrawler {
             Integer message = loginJsonParser.read("$.status.code");
             if (message == 2002) {
                 log.info("需要短信验证码");
-             return;
+                return;
             }
             if (execute.getStatusLine().getStatusCode() == 200 && message == 0) {
                 String bsid = loginJsonParser.read("$.bsid");
@@ -312,10 +312,11 @@ public class MTCrawler extends BaseCrawler {
                 log.info("更新爬取状态失败");
             }
 
-            String reportJson, url;
+            String reportJson, url = null;
             int taskId = 0;
             int status;
-            while (true) {
+            int count = 0;
+            while (count < 10) {
                 reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
@@ -325,18 +326,21 @@ public class MTCrawler extends BaseCrawler {
                     url = parse.read("$.data.url");
                     break;
                 }
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.SECONDS.sleep(60);
+                count++;
             }
+            if (url == null) return;
             url = new URI(url).toString();
             log.info("csv url is {}", url);
-            while (true) {
+            count = 0;
+            while (count < 10) {
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                     if (execute.getStatusLine().getStatusCode() == 200) {
                         Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
                         Sheet sheet = hssfWorkbook.getSheetAt(0);
 
                         if (sheet == null) {
-                            TimeUnit.SECONDS.sleep(10);
+                            TimeUnit.SECONDS.sleep(60);
                             log.info("sleep...");
                             continue;
                         }
@@ -362,6 +366,7 @@ public class MTCrawler extends BaseCrawler {
                         }
                     }
                 }
+                count++;
                 break;
             }
         } catch (Exception e) {

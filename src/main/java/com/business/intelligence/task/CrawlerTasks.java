@@ -64,7 +64,6 @@ public class CrawlerTasks {
             mtCrawler.setLoginBean(loginBean);
             mtCrawler.login();
             mtCrawler.bizDataReport(startTime, endTime, false);
-            mtCrawler.bizDataReport(startTime, endTime, false);
             mtCrawler.businessStatistics(st, et, false);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
