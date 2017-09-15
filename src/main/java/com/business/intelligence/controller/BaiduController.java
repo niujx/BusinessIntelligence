@@ -66,20 +66,27 @@ public class BaiduController {
             List<User> listUser = getAllUser();
             int index = listUser.size();
             for (User u : listUser) {
-                try {
-                    logger.info("当前查询用户{}", JSONObject.toJSONString(u));
-                    logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
-                    waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-                    content = "BaiduOrder is ok";
-                } catch (Exception e) {
-                    logger.error("百度订单获取异常", e);
+                if (u.getType().equals("1")) {
+                    try {
+                        logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                        logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
+                        waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                        content = "BaiduOrder is ok";
+                    } catch (Exception e) {
+                        logger.error("百度订单获取异常", e);
+                    }
+                } else {
+                    logger.info(u.getUserName() + " 不需要抓取api");
                 }
             }
         } else {
             User u = getUser(userName);
-            logger.info("当前查询用户{}", JSONObject.toJSONString(u));
-            waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            return "OrderList is ok";
+            if (u.getType().equals("1")) {
+                logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                waimaiApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                return "OrderList is ok";
+            }
+            return userName + " 不需要抓取api";
         }
         return content;
     }
@@ -92,20 +99,27 @@ public class BaiduController {
             List<User> listUser = getAllUser();
             int index = listUser.size();
             for (User u : listUser) {
-                try {
-                    logger.info("当前查询用户{}", JSONObject.toJSONString(u));
-                    logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
-                    waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-                    content = "BaiduComment is ok";
-                } catch (Exception e) {
-                    logger.error("百度评论获取异常", e);
+                if (u.getType().equals("1")) {
+                    try {
+                        logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                        logger.info("排队待查询用户数：" + index-- + " ," + JSONObject.toJSONString(listUser));
+                        waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                        content = "BaiduComment is ok";
+                    } catch (Exception e) {
+                        logger.error("百度评论获取异常", e);
+                    }
+                } else {
+                    logger.info(u.getUserName() + " 不需要抓取api");
                 }
             }
         } else {
             User u = getUser(userName);
-            logger.info("当前查询用户{}", JSONObject.toJSONString(u));
-            waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            return "Comment is ok";
+            if (u.getType().equals("1")) {
+                logger.info("当前查询用户{}", JSONObject.toJSONString(u));
+                waimaiApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                return "Comment is ok";
+            }
+            return userName + " 不需要抓取api";
         }
 
         return content;

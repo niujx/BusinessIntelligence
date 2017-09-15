@@ -64,6 +64,8 @@ public class WaimaiCrawler {
 
     private CookieStore cookieStore = new BasicCookieStore();
 
+    private int index = 0;
+
     /**
      * 商户id
      */
@@ -123,6 +125,13 @@ public class WaimaiCrawler {
                     loadBills(start, end);
                     setCookieStores(userName, passWord);
                 }
+            } else {
+                index++;
+                if (index == 5) {
+                    log.info("重试次数达到5次，退出" + userName + " 商户的登录操作；返回内容：" + content);
+                    return content;
+                }
+                return logins(userName, passWord, start, end, shopId);
             }
 
         } catch (IOException e) {
@@ -350,7 +359,7 @@ public class WaimaiCrawler {
                                         map.put(rowKey, true);
                                     }
                                 }
-                                if (!map.containsValue(false) && map.size() > 0) {
+                                if (map.containsValue(true) && map.size() > 0) {
                                     //当map中不存在值为false时，说明全部下载完毕
                                     map.clear();
                                     flag = true;
@@ -359,6 +368,11 @@ public class WaimaiCrawler {
 
                             }
 
+                        }
+                        try {
+                            Thread.sleep(30000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
