@@ -123,11 +123,11 @@ public class WaimaiApi {
             post.addHeader("Content-Type", "application/x-www-form-urlencoded");
             try {
                 String content = HttpClientUtil.executePostWithResult(client, post);
+                logger.info("获取百度上行订单列表{}", content);
                 if (content.contains("order_id")) {
                     JSONObject json = JSONObject.parseObject(content);
                     JSONObject body = json.getJSONObject("body").getJSONObject("data");
                     JSONArray array = body.getJSONArray("list");
-                    logger.info("获取百度上行订单列表{}", content);
                     if (array.size() > 0) {
                         allList.addAll(array.toJavaList(OrderUpList.class));
                     }

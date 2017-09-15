@@ -60,6 +60,9 @@ public class User {
      */
     String shopId;
 
-
+    /**
+     * 爬取类型
+     */
+    String type;
 
 }

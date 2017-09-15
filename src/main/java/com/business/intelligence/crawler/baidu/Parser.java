@@ -147,7 +147,7 @@ public class Parser {
                 bt.setFinancialTime(record.get(8).toString());
                 bt.setYsMax(Double.valueOf(record.get(9).toString()));
                 bt.setYxMin(Double.valueOf(record.get(10).toString()));
-                bt.setAccountBalance(Double.valueOf(record.get(11).toString()));
+                bt.setAccountBalance(Double.valueOf(record.get(11).toString().replace("-", "0")));
                 bt.setNote(record.get(12).toString());
                 bt.setSecondarySubject(record.get(13).toString());
                 bt.setBusinessType(record.get(14).toString());
@@ -161,17 +161,17 @@ public class Parser {
                 bt.setShippEffect(Double.valueOf(record.get(22).toString()));
                 bt.setBdSubsidieEffect(Double.valueOf(record.get(23).toString()));
                 bt.setSubsidieAgentsEffect(Double.valueOf(record.get(24).toString()));
-                bt.setUserPayEffect(Double.valueOf(record.get(25).toString()));
-                bt.setBillAmount(Double.valueOf(record.get(26).toString()));
-                bt.setFoodDonEffect(Double.valueOf(record.get(27).toString()));
-                bt.setBoxesDonEffect(Double.valueOf(record.get(28).toString()));
-                bt.setSubsidieDonEffect(Double.valueOf(record.get(29).toString()));
-                bt.setCommissionDonEffect(Double.valueOf(record.get(30).toString()));
-                bt.setShippDonEffect(Double.valueOf(record.get(31).toString()));
-                bt.setBdSubsidieDonEffect(Double.valueOf(record.get(32).toString()));
-                bt.setSubsidieAgentsDonEffect(Double.valueOf(record.get(33).toString()));
-                bt.setUserPayDonEffect(Double.valueOf(record.get(34).toString()));
-                bt.setBillDonAmount(Double.valueOf(record.get(35).toString()));//
+                bt.setUserPayEffect(Double.valueOf(record.get(25).toString()=="" ? record.get(25).toString():"0"));
+                bt.setBillAmount(Double.valueOf(record.get(26).toString()=="" ? record.get(26).toString():"0"));
+                bt.setFoodDonEffect(Double.valueOf(record.get(27).toString()=="" ? record.get(27).toString():"0"));
+                bt.setBoxesDonEffect(Double.valueOf(record.get(28).toString()=="" ? record.get(28).toString():"0"));
+                bt.setSubsidieDonEffect(Double.valueOf(record.get(29).toString()=="" ? record.get(29).toString():"0"));
+                bt.setCommissionDonEffect(Double.valueOf(record.get(30).toString()=="" ? record.get(30).toString():"0"));
+                bt.setShippDonEffect(Double.valueOf(record.get(31).toString()=="" ? record.get(31).toString():"0"));
+                bt.setBdSubsidieDonEffect(Double.valueOf(record.get(32).toString()=="" ? record.get(32).toString():"0"));
+                bt.setSubsidieAgentsDonEffect(Double.valueOf(record.get(33).toString()=="" ? record.get(33).toString():"0"));
+                bt.setUserPayDonEffect(Double.valueOf(record.get(34).toString()=="" ? record.get(34).toString():"0"));
+                bt.setBillDonAmount(Double.valueOf(record.get(35).toString()=="" ? record.get(35).toString():"0"));//
                 bt.setSupplier(record.get(36).toString());
                 bt.setLogistic(record.get(37).toString());
                 bt.setAgent(record.get(38).toString());
