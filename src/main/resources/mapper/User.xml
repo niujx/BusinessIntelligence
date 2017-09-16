@@ -19,6 +19,7 @@
             SOURCE as source,
             SECRET as secret,
             SHOP_ID  as shopId
+            TYPES as type
         FROM
             TB_ALL_MERCHANTINFO
         where
