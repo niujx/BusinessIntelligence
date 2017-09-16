@@ -7,49 +7,50 @@
 
     <select id="getUsers" resultType="User" parameterType="String">
         SELECT
-            MERCHANT_ID as merchantId,
-            USER_NAME as userName,
-            PASSWORD as password,
-            IS_LAUNCH as isLaunch,
-            PLATFORM as platform,
-            UPDATE_TIME as updateTime,
-            MERCHANT_NAME as merchantName,
-            MERCHANT_ADDRESS as merchantAddress,
-            PHONE as phone,
-            SOURCE as source,
-            SECRET as secret,
-            SHOP_ID  as shopId
-            TYPES as type
+        MERCHANT_ID as merchantId,
+        USER_NAME as userName,
+        PASSWORD as password,
+        IS_LAUNCH as isLaunch,
+        PLATFORM as platform,
+        UPDATE_TIME as updateTime,
+        MERCHANT_NAME as merchantName,
+        MERCHANT_ADDRESS as merchantAddress,
+        PHONE as phone,
+        SOURCE as source,
+        SECRET as secret,
+        SHOP_ID as shopId,
+        TYPES as type
         FROM
-            TB_ALL_MERCHANTINFO
+        TB_ALL_MERCHANTINFO
         where
-            PLATFORM = #{platform}
+        PLATFORM = #{platform}
 
     </select>
 
 
     <select id="getUser" resultType="User" parameterType="map">
         SELECT
-            MERCHANT_ID as merchantId,
-            USER_NAME as userName,
-            PASSWORD as password,
-            IS_LAUNCH as isLaunch,
-            PLATFORM as platform,
-            UPDATE_TIME as updateTime,
-            MERCHANT_NAME as merchantName,
-            MERCHANT_ADDRESS as merchantAddress,
-            PHONE as phone,
-            SOURCE as source,
-            SECRET as secret,
-            SHOP_ID  as shopId
+        MERCHANT_ID as merchantId,
+        USER_NAME as userName,
+        PASSWORD as password,
+        IS_LAUNCH as isLaunch,
+        PLATFORM as platform,
+        UPDATE_TIME as updateTime,
+        MERCHANT_NAME as merchantName,
+        MERCHANT_ADDRESS as merchantAddress,
+        PHONE as phone,
+        SOURCE as source,
+        SECRET as secret,
+        SHOP_ID as shopId,
+        TYPES as type
         FROM
-            TB_ALL_MERCHANTINFO
+        TB_ALL_MERCHANTINFO
         where
-            USER_NAME = #{userName}
+        USER_NAME = #{userName}
         and
-            PLATFORM = #{platformName}
+        PLATFORM = #{platformName}
         AND
-            ROWNUM = 1
+        ROWNUM = 1
 
     </select>
 
