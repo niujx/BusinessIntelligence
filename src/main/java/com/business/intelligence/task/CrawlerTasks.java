@@ -82,10 +82,13 @@ public class CrawlerTasks {
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
         for (User u : users) {
-            log.info("百度当前执行商户{}", JSONObject.toJSONString(u));
-            bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+            if (u.getType().equals("1")) {
+                log.info("百度当前执行商户{}", JSONObject.toJSONString(u));
+                bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+            } else {
+                bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+            }
         }
     }
 
