@@ -33,8 +33,8 @@ public class MtCrawlerTest extends BaseTest {
     @Test
     public void testBusiness() throws InterruptedException {
         Authenticate authenticate = new Authenticate();
-        authenticate.setUserName("wmmswM418379");
-        authenticate.setPassword("7597739");
+        authenticate.setUserName("wmONEd46480");
+        authenticate.setPassword("RHpXW72879");
         authenticate.setMerchantId("TEST-ID");
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);

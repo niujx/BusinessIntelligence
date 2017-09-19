@@ -89,10 +89,20 @@ public class MTCrawler extends BaseCrawler {
 
     }
 
-    public void login() {
+    public void login(boolean isLogin) {
         try {
-            cookieStore = new BasicCookieStore();
-            client = HttpClientUtil.getHttpClient(cookieStore);
+            if (!isLogin && accountInfo != null) return;
+
+            CookieStore localCookieStore = CookieStoreUtils.readStore(loginBean.cookieStoreName());
+            if (localCookieStore != null && !localCookieStore.clearExpired(new Date())) {
+                cookieStore = localCookieStore;
+                client = HttpClientUtil.getHttpClient(cookieStore);
+                accountInfo = (AccountInfo) CookieStoreUtils.readObject(loginBean.cookieStoreName() + "$loginbean");
+                return;
+            }
+
+            this.cookieStore = new BasicCookieStore();
+            client = HttpClientUtil.getHttpClient(this.cookieStore);
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
             loginS1.setHeader("Pragma", "no-cache");
             loginS1.setHeader("Accept", "application/json");
@@ -121,7 +131,7 @@ public class MTCrawler extends BaseCrawler {
             }
             if (execute.getStatusLine().getStatusCode() == 200 && message == 0) {
                 String bsid = loginJsonParser.read("$.bsid");
-                Optional<String> uuid = cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
+                Optional<String> uuid = this.cookieStore.getCookies().stream().filter(cookie -> cookie.getName().equals("device_uuid")).map(cookie -> cookie.getValue()).findFirst();
                 String uuidDev = null;
                 //获取设备ID
                 if (uuid.isPresent()) {
@@ -157,7 +167,7 @@ public class MTCrawler extends BaseCrawler {
                         //保存COOKIE 到指定文件
 
                         HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
-                        CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
+                        CookieStoreUtils.storeCookie(this.cookieStore, loginBean.cookieStoreName());
                         CookieStoreUtils.storeObject(accountInfo, loginBean.cookieStoreName() + "$loginbean");
                         break;
                     }
@@ -175,7 +185,7 @@ public class MTCrawler extends BaseCrawler {
                 loginBean.setCaptchaCode(captchaCode);
                 retry++;
                 if (retry < 2)
-                    login();
+                    login(true);
             }
 
         } catch (IOException e) {
@@ -192,7 +202,7 @@ public class MTCrawler extends BaseCrawler {
      */
     public void bizDataReport(String fromDate, String endDate, Boolean isLogin) {
         try {
-            login();
+            login(isLogin);
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
             if (ii == 1) {
@@ -292,7 +302,7 @@ public class MTCrawler extends BaseCrawler {
     //营业数据 营业统计
     public void businessStatistics(String fromDate, String endDate, boolean isLogin) {
         try {
-            login();
+            login(isLogin);
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_SALE);
             if (ii == 1) {
@@ -374,7 +384,7 @@ public class MTCrawler extends BaseCrawler {
     //营业统计流量分析
     public void flowanalysis(String days, boolean isLogin) {
         try {
-            login();
+            login(isLogin);
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_FLOW);
             if (ii == 1) {
@@ -416,7 +426,7 @@ public class MTCrawler extends BaseCrawler {
     //营业分析热门商品
     public void hotSales(String fromDate, String endDate, boolean isLogin) {
         try {
-            login();
+            login(isLogin);
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_GOODS_SALE);
@@ -466,7 +476,7 @@ public class MTCrawler extends BaseCrawler {
     public void comment(String fromDate, String endDate, boolean isLogin) {
         try {
 
-            login();
+            login(isLogin);
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_EVALUATE);
@@ -529,7 +539,7 @@ public class MTCrawler extends BaseCrawler {
     public void historySettleBillList(String fromDate, String endDate, boolean isLogin) {
         try {
 
-            login();
+            login(isLogin);
 
 
             //更新爬取状态为进行中
@@ -630,8 +640,7 @@ public class MTCrawler extends BaseCrawler {
     public void acts(boolean isLogin) {
         try {
 
-            login();
-
+            login(isLogin);
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_SALE_ACTIVITY);
@@ -829,7 +838,7 @@ public class MTCrawler extends BaseCrawler {
         loginBean.setAuthenticate(authenticate);
         MTCrawler mtCrawler = new MTCrawler();
         mtCrawler.setLoginBean(loginBean);
-        mtCrawler.login();
+        mtCrawler.login(true);
         //  mtCrawler.login(loginBean);
         //  mtCrawler.bizDataReport("2017-07-02", "2017-08-02", false);
         // mtCrawler.businessStatistics("20170707", "20170805", false);
