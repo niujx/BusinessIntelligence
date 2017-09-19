@@ -50,7 +50,8 @@ public class BDDao {
         try {
             sqlSessionTemplate.insert("com.business.intelligence.insertBusinessData", businessData);
         } catch (Exception e) {
-            log.error("百度曝光入库数据已存在{}", JSONObject.toJSONString(businessData));
+            sqlSessionTemplate.update("com.business.intelligence.updateBusinessData",businessData);
+            log.error("百度曝光入库数据已存在,进行更新{}", JSONObject.toJSONString(businessData));
         }
     }
 
