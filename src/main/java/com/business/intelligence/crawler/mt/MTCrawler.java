@@ -47,6 +47,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -90,6 +91,8 @@ public class MTCrawler extends BaseCrawler {
 
     public void login() {
         try {
+            cookieStore = new BasicCookieStore();
+            client = HttpClientUtil.getHttpClient(cookieStore);
             HttpPost loginS1 = new HttpPost(LOGIN_URL);
             loginS1.setHeader("Pragma", "no-cache");
             loginS1.setHeader("Accept", "application/json");
@@ -155,6 +158,7 @@ public class MTCrawler extends BaseCrawler {
 
                         HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
                         CookieStoreUtils.storeCookie(cookieStore, loginBean.cookieStoreName());
+                        CookieStoreUtils.storeObject(accountInfo, loginBean.cookieStoreName() + "$loginbean");
                         break;
                     }
                 }
@@ -186,17 +190,9 @@ public class MTCrawler extends BaseCrawler {
      * @param endDate
      * @param isLogin
      */
-    public void bizDataReport(String fromDate, String endDate, Boolean isLogin)  {
+    public void bizDataReport(String fromDate, String endDate, Boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            AccountInfo localaccountInfo = (AccountInfo) CookieStoreUtils.readStore(loginBean.cookieStoreName() + "$loginbean");
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-                accountInfo = localaccountInfo;
-            }
-
+            login();
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
             if (ii == 1) {
@@ -208,7 +204,7 @@ public class MTCrawler extends BaseCrawler {
             String reportJson, url = null;
             int taskId = 0;
             int status;
-            int count = 10;
+            int count = 0;
             while (count < 3) {
                 reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/report/charts/download?wmPoiIdSel=%s&fromDate=%s&toDate=%s&taskId=%s", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
                 log.info("read json is {}", reportJson);
@@ -219,7 +215,7 @@ public class MTCrawler extends BaseCrawler {
                     url = parse.read("$.data.url");
                     break;
                 }
-                TimeUnit.MINUTES.sleep(5);
+                TimeUnit.SECONDS.sleep(5);
                 count++;
             }
             if (url == null) return;
@@ -274,9 +270,6 @@ public class MTCrawler extends BaseCrawler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                bizDataReport(fromDate, endDate, true);
-            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
         if (f == 1) {
@@ -299,13 +292,7 @@ public class MTCrawler extends BaseCrawler {
     //营业数据 营业统计
     public void businessStatistics(String fromDate, String endDate, boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
-
+            login();
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_SALE);
             if (ii == 1) {
@@ -319,16 +306,17 @@ public class MTCrawler extends BaseCrawler {
             int status;
             int count = 0;
             while (count < 3) {
-                reportJson = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId));
+                String url1 = String.format("https://waimaieapp.meituan.com/bizdata/businessStatisticsV2/report/allAnalysis?wmPoiId=%s&beginTime=%s&endTime=%s&taskId=%s", accountInfo.wmPoiId, fromDate, endDate, taskId == 0 ? "" : taskId);
+                reportJson = HttpClientUtil.executeGetWithResult(client, url1);
                 log.info("read json is {}", reportJson);
                 ReadContext parse = JsonPath.parse(reportJson);
                 taskId = parse.read("$.data.taskId");
                 status = parse.read("$.data.status");
-                if (status != 0) {
+                if (status == 1) {
                     url = parse.read("$.data.url");
                     break;
                 }
-                TimeUnit.MINUTES.sleep(5);
+                TimeUnit.SECONDS.sleep(10);
                 count++;
             }
             if (url == null) return;
@@ -373,9 +361,6 @@ public class MTCrawler extends BaseCrawler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                businessStatistics(fromDate, endDate, true);
-            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_SALE);
         if (f == 1) {
@@ -389,13 +374,7 @@ public class MTCrawler extends BaseCrawler {
     //营业统计流量分析
     public void flowanalysis(String days, boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
-
+            login();
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_FLOW);
             if (ii == 1) {
@@ -424,9 +403,6 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                flowanalysis(days, true);
-            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_FLOW);
         if (f == 1) {
@@ -440,12 +416,7 @@ public class MTCrawler extends BaseCrawler {
     //营业分析热门商品
     public void hotSales(String fromDate, String endDate, boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
+            login();
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_GOODS_SALE);
@@ -454,7 +425,6 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
-
 
             try (CloseableHttpResponse execute = client.execute(new HttpGet(String.format("https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=%s&endDate=%s&type=count", fromDate, endDate)))) {
                 Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
@@ -481,9 +451,6 @@ public class MTCrawler extends BaseCrawler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                hotSales(fromDate, endDate, true);
-            }
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_GOODS_SALE);
         if (f == 1) {
@@ -498,12 +465,8 @@ public class MTCrawler extends BaseCrawler {
     //http://e.waimai.meituan.com/v2/customer/getCommentList?wmPoiId=2843062&acctId=27578629&token=0a2TJcERKArTCsg5YO2qsWVv3JoRgTnEUynbbnU4_olc*&rate=-1&reply=-1&context=-1&startDate=2017-07-07&endDate=2017-08-06&pageNum=1
     public void comment(String fromDate, String endDate, boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
+
+            login();
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_CRAWLER_EVALUATE);
@@ -551,9 +514,6 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                comment(fromDate, endDate, true);
-            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_EVALUATE);
@@ -568,12 +528,9 @@ public class MTCrawler extends BaseCrawler {
     //财务管理
     public void historySettleBillList(String fromDate, String endDate, boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
+
+            login();
+
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_ORDER_CHECKING);
@@ -657,9 +614,6 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                historySettleBillList(fromDate, endDate, true);
-            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_ORDER_CHECKING);
@@ -675,12 +629,9 @@ public class MTCrawler extends BaseCrawler {
     //活动管理
     public void acts(boolean isLogin) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(loginBean.cookieStoreName());
-            if (localCookie == null || isLogin) {
-                login();
-            } else {
-                cookieStore = localCookie;
-            }
+
+            login();
+
 
             //更新爬取状态为进行中
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_SALE_ACTIVITY);
@@ -770,9 +721,6 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            if (!isLogin) {
-                acts(true);
-            }
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_SALE_ACTIVITY);
@@ -864,7 +812,7 @@ public class MTCrawler extends BaseCrawler {
     }
 
     @Data
-    static class AccountInfo {
+    static class AccountInfo implements Serializable {
         private String cityId;
         private Integer wmPoiId;
         private Integer acctId;

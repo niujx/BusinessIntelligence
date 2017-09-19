@@ -13,6 +13,7 @@ import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.util.ApplicationContextTestUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +50,8 @@ public class CrawlerTasks {
     @Scheduled(cron = "0 30 13 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
-        Date startDate = new Date();
-        Date endDate = DateUtils.addDays(new Date(), -30);
+        Date endDate = new Date();
+        Date startDate = DateUtils.addDays(new Date(), -30);
 
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
@@ -64,7 +65,7 @@ public class CrawlerTasks {
             mtCrawler.setLoginBean(loginBean);
             mtCrawler.login();
             mtCrawler.bizDataReport(startTime, endTime, false);
-            mtCrawler.businessStatistics(st, et, false);
+            mtCrawler.businessStatistics(st, et, true);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
             mtCrawler.acts(false);
@@ -100,6 +101,7 @@ public class CrawlerTasks {
             Authenticate authenticate = new Authenticate();
             authenticate.setUserName(user.getUserName());
             authenticate.setPassword(user.getPassWord());
+            authenticate.setMerchantId(user.getMerchantId());
             list.add(authenticate);
         }
         log.info("所有美团商户信息已经加载完成");
