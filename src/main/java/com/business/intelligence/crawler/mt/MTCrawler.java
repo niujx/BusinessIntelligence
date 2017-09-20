@@ -76,6 +76,7 @@ public class MTCrawler extends BaseCrawler {
     private int retry = 0;
 
     public MTCrawler() {
+        log.info("mt creawler init .....");
         client = HttpClientUtil.getHttpClient(cookieStore);
     }
 
@@ -340,7 +341,7 @@ public class MTCrawler extends BaseCrawler {
                         Sheet sheet = hssfWorkbook.getSheetAt(0);
 
                         if (sheet == null) {
-                            TimeUnit.MINUTES.sleep(5);
+                            TimeUnit.SECONDS.sleep(5);
                             log.info("sleep...");
                             continue;
                         }
@@ -575,7 +576,7 @@ public class MTCrawler extends BaseCrawler {
                     Workbook workbook = WorkbookFactory.create(execute.getEntity().getContent());
                     Sheet sheet = workbook.getSheetAt(0);
                     if (sheet == null) {
-                        TimeUnit.MINUTES.sleep(5);
+                        TimeUnit.SECONDS.sleep(5);
                         log.info("sleep...");
                         count++;
                         continue;

@@ -9,6 +9,7 @@ import com.business.intelligence.dao.UserDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.Platform;
 import com.business.intelligence.model.User;
+import com.business.intelligence.util.ApplicationUtils;
 import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -33,8 +34,6 @@ public class CrawlerTasks {
     @Autowired
     private UserDao userdao;
 
-    @Autowired
-    private MTCrawler mtCrawler;
 
     @Autowired
     private WaimaiCrawler bdCrawler;
@@ -62,9 +61,10 @@ public class CrawlerTasks {
         for (Authenticate authenticate : authenticates) {
             MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
             loginBean.setAuthenticate(authenticate);
+            MTCrawler mtCrawler = ApplicationUtils.getBean(MTCrawler.class);
             mtCrawler.setLoginBean(loginBean);
             mtCrawler.login(true);
-          //  mtCrawler.bizDataReport(startTime, endTime, false);
+            mtCrawler.bizDataReport(startTime, endTime, false);
             mtCrawler.businessStatistics(st, et, false);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
