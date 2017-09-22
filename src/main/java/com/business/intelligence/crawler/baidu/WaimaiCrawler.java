@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableAsync
+//@EnableAsync
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WaimaiCrawler {
