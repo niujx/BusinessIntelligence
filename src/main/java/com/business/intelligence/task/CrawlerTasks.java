@@ -9,10 +9,12 @@ import com.business.intelligence.dao.UserDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.Platform;
 import com.business.intelligence.model.User;
+import com.business.intelligence.util.ApplicationUtils;
 import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.util.ApplicationContextTestUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +34,6 @@ public class CrawlerTasks {
     @Autowired
     private UserDao userdao;
 
-    @Autowired
-    private MTCrawler mtCrawler;
 
     @Autowired
     private WaimaiCrawler bdCrawler;
@@ -49,8 +49,8 @@ public class CrawlerTasks {
     @Scheduled(cron = "0 30 13 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
-        Date startDate = new Date();
-        Date endDate = DateUtils.addDays(new Date(), -30);
+        Date endDate = new Date();
+        Date startDate = DateUtils.addDays(new Date(), -30);
 
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
@@ -61,13 +61,14 @@ public class CrawlerTasks {
         for (Authenticate authenticate : authenticates) {
             MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
             loginBean.setAuthenticate(authenticate);
+            MTCrawler mtCrawler = ApplicationUtils.getBean(MTCrawler.class);
             mtCrawler.setLoginBean(loginBean);
-            mtCrawler.login();
-            mtCrawler.bizDataReport(startTime, endTime, false);
+            mtCrawler.login(true);
             mtCrawler.bizDataReport(startTime, endTime, false);
             mtCrawler.businessStatistics(st, et, false);
             mtCrawler.flowanalysis("30", false);
             mtCrawler.hotSales(startTime, endTime, false);
+            mtCrawler.acts(false);
             mtCrawler.comment(startTime, endTime, false);
             mtCrawler.historySettleBillList(startTime, endTime, false);
         }
@@ -82,10 +83,13 @@ public class CrawlerTasks {
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
         for (User u : users) {
-            log.info("百度当前执行商户{}", JSONObject.toJSONString(u));
-            bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
-            bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+            if (u.getType().equals("1")) {
+                log.info("百度当前执行商户{}", JSONObject.toJSONString(u));
+                bdApi.ouderListGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+                bdApi.commentGet(u.getSource(), u.getSecret(), u.getShopId(), u.getMerchantId(), startTime, endTime);
+            } else {
+                bdCrawler.logins(u.getUserName(), u.getPassWord(), startTime, endTime, u.getMerchantId());
+            }
         }
     }
 
@@ -97,6 +101,7 @@ public class CrawlerTasks {
             Authenticate authenticate = new Authenticate();
             authenticate.setUserName(user.getUserName());
             authenticate.setPassword(user.getPassWord());
+            authenticate.setMerchantId(user.getMerchantId());
             list.add(authenticate);
         }
         log.info("所有美团商户信息已经加载完成");

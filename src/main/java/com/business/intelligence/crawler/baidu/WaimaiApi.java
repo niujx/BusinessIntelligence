@@ -123,11 +123,11 @@ public class WaimaiApi {
             post.addHeader("Content-Type", "application/x-www-form-urlencoded");
             try {
                 String content = HttpClientUtil.executePostWithResult(client, post);
+                logger.info("获取百度上行订单列表{}", content);
                 if (content.contains("order_id")) {
                     JSONObject json = JSONObject.parseObject(content);
                     JSONObject body = json.getJSONObject("body").getJSONObject("data");
                     JSONArray array = body.getJSONArray("list");
-                    logger.info("获取百度上行订单列表{}", content);
                     if (array.size() > 0) {
                         allList.addAll(array.toJavaList(OrderUpList.class));
                     }
@@ -184,7 +184,7 @@ public class WaimaiApi {
         List<String> s = new ArrayList<>();
         params.keySet().stream().sorted().forEach(k -> s.add(k + "=" + params.get(k)));
         String join = StringUtils.join(s, "&");
-        logger.info("join============>" + join);
+//        logger.info("join============>" + join);
         String sign = getMD5(chinaToUnicode(join.replace("/", "\\/")));
         params.put("sign", sign);
         HttpPost post = HttpClientUtil.post("http://api.waimai.baidu.com/", params);

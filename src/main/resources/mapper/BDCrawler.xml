@@ -35,6 +35,15 @@
         #{creatTime,jdbcType=DATE}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
 
+    <insert id="updateBusinessData" keyProperty="id" parameterType="BusinessData">
+        update "HYF"."BIL_BD_BUSINESS_DATA"
+        set VISITING_RS=#{visitingRs,jdbcType=INTEGER}, VISITING_CS=#{visitingCs,jdbcType=INTEGER},
+        VISITING_PER=#{visitingPer,jdbcType=DOUBLE},
+        EXPOSURE_RS=#{exposureRs,jdbcType=INTEGER},EXPOSURE_CS=#{exposureCs,jdbcType=INTEGER},
+        ORDER_AMOUNT=#{orderAmount,jdbcType=INTEGER}, ORDER_CONVERT=#{orderConvert,jdbcType=DOUBLE},
+        SHOP_RANKING=#{shopRanking,jdbcType=DOUBLE}, UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP} where ID=#{id,jdbcType=VARCHAR}
+    </insert>
+
     <insert id="insertShopWthdrawal" keyProperty="id" parameterType="ShopWthdrawal">
         Insert into "HYF"."BIL_BD_SHOP_WITHDRAWAL"
         (ID,BILL_DATE,ACCOUNT_DATE,SERIAL_NUMBER,TURN_SERIAL_NUMBER,ACCOUNT_TYPE,AMOUNT,ACCOUNT_BALANCE,FREEZE_AMOUNT,SUM_FREEZE_AMOUNT,PAYMENT_ACCOUNT,PAYMENT_NAME,PAYMENT_STATUS,NOTE,APPLICATION_DATE,SHOP_ID,UPDATE_TIME,CREAT_TIME)

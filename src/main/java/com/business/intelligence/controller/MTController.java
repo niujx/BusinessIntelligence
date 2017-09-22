@@ -78,7 +78,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.bizDataReport(startTime, endTime, false);
             }
         } else {
@@ -87,7 +87,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.bizDataReport(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -108,7 +108,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.businessStatistics(startTime, endTime, false);
             }
         } else {
@@ -117,7 +117,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.businessStatistics(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -136,7 +136,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.flowanalysis("30", false);
             }
         } else {
@@ -145,7 +145,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.flowanalysis("30", false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -164,7 +164,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.hotSales(startTime, endTime, false);
             }
         } else {
@@ -173,7 +173,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.hotSales(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -191,7 +191,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.comment(startTime, endTime, false);
             }
         } else {
@@ -200,7 +200,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.comment(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -219,7 +219,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.historySettleBillList(startTime, endTime, false);
             }
         } else {
@@ -228,7 +228,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.historySettleBillList(startTime, endTime, false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);
@@ -246,7 +246,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.acts(false);
             }
         } else {
@@ -255,7 +255,7 @@ public class MTController {
                 MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
                 loginBean.setAuthenticate(authenticate);
                 mtCrawler.setLoginBean(loginBean);
-                mtCrawler.login();
+                mtCrawler.login(true);
                 mtCrawler.acts(false);
             } else {
                 log.info("没有找到 {} 用户的信息", userName);

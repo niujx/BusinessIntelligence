@@ -3,6 +3,7 @@ package com.business.intelligence.crawler;
 import com.business.intelligence.BaseTest;
 import com.business.intelligence.crawler.mt.MTCrawler;
 import com.business.intelligence.model.Authenticate;
+import com.business.intelligence.task.CrawlerTasks;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ public class MtCrawlerTest extends BaseTest {
 
     @Autowired
     private MTCrawler crawler;
+    @Autowired
+    private CrawlerTasks crawlerTasks;
 
 
     @Test
@@ -23,20 +26,20 @@ public class MtCrawlerTest extends BaseTest {
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.bizDataReport("2017-07-20", "2017-08-07", true);
+        crawler.bizDataReport("2017-07-2", "2017-08-07", true);
     }
 
-    //wmxsty11599   2017/7/15   2017/8/15
+    //wmxsty11599   2017/7/15   2017/8/15  wmmswM418379 7597739
     @Test
     public void testBusiness() throws InterruptedException {
         Authenticate authenticate = new Authenticate();
-        authenticate.setUserName("wmxsty11599");
-        authenticate.setPassword("0315758");
+        authenticate.setUserName("wmONEd46480");
+        authenticate.setPassword("RHpXW72879");
         authenticate.setMerchantId("TEST-ID");
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.businessStatistics("20170715", "20170815", false);
+        crawler.businessStatistics("20170820", "20170919", false);
     }
 
     @Test
@@ -98,6 +101,15 @@ public class MtCrawlerTest extends BaseTest {
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
         crawler.acts(true);
+    }
+
+    @Test
+    public void taskScheduled(){
+        try {
+            crawlerTasks.runAllMtCrawler();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

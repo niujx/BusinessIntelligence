@@ -64,6 +64,8 @@ public class WaimaiCrawler {
 
     private CookieStore cookieStore = new BasicCookieStore();
 
+    private int index = 0;
+
     /**
      * 商户id
      */
@@ -123,6 +125,13 @@ public class WaimaiCrawler {
                     loadBills(start, end);
                     setCookieStores(userName, passWord);
                 }
+            } else {
+                index++;
+                if (index == 5) {
+                    log.info("重试次数达到5次，退出" + userName + " 商户的登录操作；返回内容：" + content);
+                    return content;
+                }
+                return logins(userName, passWord, start, end, shopId);
             }
 
         } catch (IOException e) {
@@ -350,7 +359,7 @@ public class WaimaiCrawler {
                                         map.put(rowKey, true);
                                     }
                                 }
-                                if (!map.containsValue(false) && map.size() > 0) {
+                                if (map.containsValue(true) && map.size() > 0) {
                                     //当map中不存在值为false时，说明全部下载完毕
                                     map.clear();
                                     flag = true;
@@ -359,6 +368,11 @@ public class WaimaiCrawler {
 
                             }
 
+                        }
+                        try {
+                            Thread.sleep(30000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -383,29 +397,33 @@ public class WaimaiCrawler {
             CloseableHttpResponse response = client.execute(dwd);
             Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "UTF-8");
             CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
-            switch (name) {
-                case "热销菜品导出":
-                    List<HotDishes> hotList = Parser.hotParser(csvRecords, shopId);
-                    for (HotDishes hot : hotList) {
-                        bdDao.insertHotDishes(hot);
-                    }
-                    break;
-                case "所有现金账户流水明细导出":
-                    List<BookedTable> btList = Parser.btParser(csvRecords, shopId);
-                    for (BookedTable bt : btList) {
-                        bdDao.insertBookedTable(bt);
-                    }
-                    break;
-                case "自动提现账户页面导出":
-                    List<ShopWthdrawal> swList = Parser.swParser(csvRecords, shopId);
-                    for (ShopWthdrawal sw : swList) {
-                        bdDao.insertShopWthdrawal(sw);
-                    }
-                    break;
-                default:
-                    break;
+            try {
+                switch (name) {
+                    case "热销菜品导出":
+                        List<HotDishes> hotList = Parser.hotParser(csvRecords, shopId);
+                        for (HotDishes hot : hotList) {
+                            bdDao.insertHotDishes(hot);
+                        }
+                        break;
+                    case "所有现金账户流水明细导出":
+                        List<BookedTable> btList = Parser.btParser(csvRecords, shopId);
+                        for (BookedTable bt : btList) {
+                            bdDao.insertBookedTable(bt);
+                        }
+                        break;
+                    case "自动提现账户页面导出":
+                        List<ShopWthdrawal> swList = Parser.swParser(csvRecords, shopId);
+                        for (ShopWthdrawal sw : swList) {
+                            bdDao.insertShopWthdrawal(sw);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                log.info("入库成功{}", name);
+            } catch (Exception e) {
+                log.error(name + " 入库出险异常，请检查数据库连接是否正常。", e);
             }
-            log.info("入库成功{}", name);
         } catch (Exception e) {
             log.error("下载 【{0}】 csv失败", name, e);
         }
