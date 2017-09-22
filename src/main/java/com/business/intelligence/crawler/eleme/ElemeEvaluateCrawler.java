@@ -9,6 +9,7 @@ import com.business.intelligence.model.ElemeModel.ElemeBill;
 import com.business.intelligence.model.ElemeModel.ElemeEvaluate;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.WebUtils;
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
@@ -63,11 +64,13 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         if(client != null){
             log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
             String evaluateText = getEvaluateText(client);
-            List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
-            List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
-            List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
-            for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
-                elemeDao.insertEvaluate(elemeEvaluate);
+            if(evaluateText != null){
+                List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
+                List<LinkedHashMap<String, Object>> foodList = getFoodList(evaluateText);
+                List<ElemeEvaluate> elemeEvaluateBeans = getElemeEvaluateBeans(orderList, foodList);
+                for (ElemeEvaluate elemeEvaluate : elemeEvaluateBeans){
+                    elemeDao.insertEvaluate(elemeEvaluate);
+                }
             }
             log.info("用户名为 {} 的顾客评价已入库完毕",username);
         }
@@ -115,9 +118,11 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             result = EntityUtils.toString(entity, "UTF-8");
             log.info("result is {}",result);
             return result;
-        } catch (IOException e) {
+        } catch (IOException e ) {
             e.printStackTrace();
-        }finally {
+        } catch (PathNotFoundException e2){
+            log.info("count is 0");
+        } finally {
             try {
                 if (execute != null){
                     execute.close();
@@ -128,7 +133,6 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
         return null;
     }
