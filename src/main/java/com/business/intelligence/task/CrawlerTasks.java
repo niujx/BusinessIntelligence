@@ -49,7 +49,7 @@ public class CrawlerTasks {
     @Scheduled(cron = "0 30 13 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
-        Date endDate = new Date();
+        Date endDate = DateUtils.addDays(new Date(),-1);
         Date startDate = DateUtils.addDays(new Date(), -30);
 
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
