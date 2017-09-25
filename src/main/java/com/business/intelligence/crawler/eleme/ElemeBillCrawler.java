@@ -108,7 +108,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
             log.info("{} 爬取账单的 token 是 {}",username,token);
             long beginTime = crawlerDate.getTime();
             long endTime = endCrawlerDate.getTime();
-            String limit = String.valueOf((endTime-beginTime)/1000/60/60/24);
+            String limit = String.valueOf((endTime-beginTime)/1000/60/60/24+1);
             //利用得到的token进行get请求
             Map<String,String> params = new HashMap<>();
             params.put("beginDate",String.valueOf(beginTime));
