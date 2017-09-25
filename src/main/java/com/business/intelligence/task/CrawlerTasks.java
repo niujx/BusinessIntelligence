@@ -14,7 +14,6 @@ import com.business.intelligence.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.util.ApplicationContextTestUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +48,8 @@ public class CrawlerTasks {
     @Scheduled(cron = "0 30 13 * * *")
     public void runAllMtCrawler() throws InterruptedException {
         List<Authenticate> authenticates = getAllUser();
-        Date endDate = DateUtils.addDays(new Date(),-1);
-        Date startDate = DateUtils.addDays(new Date(), -30);
+        Date endDate = DateUtils.addDays(new Date(), -1);
+        Date startDate = DateUtils.addDays(new Date(), -1);
 
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");

@@ -239,7 +239,6 @@ public class MTCrawler extends BaseCrawler {
                     log.info("load bizData size is {}", csvRecords.getCurrentLineNumber());
                     for (CSVRecord record : csvRecords) {
                         log.info("length is {}", record.size());
-                        int i = 0;
                         MTOrder order = new MTOrder();
                         order.setAppNo(record.get(0));
                         order.setOrderTime(toDate(record.get(1)));
@@ -575,7 +574,7 @@ public class MTCrawler extends BaseCrawler {
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
                     Workbook workbook = WorkbookFactory.create(execute.getEntity().getContent());
                     Sheet sheet = workbook.getSheetAt(0);
-                    if (sheet == null) {
+                    if (sheet == null || !sheet.getSheetName().equals("订单明细")) {
                         TimeUnit.SECONDS.sleep(5);
                         log.info("sleep...");
                         count++;

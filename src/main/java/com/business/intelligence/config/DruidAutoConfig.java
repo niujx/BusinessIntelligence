@@ -24,7 +24,7 @@ public class DruidAutoConfig {
         druidDataSource.setUsername(properties.getUsername());
         druidDataSource.setPassword(properties.getPassword());
         druidDataSource.setDriverClassName(properties.getDriverClassName());
-        druidDataSource.setMaxActive(20);
+        druidDataSource.setMaxActive(100);
         druidDataSource.setInitialSize(5);
         druidDataSource.setMinIdle(5);
         druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
