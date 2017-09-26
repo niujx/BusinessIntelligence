@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Encoder;
 
@@ -66,6 +65,8 @@ public class WaimaiCrawler {
 
     private int index = 0;
 
+    private String DAY = DateUtils.formatDate(new Date(), "yyyy-MM-dd");
+
     /**
      * 商户id
      */
@@ -91,7 +92,7 @@ public class WaimaiCrawler {
         this.shopId = shopId;
         boolean tag = getCookiestores(userName, passWord, start, end);
         if (tag) {
-            return "{errno:0000,errmsg:抓取进行中,data:null}";
+            return "{errno:0000,errmsg:抓取已完成,data:null}";
         }
         getToken();
         String loginUrl = "https://wmpass.baidu.com/api/login";
@@ -370,7 +371,7 @@ public class WaimaiCrawler {
 
                         }
                         try {
-                            Thread.sleep(30000);
+                            Thread.sleep(10000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -494,7 +495,7 @@ public class WaimaiCrawler {
      */
     private void setCookieStores(String userName, String pwd) {
         log.info("存储本地cookie{}", userName);
-        CookieStoreUtils.storeCookie(cookieStore, MD5.md5(userName + "_" + pwd) + ".cookies");
+        CookieStoreUtils.storeCookie(cookieStore, DAY + "_" + MD5.md5(userName + "_" + pwd) + ".cookies");
         client = HttpClientUtil.getHttpClient(new BasicCookieStore());
     }
 
@@ -510,7 +511,8 @@ public class WaimaiCrawler {
      */
     private boolean getCookiestores(String userName, String pwd, String start, String end) {
         try {
-            CookieStore localCookie = CookieStoreUtils.readStore(MD5.md5(userName + "_" + pwd) + ".cookies");
+
+            CookieStore localCookie = CookieStoreUtils.readStore(DAY + "_" + MD5.md5(userName + "_" + pwd) + ".cookies");
             if (localCookie == null) {
                 return false;
             } else {
