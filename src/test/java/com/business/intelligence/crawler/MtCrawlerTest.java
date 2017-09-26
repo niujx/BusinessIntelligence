@@ -43,7 +43,7 @@ public class MtCrawlerTest extends BaseTest {
     }
 
     @Test
-    public void insertAnalysis(){
+    public void insertAnalysis() {
         Authenticate authenticate = new Authenticate();
         authenticate.setUserName("wmONEd46480");
         authenticate.setPassword("RHpXW72879");
@@ -55,7 +55,7 @@ public class MtCrawlerTest extends BaseTest {
     }
 
     @Test
-    public void hotSales(){
+    public void hotSales() {
         Authenticate authenticate = new Authenticate();
         authenticate.setUserName("wmONEd46480");
         authenticate.setPassword("RHpXW72879");
@@ -63,24 +63,24 @@ public class MtCrawlerTest extends BaseTest {
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.hotSales("2017-07-31","2017-08-06",true);
+        crawler.hotSales("2017-07-31", "2017-08-06", true);
     }
 
     @Test
-    public void comment(){
+    public void comment() {
         Authenticate authenticate = new Authenticate();
-        authenticate.setUserName("wmONEd46480");
-        authenticate.setPassword("RHpXW72879");
+        authenticate.setUserName("xsxl6");
+        authenticate.setPassword("xiashi");
         authenticate.setMerchantId("TEST-ID");
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.comment("2017-08-01", "2017-08-06", true);
+        crawler.comment("2017-09-23", "2017-09-24", true);
     }
 
 
     @Test
-    public void bill(){
+    public void bill() {
         Authenticate authenticate = new Authenticate();
         authenticate.setUserName("wmxsty11599");
         authenticate.setPassword("0315758");
@@ -92,7 +92,7 @@ public class MtCrawlerTest extends BaseTest {
     }
 
     @Test
-    public void acts(){
+    public void acts() {
         Authenticate authenticate = new Authenticate();
         authenticate.setUserName("wmONEd46480");
         authenticate.setPassword("RHpXW72879");
@@ -104,12 +104,8 @@ public class MtCrawlerTest extends BaseTest {
     }
 
     @Test
-    public void taskScheduled(){
-        try {
-            crawlerTasks.runAllMtCrawler();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void taskScheduled() {
+        crawlerTasks.runAllMtCrawler();
     }
 
 }
