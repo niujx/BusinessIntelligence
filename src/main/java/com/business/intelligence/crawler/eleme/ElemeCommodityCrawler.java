@@ -64,6 +64,9 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         if(client != null){
             log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
             List<LinkedHashMap<String, Object>> commodityText = getCommodityText(client);
+            if(commodityText.size()>=0){
+                log.info("用户名为 {} 的登录服务器异常，请稍后再试",username);
+            }
             List<ElemeCommodity> elemeCommodityBeans = getElemeCommodityBeans(commodityText);
             for(ElemeCommodity elemeCommodity : elemeCommodityBeans){
                 elemeDao.insertCommodity(elemeCommodity);
@@ -97,6 +100,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         post.setEntity(jsonEntity);
         setElemeHeader(post);
         post.setHeader("X-Eleme-RequestID", "35d39394-86eb-4951-9ef5-493b8d265f64");
+        List<LinkedHashMap<String, Object>> mapsByJsonPath = new ArrayList<>();
         try {
             execute = client.execute(post);
             HttpEntity entity = execute.getEntity();
@@ -110,7 +114,10 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
             entity = execute.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
             log.info("result is {}",result);
-            List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.foodSalesDetails");
+            if(result.contains("服务器错误,请稍后重试")){
+                return mapsByJsonPath;
+            }
+            mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result.foodSalesDetails");
             return mapsByJsonPath;
         } catch (IOException e) {
             e.printStackTrace();
