@@ -197,7 +197,7 @@ public class WaimaiCrawler {
             log.info("曝光数据下载成功");
             try {
 //                List<String> list = CSVFileUtil.importCsv(target);
-                Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "UTF-8");
+                Reader reader = new InputStreamReader(new BOMInputStream(response.getEntity().getContent()), "GBK");
                 CSVParser csvRecords = new CSVParser(reader, CSVFormat.EXCEL.withHeader());
                 List<BusinessData> bdList = Parser.bdParser(csvRecords, shopId);
                 for (BusinessData bd : bdList) {
