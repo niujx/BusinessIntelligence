@@ -252,6 +252,7 @@ public class WaimaiCrawler {
     private void dowAllcashtradelist(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm/settlement/balanceaccounttpl");
+            //https://wmcrm.baidu.com/crm/settlement/exportallcashtradelist?begin_time=2017-09-21&end_time=2017-09-28&platform=crm&display=json
             HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/settlement/exportallcashtradelist?begin_time=" + startTime + "&end_time=" + endTime + "&display=json");
             dwd.addHeader("Accept", "application/json, text/javascript, */*; q=0.01");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
@@ -287,9 +288,11 @@ public class WaimaiCrawler {
     private void dowWthdrawlist(String startTime, String endTime) {
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=getstaterecordlist");
+            //https://wmcrm.baidu.com/crm/settlement/exportwithdrawlist?trade_begin_time=2017-09-21&trade_end_time=2017-09-28&display=json
             HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm/settlement/exportwithdrawlist?trade_begin_time=" + startTime + "&trade_end_time=" + endTime + "&display=json");
             dwd.addHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             dwd.addHeader("accept-encoding", "gzip, deflate, br");
+            dwd.addHeader("x-requested-with", "XMLHttpRequest");
             CloseableHttpResponse response = client.execute(dwd);
             try {
                 HttpEntity entity = response.getEntity();
