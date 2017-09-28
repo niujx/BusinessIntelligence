@@ -98,22 +98,22 @@ public class Parser {
                 ShopWthdrawal sw = new ShopWthdrawal();
                 sw.setBillDate(record.get(0).trim());
                 sw.setAccountDate(record.get(1).trim());
-                sw.setSerialNumber(record.get(2).trim());
-                sw.setTurnSerialNumber(record.get(3).trim());
-                sw.setAccountType(record.get(4).trim());
-                sw.setAmount(Double.valueOf(record.get(5).trim()));
-                sw.setAccountBalance(Double.valueOf(record.get(6).trim()));
-                sw.setFreezeAmount(Double.valueOf(record.get(7).trim()));
-                sw.setSumFreezeAmount(Double.valueOf(record.get(8).trim()));
-                sw.setPaymentAccount(record.get(9).trim());
-                sw.setPaymentName(record.get(10).trim());
-                sw.setPaymentStatus(record.get(11).trim());
-                sw.setNote(record.get(12).trim());
-                sw.setApplicationDate(record.get(13).trim());
+                sw.setSerialNumber("");//去除交易流水号
+                sw.setTurnSerialNumber(record.get(2).trim());
+                sw.setAccountType(record.get(3).trim());
+                sw.setAmount(Double.valueOf(record.get(4).trim()));
+                sw.setAccountBalance(Double.valueOf(record.get(5).trim()));
+                sw.setFreezeAmount(Double.valueOf(record.get(6).toString()=="" ? record.get(7).toString():"0"));
+                sw.setSumFreezeAmount(Double.valueOf(record.get(7).toString()=="" ? record.get(8).toString():"0"));
+                sw.setPaymentAccount(record.get(8).trim());
+                sw.setPaymentName(record.get(9).trim());
+                sw.setPaymentStatus(record.get(10).trim());
+                sw.setNote(record.get(11).trim());
+                sw.setApplicationDate(record.get(12).toString());
                 sw.setShopId(shopId);
                 sw.setCreatTime(new Date());
                 sw.setUpdateTime(new Date());
-                String id = MD5.md5(shopId + "_" + record.get(0).trim() + "_" + record.get(2).trim());//商户id+账单日期+交易流水号MD5后生成主键id
+                String id = MD5.md5(shopId + "_" + record.get(1).trim());//商户id+账务时间MD5后生成主键id
                 sw.setId(id);
                 swList.add(sw);
             }
