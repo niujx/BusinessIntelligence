@@ -82,13 +82,13 @@ public class MtCrawlerTest extends BaseTest {
     @Test
     public void bill() {
         Authenticate authenticate = new Authenticate();
-        authenticate.setUserName("wmxsty11599");
-        authenticate.setPassword("0315758");
+        authenticate.setUserName("wmjgzs1201776");
+        authenticate.setPassword("13552175136");
         authenticate.setMerchantId("TEST-ID");
         MTCrawler.LoginBean loginBean = new MTCrawler.LoginBean();
         loginBean.setAuthenticate(authenticate);
         crawler.setLoginBean(loginBean);
-        crawler.historySettleBillList("2017-08-01", "2017-08-30", true);
+        crawler.historySettleBillList("2017-10-10", "2017-10-10", true);
     }
 
     @Test

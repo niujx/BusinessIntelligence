@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -556,7 +557,6 @@ public class MTCrawler extends BaseCrawler {
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
             int code = parse.read("$.code");
-            String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
             if (code == 2005) {
                 log.info("not found taskNo is {}", json);
                 String exportUrls = HttpClientUtil.executeGetWithResult(client, "https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/settleBillExportList?pageNo=1&pageSize=10");
@@ -567,11 +567,14 @@ public class MTCrawler extends BaseCrawler {
                 String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
                 url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download/meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             }
+            https:
+//waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-10-11-1317988.xls
             log.info("excel url is {}", url);
             int count = 0;
             while (count < 3) {
 
                 try (CloseableHttpResponse execute = client.execute(new HttpGet(url))) {
+                    if (execute.getStatusLine().getStatusCode() != HttpStatus.SC_OK) continue;
                     Workbook workbook = WorkbookFactory.create(execute.getEntity().getContent());
                     Sheet sheet = workbook.getSheetAt(0);
                     if (sheet == null || !sheet.getSheetName().equals("订单明细")) {
@@ -618,6 +621,8 @@ public class MTCrawler extends BaseCrawler {
 
                     }
 
+                } catch (Exception e) {
+                    continue;
                 }
                 break;
             }
