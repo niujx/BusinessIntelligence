@@ -101,10 +101,10 @@ public class Parser {
                 sw.setSerialNumber("");//去除交易流水号
                 sw.setTurnSerialNumber(record.get(2).trim());
                 sw.setAccountType(record.get(3).trim());
-                sw.setAmount(Double.valueOf(record.get(4).trim()));
-                sw.setAccountBalance(Double.valueOf(record.get(5).trim()));
-                sw.setFreezeAmount(Double.valueOf(record.get(6).toString()=="" ? record.get(7).toString():"0"));
-                sw.setSumFreezeAmount(Double.valueOf(record.get(7).toString()=="" ? record.get(8).toString():"0"));
+                sw.setAmount(Double.valueOf(record.get(4).trim().toString()=="" ? record.get(4).toString():"0"));
+                sw.setAccountBalance(Double.valueOf(record.get(5).trim().toString()=="" ? record.get(5).toString():"0"));
+                sw.setFreezeAmount(Double.valueOf(record.get(6).toString()=="" ? record.get(6).toString():"0"));
+                sw.setSumFreezeAmount(Double.valueOf(record.get(7).toString()=="" ? record.get(7).toString():"0"));
                 sw.setPaymentAccount(record.get(8).trim());
                 sw.setPaymentName(record.get(9).trim());
                 sw.setPaymentStatus(record.get(10).trim());
