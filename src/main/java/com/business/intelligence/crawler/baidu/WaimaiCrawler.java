@@ -319,6 +319,7 @@ public class WaimaiCrawler {
     public void getExporthistory(String name) {
         boolean flag = false;
         String now = DateUtils.formatDate(new Date(), "yyyy-MM-dd");//记录当前日期，用于下载判断
+        Map<String, Boolean> map = new HashMap<String, Boolean>();
         while (!flag) {
             String url = "https://wmcrm.baidu.com/crm?qt=exporthistory";
             if (name.equals("热销菜品导出")) {
@@ -327,7 +328,6 @@ public class WaimaiCrawler {
             }
             try {
                 String content = HttpClientUtil.executeGetWithResult(client, url);
-                Map<String, Boolean> map = new HashMap<String, Boolean>();
                 if (content.contains("content")) {
                     String contentList = Extracter.matchFirst(content.replace(" ", "").replaceAll("\n", ""), "content\":(.*),shop_user:");
                     if (contentList.contains("download_url")) {
@@ -346,30 +346,40 @@ public class WaimaiCrawler {
                             }
                             String create_time = j.getString("create_time");//导出时间
                             String update_time = j.getString("update_time");//
-                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time) && StringUtils.isNotEmpty(update_time)) {
-                                StringBuilder key = new StringBuilder(name).append("_").append(create_time).append("_").append(update_time);
+
+                            if (StringUtils.isNotEmpty(dow) && StringUtils.isNotEmpty(create_time)) {
+                                StringBuilder key = new StringBuilder(name).append("_").append(create_time);
                                 String rowKey = MD5.md5(key.toString());
-                                String day = update_time.substring(0, 10);
+                                String day = create_time.substring(0, 10);
                                 //下载日期是今天并且map没有该rowkey时，说明是第一次下载，初始化map，并赋值false
                                 if (day.equals(now) && map.get(rowKey) == null) {
                                     map.put(rowKey, false);
                                 }
-                                if (day.equals(now) && map.size() > 0) {
-                                    //当map中有值时，并且下载链接不为空、value为false时进行下载
-                                    log.info(rowKey + "===================" + tName + "===================" + map.get(rowKey));
-                                    if (StringUtils.isNotEmpty(dow) && map.get(rowKey) == false && name.equals(tName)) {
-                                        log.info("开始下载、解析、入库{}", name);
-                                        dowCsv(name, dow);
-                                        map.put(rowKey, true);
-                                    }
-                                }
-                                if (map.containsValue(true) && map.size() > 0) {
+                                if (!map.containsValue(false) && map.size() > 0) {
                                     //当map中不存在值为false时，说明全部下载完毕
                                     map.clear();
                                     flag = true;
                                     break;
                                 }
+                                if (day.equals(now) && map.size() > 0) {
+                                    //当map中有值时，并且下载链接不为空、value为false时进行下载
+                                    log.info(rowKey + "===================" + tName + "===================" + map.get(rowKey));
 
+//                                    if (StringUtils.isNotEmpty(dow) && map.get(rowKey) == false && name.equals(tName) && StringUtils.isNotEmpty(update_time)) {
+                                    if (!map.get(rowKey) && StringUtils.isNotEmpty(update_time)) {
+                                        log.info("开始下载、解析、入库{}", name);
+                                        dowCsv(name, dow);
+                                        map.put(rowKey, true);
+                                    }
+                                }
+
+                            } else {
+                                if (!map.containsValue(false) && map.size() > 0) {
+                                    //当map中不存在值为false时，说明全部下载完毕
+                                    map.clear();
+                                    flag = true;
+                                    break;
+                                }
                             }
 
                         }
