@@ -22,6 +22,7 @@ public class BDDao {
      */
     public void insertHotDishes(HotDishes hotDishes) {
         try {
+            log.info("百度热销菜品入库数据{}", JSONObject.toJSONString(hotDishes));
             sqlSessionTemplate.insert("com.business.intelligence.insertHotDishes", hotDishes);
         } catch (Exception e) {
             log.error("百度热销菜品入库数据已存在{}", JSONObject.toJSONString(hotDishes));
@@ -35,6 +36,7 @@ public class BDDao {
      */
     public void insertBookedTable(BookedTable bookedTable) {
         try {
+            log.info("百度现金账户流水明细入库数据{}", JSONObject.toJSONString(bookedTable));
             sqlSessionTemplate.insert("com.business.intelligence.insertBookedTable", bookedTable);
         } catch (Exception e) {
             log.error("百度现金账户流水明细入库数据已存在{}", JSONObject.toJSONString(bookedTable));
@@ -48,6 +50,7 @@ public class BDDao {
      */
     public void insertBusinessData(BusinessData businessData) {
         try {
+            log.info("百度曝光入库数据{}", JSONObject.toJSONString(businessData));
             sqlSessionTemplate.insert("com.business.intelligence.insertBusinessData", businessData);
         } catch (Exception e) {
             sqlSessionTemplate.update("com.business.intelligence.updateBusinessData",businessData);
@@ -62,6 +65,7 @@ public class BDDao {
      */
     public void insertShopWthdrawal(ShopWthdrawal shopWthdrawal) {
         try {
+            log.info("百度提现账户入库数据{}", JSONObject.toJSONString(shopWthdrawal));
             sqlSessionTemplate.insert("com.business.intelligence.insertShopWthdrawal", shopWthdrawal);
         } catch (Exception e) {
             log.error("百度提现账户入库数据已存在{}", JSONObject.toJSONString(shopWthdrawal));
@@ -75,6 +79,7 @@ public class BDDao {
      */
     public void insertComment(Comment comment) {
         try {
+            log.info("百度评论入库数据{}", JSONObject.toJSONString(comment));
             sqlSessionTemplate.insert("com.business.intelligence.insertComment", comment);
         } catch (Exception e) {
             log.error("百度评论入库数据已存在{}", JSONObject.toJSONString(comment));
@@ -88,6 +93,7 @@ public class BDDao {
      */
     public void insertOrderDetails(OrderDetails orderDetails) {
         try {
+            log.info("百度订单详情入库数据{}", JSONObject.toJSONString(orderDetails));
             sqlSessionTemplate.insert("com.business.intelligence.insertOrderDetails", orderDetails);
         } catch (Exception e) {
             log.error("百度订单详情入库数据已存在{}", JSONObject.toJSONString(orderDetails));
