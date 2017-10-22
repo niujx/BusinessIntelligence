@@ -20,9 +20,9 @@ public class ElemeBill {
     private String expense;
     //本期抵扣欠款
     private String deductAmount;
-    //入账金额
-    private String dueAmount;
     //剩余欠款
+    private String dueAmount;
+    //入账金额
     private String payAmount;
     //入账日期
     private String paymentDate;
