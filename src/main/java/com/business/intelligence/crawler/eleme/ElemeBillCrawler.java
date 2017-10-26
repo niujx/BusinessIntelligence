@@ -6,9 +6,12 @@ import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
 import com.business.intelligence.model.ElemeModel.ElemeBill;
+import com.business.intelligence.model.ElemeModel.ElemeBillMessage;
+import com.business.intelligence.model.ElemeModel.ElemeMessage;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.WebUtils;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -33,7 +37,7 @@ import java.util.*;
 public class ElemeBillCrawler extends ElemeCrawler{
     //默认抓取前一天的，具体值已经在父类设置
     private Date crawlerDate = super.crawlerDate;
-    private Date endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,1);
+    private Date endCrawlerDate = crawlerDate;
     //用户信息
     private Authenticate authenticate;
     @Autowired
@@ -41,11 +45,19 @@ public class ElemeBillCrawler extends ElemeCrawler{
     @Autowired
     private CrawlerStatusDao crawlerStatusDao;
 
+
+    private static final String COUNTURL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.countOrder";
+    private static final String URL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.queryOrder";
+
+
+
+
+
     //通过post请求获得token的url
-    private static final String GETURL = "https://app-api.shop.ele.me/arena/invoke/?method=TokenService.generateToken";
+//    private static final String GETURL = "https://app-api.shop.ele.me/arena/invoke/?method=TokenService.generateToken";
     //通过token进行get请求的url
 //    private static final String URL ="https://httpizza.ele.me/hydros/bill/list";
-    private static final String URL ="https://mdc-httpizza.ele.me/walletMerchantV2/account/queryTransLog";
+//    private static final String URL ="https://mdc-httpizza.ele.me/walletMerchantV2/account/queryTransLog";
 //    //通过token获得sid
 //    private static final String KISDURL = "https://httpizza.ele.me/fe.open_auth/getSid";
 //
@@ -65,7 +77,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
         Date end = DateUtils.string2Date(endTime);
         if(start != null && end != null ){
             this.crawlerDate =start;
-            this.endCrawlerDate = org.apache.commons.lang3.time.DateUtils.addDays(end,1);
+            this.endCrawlerDate = end;
         }
         //开始爬取
         CloseableHttpClient client = getClient(elemeBean);
@@ -94,24 +106,77 @@ public class ElemeBillCrawler extends ElemeCrawler{
      * @return
      */
     public List<LinkedHashMap<String, Object>> getBillText(CloseableHttpClient client){
-        log.info("ksid is {}",ksId);
+        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
-        CloseableHttpResponse sidExecute = null;
+        HttpPost countpost = new HttpPost(COUNTURL);
+        StringEntity jsonEntity = null;
+        String date = DateUtils.date2String(org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,-1));
+        String endDate = DateUtils.date2String(endCrawlerDate);
+        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
+        jsonEntity = new StringEntity(json, "UTF-8");
+        countpost.setEntity(jsonEntity);
+        setElemeHeader(countpost);
+        countpost.setHeader("X-Eleme-RequestID","ea44935a-91db-41af-ba4f-1270055dccda");
         try {
-            //获得token
-            HttpPost post = new HttpPost(GETURL);
-            StringEntity jsonEntity = null;
-            String json = "{\"id\":\"7b898df4-ef06-40fc-a930-fcb839c63422\",\"method\":\"generateToken\",\"service\":\"TokenService\",\"params\":{\"shopId\":"+shopId+",\"appId\":\"base.rumble\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+            execute = client.execute(countpost);
+            HttpEntity entity = execute.getEntity();
+            String result = EntityUtils.toString(entity, "UTF-8");
+            Object count = WebUtils.getOneByJsonPath(result,"$.result");
+            log.info("count result is {}",count);
+            HttpPost post = new HttpPost(URL);
+            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
             jsonEntity = new StringEntity(json, "UTF-8");
             post.setEntity(jsonEntity);
             setElemeHeader(post);
-            post.setHeader("X-Eleme-RequestID", "7b898df4-ef06-40fc-a930-fcb839c63422");
+            post.setHeader("X-Eleme-RequestID", "626ffc6e-9d1b-4d16-9eea-97d8bd0e16df");
             execute = client.execute(post);
-            HttpEntity entity = execute.getEntity();
-            String result = EntityUtils.toString(entity, "UTF-8");
-            log.info("token result is {}",result);
-            String token = (String)WebUtils.getOneByJsonPath(result, "$.result");
-            log.info("{} 爬取账单的 token 是 {}",username,token);
+            entity = execute.getEntity();
+            result = EntityUtils.toString(entity,"UTF-8");
+            log.info("result is {}",result);
+            List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result");
+            return mapsByJsonPath;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if (execute != null){
+                    execute.close();
+                }
+//                if(client != null){
+//                    client.close();
+//                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
+
+
+
+
+
+
+
+
+//        log.info("ksid is {}",ksId);
+//        CloseableHttpResponse execute = null;
+//        CloseableHttpResponse sidExecute = null;
+//        try {
+//            //获得token
+//            HttpPost post = new HttpPost(GETURL);
+//            StringEntity jsonEntity = null;
+//            String json = "{\"id\":\"7b898df4-ef06-40fc-a930-fcb839c63422\",\"method\":\"generateToken\",\"service\":\"TokenService\",\"params\":{\"shopId\":"+shopId+",\"appId\":\"base.rumble\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+//            jsonEntity = new StringEntity(json, "UTF-8");
+//            post.setEntity(jsonEntity);
+//            setElemeHeader(post);
+//            post.setHeader("X-Eleme-RequestID", "7b898df4-ef06-40fc-a930-fcb839c63422");
+//            execute = client.execute(post);
+//            HttpEntity entity = execute.getEntity();
+//            String result = EntityUtils.toString(entity, "UTF-8");
+//            log.info("token result is {}",result);
+//            String token = (String)WebUtils.getOneByJsonPath(result, "$.result");
+//            log.info("{} 爬取账单的 token 是 {}",username,token);
 
 //            HttpPost somePost = new HttpPost(GETURL);
 //            StringEntity someJsonEntity = null;
@@ -166,40 +231,40 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
 
 
-            long beginTime = crawlerDate.getTime();
-            long endTime = endCrawlerDate.getTime();
-            //利用得到的token进行get请求
-            Map<String,String> params = new HashMap<>();
-            params.put("beginDate",String.valueOf(beginTime));
-            params.put("endDate",String.valueOf(endTime));
-            params.put("type","0");
-            params.put("pageIndex","1");
-            params.put("pageSize","400");
-            params.put("merchantId",shopId);
-            params.put("loginRestaurantId",shopId);
-            params.put("token",token);
-            String url2 = URL+HttpClientUtil.buildParamString(params);
-            HttpGet get = new HttpGet(url2);
-            execute = client.execute(get);
-            entity = execute.getEntity();
-            result = EntityUtils.toString(entity, "UTF-8");
-            log.info("result json is {}",result);
-            List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.accountWalletTransLog");
-            return mapsByJsonPath;
-        } catch (Exception e) {
-            log.error("io or json error");
-        }finally {
-            try {
-                if (execute != null){
-                    execute.close();
-                }
-//                if(client != null){
-//                    client.close();
+//            long beginTime = crawlerDate.getTime();
+//            long endTime = endCrawlerDate.getTime();
+//            //利用得到的token进行get请求
+//            Map<String,String> params = new HashMap<>();
+//            params.put("beginDate",String.valueOf(beginTime));
+//            params.put("endDate",String.valueOf(endTime));
+//            params.put("type","0");
+//            params.put("pageIndex","1");
+//            params.put("pageSize","400");
+//            params.put("merchantId",shopId);
+//            params.put("loginRestaurantId",shopId);
+//            params.put("token",token);
+//            String url2 = URL+HttpClientUtil.buildParamString(params);
+//            HttpGet get = new HttpGet(url2);
+//            execute = client.execute(get);
+//            entity = execute.getEntity();
+//            result = EntityUtils.toString(entity, "UTF-8");
+//            log.info("result json is {}",result);
+//            List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.accountWalletTransLog");
+//            return mapsByJsonPath;
+//        } catch (Exception e) {
+//            log.error("io or json error");
+//        }finally {
+//            try {
+//                if (execute != null){
+//                    execute.close();
 //                }
-            } catch (IOException e) {
-            }
-        }
-        return null;
+////                if(client != null){
+////                    client.close();
+////                }
+//            } catch (IOException e) {
+//            }
+//        }
+//        return null;
     }
 
 
@@ -210,21 +275,47 @@ public class ElemeBillCrawler extends ElemeCrawler{
      */
     public List<ElemeBill> getElemeBillBeans(List<LinkedHashMap<String, Object>> billList){
         List<ElemeBill> list = new ArrayList<>();
+        Map<String,ElemeBillMessage> countMap = Maps.newHashMap();
         for(LinkedHashMap<String,Object> map : billList){
-            if("收入".equals(map.getOrDefault("displayTransType","支出"))){
+            if("订单完成".equals(map.get("orderLatestStatus"))){
+                String activeTime = (String)map.getOrDefault("settledTime", "1");
+                Double i1 = (Double) map.getOrDefault("packageFee",0);
+                Double i2 =(Double) map.getOrDefault("goodsTotalWithoutPackage",0);
+                Double i3 =(Double) map.getOrDefault("deliveryFeeTotal",0);
+                Double e1 = (Double) map.getOrDefault("restaurantPart",0);
+                Double e2 =(Double) map.getOrDefault("serviceFee", 0);
+                Double p1 = (Double)map.getOrDefault("income","0");
+                activeTime = activeTime.substring(0,10);
+                ElemeBillMessage e = countMap.get(activeTime);
+                if(e == null){
+                    ElemeBillMessage elemeBillMessage = new ElemeBillMessage();
+                    elemeBillMessage.setIncome(i1+i2+i3);
+                    elemeBillMessage.setExpense(e1+e2);
+                    elemeBillMessage.setPayAmount(p1);
+                    countMap.put(activeTime,elemeBillMessage);
+                }else {
+                    e.setIncome(e.getIncome()+i1+i2+i3);
+                    e.setExpense(e.getExpense()+e1+e2);
+                    e.setPayAmount(e.getPayAmount()+p1);
+                }
+            }
+        }
+        for(String key : countMap.keySet()){
+            long time = DateUtils.string2Date(key).getTime();
+            long begin = crawlerDate.getTime();
+            long end = endCrawlerDate.getTime();
+            if(begin<=time && time<=end){
                 ElemeBill elemeBill = new ElemeBill();
-                String closingTime = (String)map.get("displayRemark");
-                closingTime = closingTime.replaceAll("账单结算入余额，已成功","");
-                elemeBill.setPri(closingTime+"~"+String.valueOf(shopId));
-                elemeBill.setClosingDate(closingTime);
-                elemeBill.setIncome("0");
-                elemeBill.setExpense("0");
+                ElemeBillMessage elemeBillMessage = countMap.get(key);
+                elemeBill.setPri(key+"~"+String.valueOf(shopId));
+                elemeBill.setClosingDate(key);
+                elemeBill.setIncome(new DecimalFormat("#.00").format(elemeBillMessage.getIncome()));
+                elemeBill.setExpense(new DecimalFormat("#.00").format(elemeBillMessage.getExpense()));
                 elemeBill.setDeductAmount("0");
                 elemeBill.setDueAmount("0");
-                elemeBill.setPayAmount(String .valueOf(NumberUtils.toLong((String)map.get("transAmount"))/1000000.0));
-                String paymentTime =(String) map.getOrDefault("transLogId","1970010100");
-                paymentTime = paymentTime.substring(0,8);
-                elemeBill.setPaymentDate(paymentTime);
+                elemeBill.setPayAmount((new DecimalFormat("#.00").format(elemeBillMessage.getPayAmount())));
+                String payMentDate = DateUtils.date2String(org.apache.commons.lang3.time.DateUtils.addDays( DateUtils.string2Date(key),3));
+                elemeBill.setPaymentDate(payMentDate);
                 elemeBill.setShopId(Long.valueOf(shopId));
                 if(merchantId != null){
                     elemeBill.setMerchantId(merchantId);
@@ -238,6 +329,13 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     @Override
     public void doRun() {
+
+    }
+
+    public static void main(String[] args) {
+        Double d = -1.2999999;
+        String format = new DecimalFormat("#.00").format(d);
+        System.out.println(format);
 
     }
 }
