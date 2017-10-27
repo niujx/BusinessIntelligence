@@ -56,6 +56,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么商店活动，URL： {} ，用户名： {}",URL,username);
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的商户活动");
             List<LinkedHashMap<String, Object>> activityText = getActivityText(client);
             List<LinkedHashMap<String, Object>> activityTextByActivated = getActivityTextByActivated(client);
             List<LinkedHashMap<String, Object>> activityTextByExpired = getActivityTextByExpired(client);
@@ -73,6 +74,7 @@ public class ElemeActivityCrawler extends ElemeCrawler {
                 elemeDao.insertActivity(elemeActivity);
             }
             log.info("用户名为 {} 的商店活动已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的商户活动");
         }
         //更新爬取状态为完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ACTIVITY);

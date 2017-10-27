@@ -2,10 +2,7 @@ package com.business.intelligence.crawler.eleme;
 
 import com.business.intelligence.crawler.BaseCrawler;
 import com.business.intelligence.model.ElemeModel.ElemeBean;
-import com.business.intelligence.util.CookieStoreUtils;
-import com.business.intelligence.util.HttpClientUtil;
-import com.business.intelligence.util.KSIDUtils;
-import com.business.intelligence.util.WebUtils;
+import com.business.intelligence.util.*;
 import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -30,6 +27,7 @@ import java.util.List;
  */
 @Slf4j
 public abstract class ElemeCrawler extends BaseCrawler{
+    protected CrawlerLogger crawlerLogger = new CrawlerLogger("饿了么");
     protected  CookieStore cookieStore = new BasicCookieStore();
     protected CloseableHttpClient client;
 
@@ -61,6 +59,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
      * 登录
      */
     protected String login() {
+        crawlerLogger.log("开始登录");
         HttpGet httpGetfirst = new HttpGet(INDEX);
 //        try {
 //            client.execute(httpGetfirst);
@@ -103,8 +102,10 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 try{
                     ksId = (String)WebUtils.getOneByJsonPath(content, "$.result.successData.ksid");
                     log.info("登陆成功");
+                    crawlerLogger.log("登录成功");
                 }catch(PathNotFoundException e){
                     log.info("登录失败，请检查用户名、密码、shopID是否正确");
+                    crawlerLogger.log("登录失败，请检查用户名、密码、shopID是否正确");
                     return null;
                 }
             }
@@ -118,11 +119,11 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 log.info("开始保存 {} 的cookie",username);
                 CookieStoreUtils.storeCookie(cookieStore,getCookieName(username,password));
             }
-        }catch (IOException e){
+        }catch (Exception e){
             e.printStackTrace();
             try {
                 client.close();
-            } catch (IOException e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }finally {
@@ -130,7 +131,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 if(httpResponse != null){
                     httpResponse.close();
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -184,6 +185,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
         this.merchantId = elemeBean.getShopPri() == null? "":elemeBean.getShopPri();
         if(username == null | password == null | shopId == null){
             log.info("用户名、密码、shopID其中有空值，程序跳过");
+            crawlerLogger.log("用户名、密码、shopID其中有空值，程序跳过");
             return null;
         }
         //导入本地ksid
@@ -196,6 +198,7 @@ public abstract class ElemeCrawler extends BaseCrawler{
 //            client = HttpClientUtil.getHttpClient(oldcookieStore);
             if(oldKsid == null ){
                 log.info("no ksid,so login");
+                crawlerLogger.log("需要进行登录");
                 String login = login();
                 if(login == null){
                     return null;
@@ -205,8 +208,10 @@ public abstract class ElemeCrawler extends BaseCrawler{
                 if(testResult == null ){
                     this.ksId = oldKsid;
                     log.info("无需登录");
+                    crawlerLogger.log("无需登录");
                 }else{
                     log.info("ksid 测试结果错误为 {},所以进行登录",testResult);
+                    crawlerLogger.log("需要进行登录");
                     login();
                 }
             }

@@ -84,12 +84,14 @@ public class ElemeBillCrawler extends ElemeCrawler{
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的账单记录");
             List<LinkedHashMap<String, Object>> billText = getBillText(client);
             List<ElemeBill> billList = getElemeBillBeans(billText);
             for(ElemeBill elemeBill : billList){
                 elemeDao.insertBill(elemeBill);
             }
             log.info("用户名为 {} 的账单记录已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的账单记录");
 
         }
         //更新爬取状态为已完成

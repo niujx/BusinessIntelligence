@@ -87,12 +87,14 @@ public class ElemeOrderCrawler extends ElemeCrawler{
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么订单，日期： {} 到 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的订单");
             ElemeMessage orderText = getOrderText(client);
             List<ElemeOrder> elemeOrderBeans = getElemeOrderBeans(orderText);
             for(ElemeOrder elemeOrder : elemeOrderBeans){
                 elemeDao.insertOrder(elemeOrder);
             }
             log.info("用户名为 {} 的订单已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的订单");
         }
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_ORDER);
