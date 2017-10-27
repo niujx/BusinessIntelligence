@@ -23,9 +23,9 @@
 
 
     <appender name="CRAWLER_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>event.log</file>
+        <file>${LOG_PATH}/event.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>event.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/event.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">

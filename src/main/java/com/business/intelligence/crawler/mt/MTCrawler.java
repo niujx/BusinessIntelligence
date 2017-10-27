@@ -179,6 +179,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 //{"status":{"code":2001,"message":"请输入图片验证码"},"loginToken":null,"needChangePassword":null,"captchaToken":"04e439ca56de48c59733412a610b151b","maskMobile":null,"continue":"http://e.waimai.meituan.com/v2/epassport/entry"}
                 //输入验证码重新登录
+                crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 自动输入验证码");
                 String token = loginJsonParser.read("$.captchaToken");
                 //https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=1503192324135&request_code=04e439ca56de48c59733412a610b151b
                 String captchaImage = "https://verify.meituan.com/v2/captcha?action=merchantlogin&timestamp=" + System.currentTimeMillis() + "&request_code=" + token;
@@ -188,6 +189,7 @@ public class MTCrawler extends BaseCrawler {
                 loginBean.setCaptchaVtoken(token);
                 loginBean.setCaptchaCode(captchaCode);
                 retry++;
+
                 if (retry < 2)
                     login(true);
             }
