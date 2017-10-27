@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -106,36 +107,49 @@ public class ElemeBillCrawler extends ElemeCrawler{
      * @return
      */
     public List<LinkedHashMap<String, Object>> getBillText(CloseableHttpClient client){
-        log.info("ksid id {}",ksId);
         CloseableHttpResponse execute = null;
-        HttpPost countpost = new HttpPost(COUNTURL);
-        StringEntity jsonEntity = null;
-        String date = DateUtils.date2String(org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,-1));
-        String endDate = DateUtils.date2String(endCrawlerDate);
-        String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
-        jsonEntity = new StringEntity(json, "UTF-8");
-        countpost.setEntity(jsonEntity);
-        setElemeHeader(countpost);
-        countpost.setHeader("X-Eleme-RequestID","ea44935a-91db-41af-ba4f-1270055dccda");
         try {
-            execute = client.execute(countpost);
-            HttpEntity entity = execute.getEntity();
-            String result = EntityUtils.toString(entity, "UTF-8");
-            Object count = WebUtils.getOneByJsonPath(result,"$.result");
-            log.info("count result is {}",count);
-            HttpPost post = new HttpPost(URL);
-            json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+date+"T00:00:00\",\"endTime\":\""+endDate+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
-            jsonEntity = new StringEntity(json, "UTF-8");
-            post.setEntity(jsonEntity);
-            setElemeHeader(post);
-            post.setHeader("X-Eleme-RequestID", "626ffc6e-9d1b-4d16-9eea-97d8bd0e16df");
-            execute = client.execute(post);
-            entity = execute.getEntity();
-            result = EntityUtils.toString(entity,"UTF-8");
-            log.info("result is {}",result);
-            List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result");
-            return mapsByJsonPath;
-        } catch (IOException e) {
+            List<LinkedHashMap<String, Object>> resultList = Lists.newArrayList();
+            log.info("ksid id {}",ksId);
+            HttpPost countpost = new HttpPost(COUNTURL);
+            StringEntity jsonEntity = null;
+            String begin;
+            String end;
+            Date b = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,-1);
+            Date e = org.apache.commons.lang3.time.DateUtils.addDays(crawlerDate,-1);
+            while(true){
+                begin = DateUtils.date2String(b);
+                end = DateUtils.date2String(e);
+                String json ="{\"id\":\"ea44935a-91db-41af-ba4f-1270055dccda\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"countOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+begin+"T00:00:00\",\"endTime\":\""+end+"T23:59:59\",\"offset\":0,\"limit\":20,\"bookingOrderType\":null}}}";
+                jsonEntity = new StringEntity(json, "UTF-8");
+                countpost.setEntity(jsonEntity);
+                setElemeHeader(countpost);
+                countpost.setHeader("X-Eleme-RequestID","ea44935a-91db-41af-ba4f-1270055dccda");
+                execute = client.execute(countpost);
+                HttpEntity entity = execute.getEntity();
+                String result = EntityUtils.toString(entity, "UTF-8");
+                Object count = WebUtils.getOneByJsonPath(result,"$.result");
+                log.info("count result is {}",count);
+                HttpPost post = new HttpPost(URL);
+                json = "{\"id\":\"626ffc6e-9d1b-4d16-9eea-97d8bd0e16df\",\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\",\"key\":\"1.0.0\"},\"ncp\":\"2.0.0\",\"service\":\"OrderService\",\"method\":\"queryOrder\",\"params\":{\"shopId\":"+shopId+",\"orderFilter\":\"ORDER_QUERY_ALL\",\"condition\":{\"page\":1,\"beginTime\":\""+begin+"T00:00:00\",\"endTime\":\""+end+"T23:59:59\",\"offset\":0,\"limit\":"+(Integer)count+",\"bookingOrderType\":null}}}";
+                jsonEntity = new StringEntity(json, "UTF-8");
+                post.setEntity(jsonEntity);
+                setElemeHeader(post);
+                post.setHeader("X-Eleme-RequestID", "626ffc6e-9d1b-4d16-9eea-97d8bd0e16df");
+                execute = client.execute(post);
+                entity = execute.getEntity();
+                result = EntityUtils.toString(entity,"UTF-8");
+                log.info("result is {}",result);
+                List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result");
+                resultList.addAll(mapsByJsonPath);
+                if(org.apache.commons.lang3.time.DateUtils.isSameDay(e,endCrawlerDate)){
+                    break;
+                }
+                b = org.apache.commons.lang3.time.DateUtils.addDays(b,1);
+                e = org.apache.commons.lang3.time.DateUtils.addDays(e,1);
+            }
+            return resultList;
+        } catch (Exception e) {
             e.printStackTrace();
         }finally {
             try {
@@ -277,24 +291,27 @@ public class ElemeBillCrawler extends ElemeCrawler{
         List<ElemeBill> list = new ArrayList<>();
         Map<String,ElemeBillMessage> countMap = Maps.newHashMap();
         for(LinkedHashMap<String,Object> map : billList){
-            if("订单完成".equals(map.get("orderLatestStatus"))){
+            if("订单完成".equals(map.get("orderLatestStatus")) || "已部分退款".equals(map.get("orderLatestStatus"))){
+//                int refund = 0;
+//                Map refundOrderTraceView =(Map) map.get("refundOrderTraceView");
+//                if(refundOrderTraceView != null){
+//                    refundOrderTraceView.get("timeLines");
+//                }
                 String activeTime = (String)map.getOrDefault("settledTime", "1");
-                Double i1 = (Double) map.getOrDefault("packageFee",0);
-                Double i2 =(Double) map.getOrDefault("goodsTotalWithoutPackage",0);
-                Double i3 =(Double) map.getOrDefault("deliveryFeeTotal",0);
                 Double e1 = (Double) map.getOrDefault("restaurantPart",0);
                 Double e2 =(Double) map.getOrDefault("serviceFee", 0);
                 Double p1 = (Double)map.getOrDefault("income","0");
+                Double i = p1-e1-e2;
                 activeTime = activeTime.substring(0,10);
                 ElemeBillMessage e = countMap.get(activeTime);
                 if(e == null){
                     ElemeBillMessage elemeBillMessage = new ElemeBillMessage();
-                    elemeBillMessage.setIncome(i1+i2+i3);
+                    elemeBillMessage.setIncome(i);
                     elemeBillMessage.setExpense(e1+e2);
                     elemeBillMessage.setPayAmount(p1);
                     countMap.put(activeTime,elemeBillMessage);
                 }else {
-                    e.setIncome(e.getIncome()+i1+i2+i3);
+                    e.setIncome(e.getIncome()+i);
                     e.setExpense(e.getExpense()+e1+e2);
                     e.setPayAmount(e.getPayAmount()+p1);
                 }
@@ -329,13 +346,6 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     @Override
     public void doRun() {
-
-    }
-
-    public static void main(String[] args) {
-        Double d = -1.2999999;
-        String format = new DecimalFormat("#.00").format(d);
-        System.out.println(format);
 
     }
 }
