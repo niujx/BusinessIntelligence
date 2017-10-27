@@ -9,10 +9,7 @@ import com.business.intelligence.dao.MTDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.CrawlerName;
 import com.business.intelligence.model.mt.*;
-import com.business.intelligence.util.CookieStoreUtils;
-import com.business.intelligence.util.HttpClientUtil;
-import com.business.intelligence.util.HttpUtil;
-import com.business.intelligence.util.MD5;
+import com.business.intelligence.util.*;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
@@ -74,6 +71,8 @@ public class MTCrawler extends BaseCrawler {
     @Autowired
     private MTDao mtDao;
 
+    private CrawlerLogger crawlerLogger = new CrawlerLogger("美团");
+
     private int retry = 0;
 
     public MTCrawler() {
@@ -94,12 +93,13 @@ public class MTCrawler extends BaseCrawler {
     public void login(boolean isLogin) {
         try {
             if (!isLogin && accountInfo != null) return;
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 登录开始");
             CookieStore localCookieStore = CookieStoreUtils.readStore(loginBean.cookieStoreName());
             if (localCookieStore != null && !localCookieStore.clearExpired(new Date())) {
                 cookieStore = localCookieStore;
                 client = HttpClientUtil.getHttpClient(cookieStore);
                 accountInfo = (AccountInfo) CookieStoreUtils.readObject(loginBean.cookieStoreName() + "$loginbean");
+                crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 登录成功");
                 return;
             }
 
@@ -171,6 +171,8 @@ public class MTCrawler extends BaseCrawler {
                         HttpClientUtil.executeGetWithResult(client, "http://e.waimai.meituan.com");
                         CookieStoreUtils.storeCookie(this.cookieStore, loginBean.cookieStoreName());
                         CookieStoreUtils.storeObject(accountInfo, loginBean.cookieStoreName() + "$loginbean");
+
+                        crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 登录成功");
                         break;
                     }
                 }
@@ -189,9 +191,10 @@ public class MTCrawler extends BaseCrawler {
                 if (retry < 2)
                     login(true);
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 登录失败 请检查账户密码是否正确，网站是否改版");
         } catch (IOException e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 登录失败 请检查账户密码是否正确，网站是否改版");
         }
     }
 
@@ -206,6 +209,7 @@ public class MTCrawler extends BaseCrawler {
         try {
             login(isLogin);
             //更新爬取状态为进行中
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取分析下载报表开始");
             int ii = crawlerStatusDao.updateStatusING(CrawlerName.MT_REPORT_FORMS);
             if (ii == 1) {
                 log.info("更新爬取状态成功");
@@ -277,10 +281,12 @@ public class MTCrawler extends BaseCrawler {
                         mtDao.insertOrder(order);
                         log.info("order info is {} ", order);
                     }
+                    crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取分析下载报表结束");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取分分析下载异常");
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_REPORT_FORMS);
         if (f == 1) {
@@ -311,6 +317,8 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
+
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业统计开始");
 
             String reportJson, url = null;
             int taskId = 0;
@@ -365,13 +373,17 @@ public class MTCrawler extends BaseCrawler {
                             }
 
                         }
+                        crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业统计结束");
+                        break;
+
                     }
+
                 }
                 count++;
-                break;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取营业统计异常");
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_SALE);
         if (f == 1) {
@@ -393,7 +405,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业统计流量分析开始");
             String json = HttpClientUtil.executeGetWithResult(client, String.format("https://waimaieapp.meituan.com/bizdata/flowanalysis/flowgeneral/r/generalInfo?recentDays=%s&wmPoiId=%s&sortType=&sortValue=", days, accountInfo.wmPoiId));
             log.info("read json is {}", json);
             ReadContext parse = JsonPath.parse(json);
@@ -411,9 +423,10 @@ public class MTCrawler extends BaseCrawler {
                 analysis.setMerchantId(loginBean.getMerchantId());
                 mtDao.insertAnalysis(analysis);
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业统计流量分析结束");
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取营业统计流量分析异常");
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_FLOW);
         if (f == 1) {
@@ -436,6 +449,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业分析热门商品开始");
 
             try (CloseableHttpResponse execute = client.execute(new HttpGet(String.format("https://waimaieapp.meituan.com/bizdata/hotSales/data/download?startDate=%s&endDate=%s&type=count", fromDate, endDate)))) {
                 Workbook hssfWorkbook = WorkbookFactory.create(execute.getEntity().getContent());
@@ -460,8 +474,10 @@ public class MTCrawler extends BaseCrawler {
                 }
 
             }
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取营业分析热门商品结束");
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版，爬取营业分析热门商品异常");
         }
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_GOODS_SALE);
         if (f == 1) {
@@ -486,7 +502,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取评价管理开始");
             int i = 1;
             while (true) {
                 String url = String.format("http://e.waimai.meituan.com/v2/customer/comment/r/list?wmPoiId=%s&acctId=%s&token=%s&rate=-1&reply=-1&context=-1&startDate=%s&endDate=%s&pageNum=%s", accountInfo.wmPoiId, accountInfo.acctId, accountInfo.accessToken, fromDate, endDate, i);
@@ -522,9 +538,10 @@ public class MTCrawler extends BaseCrawler {
                 if (i > pageCount + 1) break;
             }
 
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取评价管理结束");
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取评价管理异常");
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_CRAWLER_EVALUATE);
@@ -550,7 +567,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 log.info("更新爬取状态失败");
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取财务管理开始");
             //https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-11-1029680.xls
             String url = String.format("https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=%s&endDate=%s", fromDate, endDate);
             String json = HttpClientUtil.executeGetWithResult(client, url);
@@ -620,7 +637,7 @@ public class MTCrawler extends BaseCrawler {
                         }
 
                     }
-
+                    crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取财务管理结束");
                 } catch (Exception e) {
                     continue;
                 }
@@ -629,6 +646,7 @@ public class MTCrawler extends BaseCrawler {
 
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取财务管理异常");
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_ORDER_CHECKING);
@@ -655,6 +673,7 @@ public class MTCrawler extends BaseCrawler {
                 log.info("更新爬取状态失败");
             }
 
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取活动管理开始");
             Map<String, Object> params = Maps.newHashMap();
             params.put("wmPoiId", accountInfo.wmPoiId);
             String json = HttpClientUtil.executePostWithResult(client, "https://waimaieapp.meituan.com/reuse/activity/setting/r/listActs", params);
@@ -732,9 +751,10 @@ public class MTCrawler extends BaseCrawler {
                 }
 
             }
-
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取活动管理开始");
         } catch (Exception e) {
             e.printStackTrace();
+            crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 网站改版 爬取活动管理异常");
         }
 
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.MT_SALE_ACTIVITY);
