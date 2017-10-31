@@ -63,6 +63,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么商品分析，日期： {} 至{} ，URL： {} ，用户名： {}",DateUtils.date2String(beginCrawlerDate), DateUtils.date2String(crawlerDate),URL,username);
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的商品分析");
             List<LinkedHashMap<String, Object>> commodityText = getCommodityText(client);
             if(commodityText.size()>=0){
                 log.info("用户名为 {} 的登录服务器异常，请稍后再试",username);
@@ -72,6 +73,7 @@ public class ElemeCommodityCrawler extends ElemeCrawler{
                 elemeDao.insertCommodity(elemeCommodity);
             }
             log.info("用户名为 {} 的商品分析已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的商品分析");
         }
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_COMMODITY);

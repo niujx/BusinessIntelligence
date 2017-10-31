@@ -61,12 +61,14 @@ public class ElemeFlowCrawler extends ElemeCrawler{
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么流量排名，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的流量排名");
             List<LinkedHashMap<String, Object>> flowList = getFlowText(client);
             List<ElemeFlow> elemeFlowBeans = getElemeFlowBeans(flowList);
             for(ElemeFlow elemeFlow : elemeFlowBeans){
                 elemeDao.insertFlow(elemeFlow);
             }
             log.info("用户名为 {} 的流量排名已入库",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的流量排名");
         }
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_FLOW);

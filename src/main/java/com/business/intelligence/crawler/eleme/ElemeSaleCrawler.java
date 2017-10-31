@@ -58,12 +58,14 @@ public class ElemeSaleCrawler extends ElemeCrawler {
         CloseableHttpClient getClient = getClient(elemeBean);
         if(getClient != null){
             log.info("开始爬取饿了么经营统计，日期： {} 至 {} ，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,username);
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的经营统计");
             List<LinkedHashMap<String, Object>> saleList= getSaleText(getClient);
             List<ElemeSale> elemeSaleBeans = getElemeSaleBeans(saleList);
             for(ElemeSale elemeSale : elemeSaleBeans){
                 elemeDao.insertSale(elemeSale);
             }
             log.info("用户名为 {} 的经营统计已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的经营统计");
         }
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_SALE);
