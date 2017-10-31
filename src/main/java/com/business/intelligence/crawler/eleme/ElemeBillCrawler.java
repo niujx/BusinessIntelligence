@@ -141,7 +141,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 execute = client.execute(post);
                 entity = execute.getEntity();
                 result = EntityUtils.toString(entity,"UTF-8");
-                log.info("result is {}",result);
+//                log.info("result is {}",result);
                 List<LinkedHashMap<String, Object>> mapsByJsonPath = WebUtils.getMapsByJsonPath(result, "$.result");
                 resultList.addAll(mapsByJsonPath);
                 if(org.apache.commons.lang3.time.DateUtils.isSameDay(e,endCrawlerDate)){
@@ -152,7 +152,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
             }
             return resultList;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("饿了么服务器异常、请稍后重试：用户名： {}",username);
         }finally {
             try {
                 if (execute != null){
