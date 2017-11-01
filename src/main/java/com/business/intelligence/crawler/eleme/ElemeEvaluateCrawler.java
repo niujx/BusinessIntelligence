@@ -63,6 +63,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
         CloseableHttpClient client = getClient(elemeBean);
         if(client != null){
             log.info("开始爬取饿了么顾客评价，日期： {} 到 {} ， 最后一天不算，URL： {} ，用户名： {}",DateUtils.date2String(crawlerDate),DateUtils.date2String(endCrawlerDate),URL,username);
+            crawlerLogger.log("开始爬取饿了么用户名为"+username+"的顾客评价");
             String evaluateText = getEvaluateText(client);
             if(evaluateText != null){
                 List<LinkedHashMap<String, Object>> orderList = getOrderList(evaluateText);
@@ -73,6 +74,7 @@ public class ElemeEvaluateCrawler extends ElemeCrawler {
                 }
             }
             log.info("用户名为 {} 的顾客评价已入库完毕",username);
+            crawlerLogger.log("完成爬取饿了么用户名为"+username+"的顾客评价");
         }
         //更新爬取状态为已完成
         int f = crawlerStatusDao.updateStatusFinal(CrawlerName.ELM_CRAWLER_EVALUATE);
