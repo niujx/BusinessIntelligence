@@ -571,6 +571,8 @@ public class MTCrawler extends BaseCrawler {
             }
             crawlerLogger.log("商户账户 ["+loginBean.authenticate.getUserName()+"] 爬取财务管理开始");
             //https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-08-11-1029680.xls
+            //                          https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=2017-10-05&endDate=2017-10-13
+
             String url = String.format("https://waimaieapp.meituan.com/finance/pc/api/settleBillExport/billExportTask?beginDate=%s&endDate=%s", fromDate, endDate);
             String json = HttpClientUtil.executeGetWithResult(client, url);
             log.info("read json is {}", json);
@@ -584,7 +586,7 @@ public class MTCrawler extends BaseCrawler {
             } else {
                 int taskNo = parse.read("$.data.taskNo");
                 String format = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-                url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download/meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
+                url = String.format("https://waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-%s-%s.xls", format, taskNo);
             }
             https:
 //waimaieapp.meituan.com/finance/v2/finance/orderChecking/export/download//meituan_waimai_file_bill_export-2017-10-11-1317988.xls
@@ -612,7 +614,7 @@ public class MTCrawler extends BaseCrawler {
                             mtBill.setPayType(row.getCell(3).getStringCellValue());
                             mtBill.setAppSeq(row.getCell(4).getStringCellValue());
                             mtBill.setAppNo(row.getCell(5).getStringCellValue());
-                            mtBill.setId(accountInfo.wmPoiId + "$" + mtBill.getAppNo());
+                            mtBill.setId(accountInfo.wmPoiId + "$" + mtBill.getAppNo()+"$"+mtBill.getDesc());
                             mtBill.setOrderCreateTime(toDate(row.getCell(6).getStringCellValue()));
                             mtBill.setDoneTime(toDate(row.getCell(7).getStringCellValue()));
                             mtBill.setRefundTime(toDate(row.getCell(8).getStringCellValue()));
