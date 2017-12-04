@@ -22,6 +22,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Configuration
 //@EnableAsync
@@ -219,6 +223,27 @@ public class WaimaiCrawler {
      */
 //    @Async
     private void dowShophotsaledish(String startTime, String endTime) {
+        //先判断商户等级，当商户积分大于70时才会进行下一步
+        String gradeUrl = "https://wmcrm.baidu.com/crm?qt=grade";
+        try {
+            String gradeContent = HttpClientUtil.executeGetWithResult(client, gradeUrl);
+            Document doc = Jsoup.parse(gradeContent);
+            String str = doc.select("span[class=shopgrade-num]").first().html();
+            log.info("商户等级：" + str);
+            Pattern ptn = Pattern.compile("积分：([0-9]+)分");
+            Matcher m = ptn.matcher(str);
+            while (m.find()) {
+                String str1 = m.group(1);
+                if (StringUtils.isNotBlank(str1)) {
+                    int num = Integer.valueOf(str1);
+                    if (num < 70) {
+                        return;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.error("获取商户等级出错", e);
+        }
         try {
             HttpClientUtil.executeGet(client, "https://wmcrm.baidu.com/crm?qt=shophotsaledish");
             HttpGet dwd = HttpClientUtil.get("https://wmcrm.baidu.com/crm?qt=exportshophotsaledishtask&from=pc&start_time=" + startTime.replace("-", "") + "&end_time=" + endTime.replace("-", "") + "&orderby=xl&display=json&");
@@ -554,6 +579,19 @@ public class WaimaiCrawler {
         HttpGet httpget = new HttpGet(url);
         String path = HttpUtil.getCaptchaCodeImage(client, httpget);
         return CodeImage.Imgencode(path);
+    }
+
+    public static void main(String[] args) {
+        Document doc = Jsoup.parse("<span class=\"shopgrade-num\">积分：16分</span>");
+        String str = doc.select("span[class=shopgrade-num]").first().html();
+//        String str = element.html();
+        System.out.println(str);
+        Pattern ptn = Pattern.compile("积分：([0-9]+)分");
+        Matcher m = ptn.matcher(str);
+        while (m.find()) {
+            String str1 = m.group(1);
+            System.out.println(str1);
+        }
     }
 
 }
