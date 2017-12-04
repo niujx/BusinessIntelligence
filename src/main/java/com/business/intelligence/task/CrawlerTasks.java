@@ -74,11 +74,11 @@ public class CrawlerTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 14 * * *")
+    @Scheduled(cron = "0 30 14 * * *")
     public void runAllBdCrawler() {
         List<User> users = getAllBdUser();
-        Date startDate = new Date();
-        Date endDate = DateUtils.addDays(new Date(), -30);
+        Date endDate = DateUtils.addDays(new Date(), -1);
+        Date startDate = DateUtils.addDays(new Date(), -1);
 
         String startTime = DateFormatUtils.format(startDate, "yyyy-MM-dd");
         String endTime = DateFormatUtils.format(endDate, "yyyy-MM-dd");
