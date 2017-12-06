@@ -38,7 +38,8 @@ public class ElemeDao {
         try{
             sqlSessionTemplate.insert("com.business.intelligence.insertBill",elemeBill);
         }catch(Exception e){
-            log.error(ExceptionUtils.getStackTrace(e));
+            sqlSessionTemplate.update("com.business.intelligence.updatetBill",elemeBill);
+            log.error(elemeBill.getPri()+" 数据已存在,更新该数据。",e);
         }
     }
 
