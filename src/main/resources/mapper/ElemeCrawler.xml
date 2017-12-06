@@ -6,48 +6,64 @@
 <mapper namespace="com.business.intelligence">
     <insert id="insertEvaluate" keyProperty="id" parameterType="ElemeEvaluate">
         INSERT INTO "HYF"."BIL_ELEME_EVALUATE"
-            (ID, SHOP_ID, CRAWLER_DATE, EVA_VALUE, QUALITY, GOODS,MERCHANTID,RATING_AT,REPLIED)
+        (ID, SHOP_ID, CRAWLER_DATE, EVA_VALUE, QUALITY, GOODS,MERCHANTID,RATING_AT,REPLIED)
         VALUES
-            (#{id},#{shopId},#{crawlerDate},#{evaValue},#{quality},#{goods},#{merchantId},#{ratingAt},#{replied})
+        (#{id},#{shopId},#{crawlerDate},#{evaValue},#{quality},#{goods},#{merchantId},#{ratingAt},#{replied})
     </insert>
 
     <insert id="insertActivity" keyProperty="pri" parameterType="ElemeActivity">
         INSERT INTO "HYF"."BIL_ELEME_ACTIVITY"
-            (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION, IS_SHARE,MERCHANTID)
+        (PRI,CRAWLER_DATE,ID, SHOP_ID, BEGIN_DATE, END_DATE, NAME, STATUS, CONTENT, CREATE_TIME, DESCRIPTION,
+        IS_SHARE,MERCHANTID)
         VALUES
-            (#{pri},#{crawlerDate},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare},#{merchantId})
+        (#{pri},#{crawlerDate},#{id},#{shopId},#{beginDate},#{endDate},#{name},#{status},#{content},#{createTime},#{description},#{isShare},#{merchantId})
     </insert>
 
     <insert id="insertBill" keyProperty="pri" parameterType="ElemeBill">
         INSERT INTO "HYF"."BIL_ELEME_BILL"
-            (PRI,CLOSUBG_DATE, INCOME, EXPENSE, DEDUCT_AMOUNT, DUE_AMOUNT, PAY_AMOUNT, PAYMENT_DATE, SHOP_ID,MERCHANTID)
+        (PRI,CLOSUBG_DATE, INCOME, EXPENSE, DEDUCT_AMOUNT, DUE_AMOUNT, PAY_AMOUNT, PAYMENT_DATE, SHOP_ID,MERCHANTID)
         VALUES
-            (#{pri},#{closingDate},#{income},#{expense},#{deductAmount},#{dueAmount},#{payAmount},#{paymentDate},#{shopId},#{merchantId})
+        (#{pri},#{closingDate},#{income},#{expense},#{deductAmount},#{dueAmount},#{payAmount},#{paymentDate},#{shopId},#{merchantId})
+    </insert>
+
+    <insert id="updateBill" keyProperty="pri" parameterType="ElemeBill">
+        update "HYF"."BIL_ELEME_BILL"
+        set CLOSUBG_DATE=#{closingDate}, INCOME=#{income}, EXPENSE=#{expense}, DEDUCT_AMOUNT=#{deductAmount},
+        DUE_AMOUNT=#{dueAmount}, PAY_AMOUNT=#{payAmount}, PAYMENT_DATE=#{paymentDate},
+        SHOP_ID=#{shopId},MERCHANTID=#{merchantId}
+        where PRI = #{pri}
     </insert>
 
     <insert id="insertCommodity" keyProperty="pri" parameterType="ElemeCommodity">
         INSERT INTO "HYF"."BIL_ELEME_COMMODITY"
-            (PRI,MESSAGE_DATE, SHOP_ID, FOOD_NAME, SALES_AMOUNT, SALES_AMOUNT_RATE, SALES_VOLUME, SALES_VOLUME_RATE,MERCHANTID)
+        (PRI,MESSAGE_DATE, SHOP_ID, FOOD_NAME, SALES_AMOUNT, SALES_AMOUNT_RATE, SALES_VOLUME,
+        SALES_VOLUME_RATE,MERCHANTID)
         VALUES
-            (#{pri},#{messageDate},#{shopId},#{foodName},#{salesAmount},#{salesAmountRate},#{salesVolume},#{salesVolumeRate},#{merchantId})
+        (#{pri},#{messageDate},#{shopId},#{foodName},#{salesAmount},#{salesAmountRate},#{salesVolume},#{salesVolumeRate},#{merchantId})
     </insert>
     <insert id="insertFlow" keyProperty="FLOW_ID" parameterType="ElemeFlow">
         INSERT INTO "HYF"."BIL_ELEME_FLOW"
-            (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM,MERCHANTID)
+        (FLOW_ID, CRAWLER_DATE, SHOP_NAME, EXPOSURE_TOTAL_COUNT, VISITOR_NUM, BUYER_NUM,MERCHANTID)
         VALUES
-            (#{flowId},#{crawlerDate},#{shopName},#{exposureTotalCount},#{visitorNum},#{buyerNum},#{merchantId})
+        (#{flowId},#{crawlerDate},#{shopName},#{exposureTotalCount},#{visitorNum},#{buyerNum},#{merchantId})
     </insert>
     <insert id="insertSale" keyProperty="SALE_ID" parameterType="ElemeSale">
         INSERT INTO "HYF"."BIL_ELEME_SALE"
-            (SALE_ID, ORDER_DATE, SHOP, TOTAL_ORDER_AMOUNT, FOOD_AMOUNT, BOX_AMOUNT, DELIVER_AMOUNT, ONLINE_PAYMENT_AMOUNT, OFFLINE_PAYMENT_AMOUNT, RESTAURANT_DISCOUNT, ELEME_DISCOUNT, VALID_ORDER_COUNT, AVERAGE_PRICE, INVALID_ORDER_COUNT, LOSS_SALE_AMOUNT,MERCHANTID)
+        (SALE_ID, ORDER_DATE, SHOP, TOTAL_ORDER_AMOUNT, FOOD_AMOUNT, BOX_AMOUNT, DELIVER_AMOUNT, ONLINE_PAYMENT_AMOUNT,
+        OFFLINE_PAYMENT_AMOUNT, RESTAURANT_DISCOUNT, ELEME_DISCOUNT, VALID_ORDER_COUNT, AVERAGE_PRICE,
+        INVALID_ORDER_COUNT, LOSS_SALE_AMOUNT,MERCHANTID)
         VALUES
-          (#{saleId},#{orderDate},#{shop},#{totalOrderAmount},#{foodAmount},#{boxAmount},#{deliverAmount},#{onlinePaymentAmount},#{offlinePaymentAmount},#{restaurantDiscount},#{elemeDiscount},#{validOrderCount},#{averagePrice},#{invalidOrderCount},#{lossSaleAmount},#{merchantId})
+        (#{saleId},#{orderDate},#{shop},#{totalOrderAmount},#{foodAmount},#{boxAmount},#{deliverAmount},#{onlinePaymentAmount},#{offlinePaymentAmount},#{restaurantDiscount},#{elemeDiscount},#{validOrderCount},#{averagePrice},#{invalidOrderCount},#{lossSaleAmount},#{merchantId})
     </insert>
 
     <insert id="insertOrder" keyProperty="ORDER_ID" parameterType="ElemeOrder">
         INSERT INTO "HYF"."BIL_ELEME_ORDER"
-            (ORDER_ID, SHOP_ID, ADDRESS, CREATE_AT, ACTIVE_AT, DELIVER_FEE, DELIVER_TIME, DESCRIPTION, GROUPS, INVOICE, BOOK, ONLINE_PAID, PHONE_LIST, OPEN_ID, SHOP_NAME, DAY_SN, STATUS, REFUND_STATUS, USER_ID, TOTAL_PRICE, ORIGINAL_PRICE, CONSIGNEE, DELIVERY_GEO, DELIVERY_POI_ADDRESS, INVOICED, INCOME, SERVICE_RATE, SERVICE_FEE, HONGBAO, PACKAGE_FEE, ACTIVITY_TOTAL, SHOP_PART, ELEME_PART, DOWNGRADED, SECRET_PHONE_EXPIRE_TIME, ORDER_ACTIVITIES, INVOICE_TYPE, TAXPAYER_ID,MERCHANTID)
+        (ORDER_ID, SHOP_ID, ADDRESS, CREATE_AT, ACTIVE_AT, DELIVER_FEE, DELIVER_TIME, DESCRIPTION, GROUPS, INVOICE,
+        BOOK, ONLINE_PAID, PHONE_LIST, OPEN_ID, SHOP_NAME, DAY_SN, STATUS, REFUND_STATUS, USER_ID, TOTAL_PRICE,
+        ORIGINAL_PRICE, CONSIGNEE, DELIVERY_GEO, DELIVERY_POI_ADDRESS, INVOICED, INCOME, SERVICE_RATE, SERVICE_FEE,
+        HONGBAO, PACKAGE_FEE, ACTIVITY_TOTAL, SHOP_PART, ELEME_PART, DOWNGRADED, SECRET_PHONE_EXPIRE_TIME,
+        ORDER_ACTIVITIES, INVOICE_TYPE, TAXPAYER_ID,MERCHANTID)
         VALUES
-            (#{orderId},#{shopId},#{address},#{createdAt},#{activeAt},#{deliverFee},#{deliverTime},#{description},#{groups},#{invoice},#{book},#{onlinePaid},#{phoneList},#{openId},#{shopName},#{daySn},#{status},#{refundStatus},#{userId},#{totalPrice},#{originalPrice},#{consignee},#{deliveryGeo},#{deliveryPoiAddress},#{invoiced},#{income},#{serviceRate},#{serviceFee},#{hongbao},#{packageFee},#{activityTotal},#{shopPart},#{elemePart},#{downgraded},#{secretPhoneExpireTime},#{orderActivities},#{invoiceType},#{taxpayerId},#{merchantId})
+        (#{orderId},#{shopId},#{address},#{createdAt},#{activeAt},#{deliverFee},#{deliverTime},#{description},#{groups},#{invoice},#{book},#{onlinePaid},#{phoneList},#{openId},#{shopName},#{daySn},#{status},#{refundStatus},#{userId},#{totalPrice},#{originalPrice},#{consignee},#{deliveryGeo},#{deliveryPoiAddress},#{invoiced},#{income},#{serviceRate},#{serviceFee},#{hongbao},#{packageFee},#{activityTotal},#{shopPart},#{elemePart},#{downgraded},#{secretPhoneExpireTime},#{orderActivities},#{invoiceType},#{taxpayerId},#{merchantId})
     </insert>
 </mapper>
