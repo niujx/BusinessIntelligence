@@ -302,6 +302,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 String activeTime = (String)map.getOrDefault("settledTime", "1");
                 Double e1 = (Double) map.getOrDefault("restaurantPart",0);
                 Double e2 =(Double) map.getOrDefault("serviceFee", 0);
+                Double e3 = getFreight(map);
                 Double p1 = (Double)map.getOrDefault("income","0");
                 Double i = p1-e1-e2;
                 activeTime = activeTime.substring(0,10);
@@ -309,13 +310,13 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 if(e == null){
                     ElemeBillMessage elemeBillMessage = new ElemeBillMessage();
                     elemeBillMessage.setIncome(i);
-                    elemeBillMessage.setExpense(e1+e2);
-                    elemeBillMessage.setPayAmount(p1);
+                    elemeBillMessage.setExpense(e1+e2-e3);
+                    elemeBillMessage.setPayAmount(p1-e3);
                     countMap.put(activeTime,elemeBillMessage);
                 }else {
                     e.setIncome(e.getIncome()+i);
-                    e.setExpense(e.getExpense()+e1+e2);
-                    e.setPayAmount(e.getPayAmount()+p1);
+                    e.setExpense(e.getExpense()+e1+e2-e3);
+                    e.setPayAmount(e.getPayAmount()+p1-e3);
                 }
             }
         }
@@ -343,6 +344,32 @@ public class ElemeBillCrawler extends ElemeCrawler{
             }
         }
         return list;
+    }
+
+    public double getFreight(Map map){
+        double a =0.0;
+        double b =0.0;
+        try{
+            LinkedHashMap<String, Object> distTraceView = (LinkedHashMap<String, Object>) map.getOrDefault("distTraceView", null);
+            if(distTraceView != null){
+                LinkedHashMap<String, Object> traceView = (LinkedHashMap<String, Object>) distTraceView.getOrDefault("traceView",null);
+                if(traceView != null){
+                    LinkedHashMap<String, Object> statusDesc = (LinkedHashMap<String, Object>)traceView.getOrDefault("statusDesc",null);
+                    if(statusDesc != null){
+                        String message = (String) statusDesc.getOrDefault("message", null);
+                        if(message != null){
+                            a = Double.valueOf(message.substring(5,9));
+                            b = Double.valueOf(message.substring(14,18));
+                        }
+                    }
+                }
+            }
+
+        }catch (Exception e ){
+
+        }
+        return a+b;
+
     }
 
 
