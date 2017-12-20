@@ -4,15 +4,13 @@ import com.business.intelligence.dao.CrawlerStatusDao;
 import com.business.intelligence.dao.ElemeDao;
 import com.business.intelligence.model.Authenticate;
 import com.business.intelligence.model.CrawlerName;
-import com.business.intelligence.model.ElemeModel.ElemeBean;
-import com.business.intelligence.model.ElemeModel.ElemeBill;
-import com.business.intelligence.model.ElemeModel.ElemeBillMessage;
-import com.business.intelligence.model.ElemeModel.ElemeMessage;
+import com.business.intelligence.model.ElemeModel.*;
 import com.business.intelligence.util.DateUtils;
 import com.business.intelligence.util.HttpClientUtil;
 import com.business.intelligence.util.WebUtils;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -49,6 +47,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     private static final String COUNTURL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.countOrder";
     private static final String URL = "https://app-api.shop.ele.me/nevermore/invoke/?method=OrderService.queryOrder";
+    private static final String ALIURL="https://app-api.shop.ele.me/alchemy/invoke/?method=AlipayPullNewStatsService.getStats";
 
 
 
@@ -85,8 +84,8 @@ public class ElemeBillCrawler extends ElemeCrawler{
         if(client != null){
             log.info("开始爬取饿了么账单记录，日期： {} 到 {}，URL： {} ，用户名： {}", DateUtils.date2String(crawlerDate), DateUtils.date2String(endCrawlerDate),URL,elemeBean.getUsername());
             crawlerLogger.log("开始爬取饿了么用户名为"+username+"的账单记录");
-            List<LinkedHashMap<String, Object>> billText = getBillText(client);
-            List<ElemeBill> billList = getElemeBillBeans(billText);
+            ElemeBillPro elemeBillPro = getBillText(client);
+            List<ElemeBill> billList = getElemeBillBeans(elemeBillPro);
             for(ElemeBill elemeBill : billList){
                 elemeDao.insertBill(elemeBill);
             }
@@ -108,7 +107,7 @@ public class ElemeBillCrawler extends ElemeCrawler{
      * @param client
      * @return
      */
-    public List<LinkedHashMap<String, Object>> getBillText(CloseableHttpClient client){
+    public ElemeBillPro getBillText(CloseableHttpClient client){
         CloseableHttpResponse execute = null;
         try {
             List<LinkedHashMap<String, Object>> resultList = Lists.newArrayList();
@@ -150,7 +149,34 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 b = org.apache.commons.lang3.time.DateUtils.addDays(b,1);
                 e = org.apache.commons.lang3.time.DateUtils.addDays(e,1);
             }
-            return resultList;
+
+
+            HttpPost aliPost = new HttpPost(ALIURL);
+            String aliJson = "{\"id\":\"ab635687-99ac-4584-b604-e373eda728c0\",\"method\":\"getStats\",\"service\":\"AlipayPullNewStatsService\",\"params\":{\"shopId\":"+shopId+",\"dateType\":\"LAST_30_DAYS\"},\"metas\":{\"appName\":\"melody\",\"appVersion\":\"4.4.0\",\"ksid\":\""+ksId+"\"},\"ncp\":\"2.0.0\"}";
+            jsonEntity = new StringEntity(aliJson, "UTF-8");
+            aliPost.setEntity(jsonEntity);
+            setElemeHeader(aliPost);
+            aliPost.setHeader("X-Eleme-RequestID", "626ffc6e-9d1b-4d16-9eea-97d8bd0e16df");
+            execute = client.execute(aliPost);
+            HttpEntity aliEntity = execute.getEntity();
+            String aliResult = EntityUtils.toString(aliEntity,"UTF-8");
+            Map<String,Integer> map = Maps.newHashMap();
+            ElemeBillPro elemeBillPro = new ElemeBillPro();
+            elemeBillPro.setResultList(resultList);
+            try{
+                List<LinkedHashMap<String, Object>> aliMapList = WebUtils.getMapsByJsonPath(aliResult, "$.result.details");
+                for(LinkedHashMap<String,Object> aliMap : aliMapList){
+                    String touchDate =(String) aliMap.getOrDefault("touchDate", null);
+                    Integer orderNum =(Integer) aliMap.getOrDefault("orderNum", null);
+                    if(touchDate != null && orderNum != null){
+                        map.put(touchDate,orderNum);
+                    }
+                }
+            }catch (Exception err){
+            }finally {
+                elemeBillPro.setMap(map);
+                return elemeBillPro;
+            }
         } catch (Exception e) {
             log.error("饿了么服务器异常、请稍后重试：用户名： {}",username);
         }finally {
@@ -286,10 +312,12 @@ public class ElemeBillCrawler extends ElemeCrawler{
 
     /**
      * 获取ElemeBill实体类
-     * @param billList
+     * @param elemeBillPro
      * @return
      */
-    public List<ElemeBill> getElemeBillBeans(List<LinkedHashMap<String, Object>> billList){
+    public List<ElemeBill> getElemeBillBeans(ElemeBillPro elemeBillPro){
+        List<LinkedHashMap<String, Object>> billList = elemeBillPro.getResultList();
+        Map<String, Integer> aliMap = elemeBillPro.getMap();
         List<ElemeBill> list = new ArrayList<>();
         Map<String,ElemeBillMessage> countMap = Maps.newHashMap();
         for(LinkedHashMap<String,Object> map : billList){
@@ -320,6 +348,20 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 }
             }
         }
+        if(!aliMap.isEmpty()){
+            for(String str : countMap.keySet()){
+                Date date = DateUtils.string2Date(str);
+                date = org.apache.commons.lang3.time.DateUtils.addDays(date,2);
+                String str2 = DateUtils.date2String(date);
+                if(aliMap.keySet().contains(str2)){
+                    ElemeBillMessage elemeBillMessage = countMap.get(str);
+                    elemeBillMessage.setPayAmount(elemeBillMessage.getPayAmount()-5.0*aliMap.get(str2));
+                    elemeBillMessage.setExpense(elemeBillMessage.getExpense()-5.0*aliMap.get(str2));
+                }
+            }
+        }
+
+
         for(String key : countMap.keySet()){
             long time = DateUtils.string2Date(key).getTime();
             long begin = crawlerDate.getTime();
