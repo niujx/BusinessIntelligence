@@ -161,19 +161,22 @@ public class ElemeBillCrawler extends ElemeCrawler{
             HttpEntity aliEntity = execute.getEntity();
             String aliResult = EntityUtils.toString(aliEntity,"UTF-8");
             Map<String,Integer> map = Maps.newHashMap();
-            List<LinkedHashMap<String, Object>> aliMapList = WebUtils.getMapsByJsonPath(aliResult, "$.result.details");
-            for(LinkedHashMap<String,Object> aliMap : aliMapList){
-                String touchDate =(String) aliMap.getOrDefault("touchDate", null);
-                Integer orderNum =(Integer) aliMap.getOrDefault("orderNum", null);
-                if(touchDate != null && orderNum != null){
-                    map.put(touchDate,orderNum);
-                }
-            }
-
             ElemeBillPro elemeBillPro = new ElemeBillPro();
-            elemeBillPro.setMap(map);
             elemeBillPro.setResultList(resultList);
-            return elemeBillPro;
+            try{
+                List<LinkedHashMap<String, Object>> aliMapList = WebUtils.getMapsByJsonPath(aliResult, "$.result.details");
+                for(LinkedHashMap<String,Object> aliMap : aliMapList){
+                    String touchDate =(String) aliMap.getOrDefault("touchDate", null);
+                    Integer orderNum =(Integer) aliMap.getOrDefault("orderNum", null);
+                    if(touchDate != null && orderNum != null){
+                        map.put(touchDate,orderNum);
+                    }
+                }
+            }catch (Exception err){
+            }finally {
+                elemeBillPro.setMap(map);
+                return elemeBillPro;
+            }
         } catch (Exception e) {
             log.error("饿了么服务器异常、请稍后重试：用户名： {}",username);
         }finally {
@@ -345,14 +348,16 @@ public class ElemeBillCrawler extends ElemeCrawler{
                 }
             }
         }
-        for(String str : countMap.keySet()){
-            Date date = DateUtils.string2Date(str);
-            date = org.apache.commons.lang3.time.DateUtils.addDays(date,2);
-            String str2 = DateUtils.date2String(date);
-            if(aliMap.keySet().contains(str2)){
-                ElemeBillMessage elemeBillMessage = countMap.get(str);
-                elemeBillMessage.setPayAmount(elemeBillMessage.getPayAmount()-5.0*aliMap.get(str2));
-                elemeBillMessage.setExpense(elemeBillMessage.getExpense()-5.0*aliMap.get(str2));
+        if(!aliMap.isEmpty()){
+            for(String str : countMap.keySet()){
+                Date date = DateUtils.string2Date(str);
+                date = org.apache.commons.lang3.time.DateUtils.addDays(date,2);
+                String str2 = DateUtils.date2String(date);
+                if(aliMap.keySet().contains(str2)){
+                    ElemeBillMessage elemeBillMessage = countMap.get(str);
+                    elemeBillMessage.setPayAmount(elemeBillMessage.getPayAmount()-5.0*aliMap.get(str2));
+                    elemeBillMessage.setExpense(elemeBillMessage.getExpense()-5.0*aliMap.get(str2));
+                }
             }
         }
 
